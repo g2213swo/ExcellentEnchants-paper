@@ -29,14 +29,14 @@ public class V1_17_R1 implements EnchantNMS {
 
     @Override
     public void addEnchantmentEffect(@NotNull LivingEntity entity, @NotNull Enchantment enchant, @NotNull PotionEffect effect) {
-        net.minecraft.world.entity.LivingEntity entity1 = ((CraftLivingEntity)entity).getHandle();
+        net.minecraft.world.entity.LivingEntity entity1 = ((CraftLivingEntity) entity).getHandle();
         entity1.addEffect(new CustomEffectInstance(MobEffect.byId(effect.getType().getId()), effect.getAmplifier(), enchant), EntityPotionEffectEvent.Cause.PLUGIN);
     }
 
     @Override
     @Nullable
     public Enchantment getEnchantmentByEffect(@NotNull LivingEntity entity, @NotNull PotionEffect type) {
-        net.minecraft.world.entity.LivingEntity entity1 = ((CraftLivingEntity)entity).getHandle();
+        net.minecraft.world.entity.LivingEntity entity1 = ((CraftLivingEntity) entity).getHandle();
         MobEffectInstance handle = entity1.getEffect(MobEffect.byId(type.getType().getId()));
         if (handle instanceof CustomEffectInstance instance) {
             return instance.getEnchantment();
@@ -56,7 +56,7 @@ public class V1_17_R1 implements EnchantNMS {
         BlockPos.MutableBlockPos posAbove = new BlockPos.MutableBlockPos();
 
         Set<Block> blocks = new HashSet<>();
-        for (BlockPos posNear : BlockPos.betweenClosed(pos.b(-radius, -1.0, -radius), pos.b(radius, -1.0, radius))) {
+        for (BlockPos posNear : BlockPos.betweenClosed(pos.offset(-radius, -1.0, -radius), pos.offset(radius, -1.0, radius))) {
             if (!posNear.closerThan(entity.position(), radius)) continue;
 
             posAbove.set(posNear.getX(), posNear.getY() + 1, posNear.getZ());
@@ -70,7 +70,7 @@ public class V1_17_R1 implements EnchantNMS {
             if (!bStone.canSurvive(world, posNear)) continue;
             if (!world.isUnobstructed(bStone, posNear, CollisionContext.empty())) continue;
             if (!CraftEventFactory.handleBlockFormEvent(world, posNear, bStone, entity)) continue;
-            //world.scheduleTick(posNear, Blocks.STONE, Rnd.get(60, 120));
+            // world.scheduleTick(posNear, Blocks.STONE, Rnd.get(60, 120));
 
             Location bukkitLoc = new Location(world.getWorld(), posNear.getX(), posNear.getY(), posNear.getZ());
             blocks.add(bukkitLoc.getBlock());
