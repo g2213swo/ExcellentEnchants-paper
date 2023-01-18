@@ -399,9 +399,13 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
             .append(ComponentUtil.asComponent(this.getDisplayName()))
             .color(this.getTier().getColor());
 
-        return level == 1
-            ? builder.asComponent()
-            : builder.appendSpace().append(Component.text(NumberUtil.toRoman(level))).asComponent();
+        final Component displayName;
+        if (level == 1 && levelMax == 1) {
+            displayName = builder.asComponent();
+        } else {
+            displayName = builder.appendSpace().append(Component.text(NumberUtil.toRoman(level))).asComponent();
+        }
+        return displayName.compact();
     }
 
     @Override
