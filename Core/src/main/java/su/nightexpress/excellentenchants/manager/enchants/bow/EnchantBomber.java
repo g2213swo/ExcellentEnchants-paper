@@ -48,9 +48,9 @@ public class EnchantBomber extends IEnchantChanceTemplate implements BowEnchant 
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_FUSE_TICKS, NumberUtil.format((double) this.getFuseTicks(level) / 20D))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_FUSE_TICKS, NumberUtil.format((double) this.getFuseTicks(level) / 20D));
     }
 
     public int getFuseTicks(int level) {
@@ -65,16 +65,21 @@ public class EnchantBomber extends IEnchantChanceTemplate implements BowEnchant 
 
     @Override
     public boolean use(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isEnchantmentAvailable(shooter)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!(e.getProjectile() instanceof Projectile projectile)) return false;
-        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!this.isEnchantmentAvailable(shooter))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!(e.getProjectile() instanceof Projectile projectile))
+            return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter))
+            return false;
 
         TNTPrimed primed = projectile.getWorld().spawn(projectile.getLocation(), TNTPrimed.class);
         primed.setVelocity(projectile.getVelocity().multiply(e.getForce() * 1.25));
         primed.setFuseTicks(this.getFuseTicks(level));
         primed.setSource(shooter);
         e.setProjectile(primed);
+
         return true;
     }
 

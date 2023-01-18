@@ -12,7 +12,7 @@ Tier: legendary
 # You can use multiple lines here.
 # You can use 'Enchantment' placeholders: http://77.222.60.131:8080/plugin/excellentenchants/utils/placeholders
 Description:
-- '%enchantment_trigger_chance%% chance to obtain &fMob Spawner&8.'
+- '%enchantment_trigger_chance%% chance to obtain <white>Mob Spawner<dark_gray>.'
 # List of the conflicting enchantments.
 # Conflicted enchantments can not be applied together on the same item.
 Conflicts:
@@ -105,4 +105,4 @@ Settings:
   # Spawner item settings.
   Spawner_Item:
     # Spawner display name. Use '%type%' for entity type name.
-    Name: '&aMob Spawner &7(%type%)'
+    Name: '<green>Mob Spawner <gray>(%type%)'

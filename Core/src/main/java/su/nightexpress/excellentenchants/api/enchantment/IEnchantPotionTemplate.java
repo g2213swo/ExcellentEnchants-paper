@@ -17,18 +17,20 @@ import java.util.function.UnaryOperator;
 
 public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
 
-    public static final String PLACEHOLDER_POTION_LEVEL    = "%enchantment_potion_level%";
+    public static final String PLACEHOLDER_POTION_LEVEL = "%enchantment_potion_level%";
     public static final String PLACEHOLDER_POTION_DURATION = "%enchantment_potion_duration%";
-    public static final String PLACEHOLDER_POTION_TYPE     = "%enchantment_potion_type%";
+    public static final String PLACEHOLDER_POTION_TYPE = "%enchantment_potion_type%";
 
-    protected       PotionEffectType potionEffectType;
-    protected final boolean          potionParticles;
-    protected       Scaler           potionDuration;
-    protected       Scaler           potionLevel;
+    protected PotionEffectType potionEffectType;
+    protected final boolean potionParticles;
+    protected Scaler potionDuration;
+    protected Scaler potionLevel;
 
-    public IEnchantPotionTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg,
-                                  @NotNull EnchantPriority priority,
-                                  @NotNull PotionEffectType potionEffectType) {
+    public IEnchantPotionTemplate(
+        @NotNull ExcellentEnchants plugin,
+        @NotNull JYML cfg,
+        @NotNull EnchantPriority priority,
+        @NotNull PotionEffectType potionEffectType) {
         super(plugin, cfg, priority);
         this.potionEffectType = potionEffectType;
         this.potionParticles = !(this instanceof PassiveEnchant);
@@ -44,11 +46,11 @@ public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
+        return str -> str
+            .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_POTION_LEVEL, NumberUtil.toRoman(this.getEffectLevel(level)))
             .replace(PLACEHOLDER_POTION_DURATION, NumberUtil.format((double) this.getEffectDuration(level) / 20D))
-            .replace(PLACEHOLDER_POTION_TYPE, LangManager.getPotionType(this.getEffectType()))
-        );
+            .replace(PLACEHOLDER_POTION_TYPE, LangManager.getPotionType(this.getEffectType()));
     }
 
     @NotNull
@@ -81,8 +83,7 @@ public abstract class IEnchantPotionTemplate extends IEnchantChanceTemplate {
             if (!this.hasEffect(target)) {
                 this.plugin.getEnchantNMS().addEnchantmentEffect(target, this, this.getEffect(level));
             }
-        }
-        else {
+        } else {
             target.addPotionEffect(this.getEffect(level));
         }
         return true;

@@ -18,9 +18,9 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
-import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
@@ -31,7 +31,7 @@ import su.nightexpress.excellentenchants.manager.type.FitItemType;
 
 public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockBreakEnchant, CustomDropEnchant {
 
-    public static final String  ID          = "divine_touch";
+    public static final String ID = "divine_touch";
     private static final String META_HANDLE = ID + "_handle";
 
     private String particleName;
@@ -47,7 +47,7 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
         super.loadConfig();
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.VILLAGER_HAPPY.name());
         this.particleData = cfg.getString("Settings.Particle.Data", "");
-        this.spawnerName = StringUtil.color(cfg.getString("Settings.Spawner_Item.Name", "&aMob Spawner &7(%type%)"));
+        this.spawnerName = cfg.getString("Settings.Spawner_Item.Name", "<green>Mob Spawner <gray>(%type%)");
     }
 
     @Override
@@ -72,7 +72,7 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
     }
 
     @NotNull
-    public ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
+    private ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
         ItemStack itemSpawner = new ItemStack(Material.SPAWNER);
         BlockStateMeta stateItem = (BlockStateMeta) itemSpawner.getItemMeta();
         if (stateItem == null) return itemSpawner;
@@ -81,7 +81,7 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
         spawnerItem.setSpawnedType(spawnerBlock.getSpawnedType());
         spawnerItem.update(true);
         stateItem.setBlockState(spawnerItem);
-        stateItem.setDisplayName(this.spawnerName.replace("%type%", plugin.getLangManager().getEnum(spawnerBlock.getSpawnedType())));
+        stateItem.displayName(ComponentUtil.asComponent(this.spawnerName.replace("%type%", plugin.getLangManager().getEnum(spawnerBlock.getSpawnedType()))));
         itemSpawner.setItemMeta(stateItem);
 
         return itemSpawner;
@@ -92,10 +92,12 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
         BlockDropItemEvent parent = e.getParent();
         BlockState state = parent.getBlockState();
         Block block = state.getBlock();
-        if (!block.hasMetadata(META_HANDLE)) return;
-        if (!(state instanceof CreatureSpawner spawnerBlock)) return;
+        if (!block.hasMetadata(META_HANDLE))
+            return;
+        if (!(state instanceof CreatureSpawner spawnerBlock))
+            return;
 
-        e.getDrop().add(this.getSpawner(spawnerBlock));
+        e.getDrops().add(this.getSpawner(spawnerBlock));
 
         Location location = LocationUtil.getCenter(block.getLocation());
         EffectUtil.playEffect(location, this.particleName, this.particleData, 0.3f, 0.3f, 0.3f, 0.15f, 30);
@@ -105,10 +107,14 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         Block block = e.getBlock();
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (!(block.getState() instanceof CreatureSpawner spawnerBlock)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (!(block.getState() instanceof CreatureSpawner))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         e.setExpToDrop(0);
         e.setDropItems(true);
@@ -120,11 +126,13 @@ public class EnchantDivineTouch extends IEnchantChanceTemplate implements BlockB
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawnerPlace(BlockPlaceEvent e) {
         Block block = e.getBlock();
-        if (block.getType() != Material.SPAWNER) return;
+        if (block.getType() != Material.SPAWNER)
+            return;
 
         Player player = e.getPlayer();
         ItemStack spawner = player.getInventory().getItem(e.getHand());
-        if (spawner == null || spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta)) return;
+        if (spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta))
+            return;
 
         CreatureSpawner spawnerItem = (CreatureSpawner) meta.getBlockState();
         CreatureSpawner spawnerBlock = (CreatureSpawner) block.getState();

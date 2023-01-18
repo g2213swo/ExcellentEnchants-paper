@@ -19,7 +19,12 @@ public class EnchantRage extends IEnchantCombatPotionTemplate {
     }
 
     @Override
-    public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean use(
+        @NotNull EntityDamageByEntityEvent e,
+        @NotNull LivingEntity damager,
+        @NotNull LivingEntity victim,
+        @NotNull ItemStack weapon,
+        int level) {
         return super.use(e, damager, damager, weapon, level);
     }
 }

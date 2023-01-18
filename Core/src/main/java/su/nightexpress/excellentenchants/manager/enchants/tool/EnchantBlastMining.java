@@ -75,9 +75,9 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionPower(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionPower(level)));
     }
 
     @Override
@@ -94,17 +94,23 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
 
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isEnchantmentAvailable(player)) return false;
-
-        if (EnchantRegister.VEINMINER != null && EnchantManager.hasEnchantment(item, EnchantRegister.VEINMINER)) return false;
-        if (EnchantRegister.TUNNEL != null && EnchantManager.hasEnchantment(item, EnchantRegister.TUNNEL)) return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (EnchantRegister.VEINMINER != null && EnchantManager.hasEnchantment(item, EnchantRegister.VEINMINER))
+            return false;
+        if (EnchantRegister.TUNNEL != null && EnchantManager.hasEnchantment(item, EnchantRegister.TUNNEL))
+            return false;
 
         Block block = e.getBlock();
-        if (block.hasMetadata(META_EXPLOSION_MINED)) return false;
+        if (block.hasMetadata(META_EXPLOSION_MINED))
+            return false;
 
-        if (!this.isBlockHardEnough(block, level)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.isBlockHardEnough(block, level))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         float power = (float) this.getExplosionPower(level);
 
@@ -113,14 +119,17 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
         boolean exploded = block.getWorld().createExplosion(block.getLocation(), power, false, true, player);
         HookNCP.unexemptBlocks(player);
         player.removeMetadata(META_EXPLOSION_SOURCE, plugin);
+
         return exploded;
     }
-
     // Process explosion event to mine blocks.
+
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlastExplosionEvent(EntityExplodeEvent e) {
-        if (!(e.getEntity() instanceof Player player)) return;
-        if (!player.hasMetadata(META_EXPLOSION_SOURCE)) return;
+        if (!(e.getEntity() instanceof Player player))
+            return;
+        if (!player.hasMetadata(META_EXPLOSION_SOURCE))
+            return;
 
         int level = player.getMetadata(META_EXPLOSION_SOURCE).get(0).asInt();
         List<Block> blockList = e.blockList();
@@ -143,8 +152,10 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
     // Do not damage around entities by en enchantment explosion.
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlastExplosionDamage(EntityDamageByEntityEvent e) {
-        if (e.getCause() != DamageCause.ENTITY_EXPLOSION) return;
-        if (!(e.getDamager() instanceof Player player)) return;
+        if (e.getCause() != DamageCause.ENTITY_EXPLOSION)
+            return;
+        if (!(e.getDamager() instanceof Player player))
+            return;
 
         e.setCancelled(player.hasMetadata(META_EXPLOSION_SOURCE));
     }
@@ -152,8 +163,10 @@ public class EnchantBlastMining extends IEnchantChanceTemplate implements BlockB
     // Do not reduce item durability for 'exploded' blocks.
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlastExplosionItemDamage(PlayerItemDamageEvent e) {
-        if (!e.getPlayer().hasMetadata(META_EXPLOSION_SOURCE)) return;
+        if (!e.getPlayer().hasMetadata(META_EXPLOSION_SOURCE))
+            return;
 
         e.setCancelled(true);
     }
+
 }

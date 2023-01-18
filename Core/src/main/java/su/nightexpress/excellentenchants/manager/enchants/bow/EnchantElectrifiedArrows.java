@@ -25,7 +25,8 @@ public class EnchantElectrifiedArrows extends IEnchantBowTemplate {
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!super.use(e, damager, victim, weapon, level)) return false;
+        if (!super.use(e, damager, victim, weapon, level))
+            return false;
 
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             victim.setNoDamageTicks(0);
@@ -37,8 +38,10 @@ public class EnchantElectrifiedArrows extends IEnchantBowTemplate {
 
     @Override
     public boolean use(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
-        if (!super.use(e, projectile, bow, level)) return false;
-        if (e.getHitEntity() != null || e.getHitBlock() == null) return false;
+        if (!super.use(e, projectile, bow, level))
+            return false;
+        if (e.getHitEntity() != null || e.getHitBlock() == null)
+            return false;
 
         Block block = e.getHitBlock();
         block.getWorld().strikeLightning(block.getLocation());

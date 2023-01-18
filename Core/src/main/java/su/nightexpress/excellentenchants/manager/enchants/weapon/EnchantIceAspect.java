@@ -19,8 +19,14 @@ public class EnchantIceAspect extends IEnchantCombatPotionTemplate {
     }
 
     @Override
-    public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!super.use(e, damager, victim, weapon, level)) return false;
+    public boolean use(
+        @NotNull EntityDamageByEntityEvent e,
+        @NotNull LivingEntity damager,
+        @NotNull LivingEntity victim,
+        @NotNull ItemStack weapon,
+        int level) {
+        if (!super.use(e, damager, victim, weapon, level))
+            return false;
 
         victim.setFreezeTicks(victim.getMaxFreezeTicks());
         return true;

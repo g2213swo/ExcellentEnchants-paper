@@ -98,4 +98,4 @@ Settings:
     # Placeholders:
     # - %name% - Item material name.
     # - %items% - Amount of items in chest.
-    Name: '&f%name% &7(%items% items)'
+    Name: '<white>%name% <gray>(%items% items)'

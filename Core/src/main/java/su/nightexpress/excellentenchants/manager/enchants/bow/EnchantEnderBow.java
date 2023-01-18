@@ -32,10 +32,14 @@ public class EnchantEnderBow extends IEnchantChanceTemplate implements BowEnchan
 
     @Override
     public boolean use(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isEnchantmentAvailable(shooter)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!(e.getProjectile() instanceof Projectile projectile)) return false;
-        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!this.isEnchantmentAvailable(shooter))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!(e.getProjectile() instanceof Projectile projectile))
+            return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter))
+            return false;
 
         EnderPearl pearl = shooter.launchProjectile(EnderPearl.class);
         pearl.setVelocity(projectile.getVelocity());

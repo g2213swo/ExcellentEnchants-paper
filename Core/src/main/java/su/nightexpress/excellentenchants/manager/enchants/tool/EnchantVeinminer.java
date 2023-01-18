@@ -33,14 +33,14 @@ import java.util.stream.Stream;
 
 public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBreakEnchant {
 
-    private Scaler        blocksLimit;
+    private Scaler blocksLimit;
     private Set<Material> blocksAffected;
 
-    public static final  String      ID                = "veinminer";
+    public static final String ID = "veinminer";
 
-    private static final BlockFace[] AREA                    = {BlockFace.UP, BlockFace.DOWN, BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH};
-    private static final String      META_BLOCK_VEINED = ID + "_block_veined";
-    private static final String      PLACEHOLDER_BLOCK_LIMIT = "%enchantment_block_limit%";
+    private static final BlockFace[] AREA = {BlockFace.UP, BlockFace.DOWN, BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH, BlockFace.NORTH};
+    private static final String META_BLOCK_VEINED = ID + "_block_veined";
+    private static final String PLACEHOLDER_BLOCK_LIMIT = "%enchantment_block_limit%";
 
     public EnchantVeinminer(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.HIGH);
@@ -50,8 +50,11 @@ public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBre
     public void loadConfig() {
         super.loadConfig();
         this.blocksLimit = new EnchantScaler(this, "Settings.Blocks.Max_At_Once");
-        this.blocksAffected = cfg.getStringSet("Settings.Blocks.Affected").stream()
-            .map(type -> Material.getMaterial(type.toUpperCase())).filter(Objects::nonNull).collect(Collectors.toSet());
+        this.blocksAffected = cfg.getStringSet("Settings.Blocks.Affected")
+            .stream()
+            .map(type -> Material.getMaterial(type.toUpperCase()))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
     }
 
     @NotNull
@@ -66,9 +69,9 @@ public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBre
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_BLOCK_LIMIT, String.valueOf(this.getBlocksLimit(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_BLOCK_LIMIT, String.valueOf(this.getBlocksLimit(level)));
     }
 
     @Override
@@ -85,8 +88,10 @@ public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBre
 
     @NotNull
     private Set<Block> getNearby(@NotNull Block block) {
-        return Stream.of(AREA).map(block::getRelative)
-            .filter(blockAdded -> blockAdded.getType() == block.getType()).collect(Collectors.toSet());
+        return Stream.of(AREA)
+            .map(block::getRelative)
+            .filter(blockAdded -> blockAdded.getType() == block.getType())
+            .collect(Collectors.toSet());
     }
 
     private void vein(@NotNull Player player, @NotNull Block source, int level) {
@@ -94,7 +99,8 @@ public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBre
         Set<Block> prepare = new HashSet<>(this.getNearby(source));
 
         int limit = Math.min(this.getBlocksLimit(level), 30);
-        if (limit < 0) return;
+        if (limit < 0)
+            return;
 
         while (ores.addAll(prepare) && ores.size() < limit) {
             Set<Block> nearby = new HashSet<>();
@@ -115,17 +121,25 @@ public class EnchantVeinminer extends IEnchantChanceTemplate implements BlockBre
 
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack tool, int level) {
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (EnchantRegister.TUNNEL != null && EnchantManager.hasEnchantment(tool, EnchantRegister.TUNNEL)) return false;
-        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(tool, EnchantRegister.BLAST_MINING)) return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (EnchantRegister.TUNNEL != null && EnchantManager.hasEnchantment(tool, EnchantRegister.TUNNEL))
+            return false;
+        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(tool, EnchantRegister.BLAST_MINING))
+            return false;
 
         Block block = e.getBlock();
-        if (block.hasMetadata(META_BLOCK_VEINED)) return false;
-        if (block.getDrops(tool).isEmpty()) return false;
+        if (block.hasMetadata(META_BLOCK_VEINED))
+            return false;
+        if (block.getDrops(tool).isEmpty())
+            return false;
 
-        if (!this.getBlocksAffected().contains(block.getType())) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.getBlocksAffected().contains(block.getType()))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         HookNCP.exemptBlocks(player);
         this.vein(player, block, level);

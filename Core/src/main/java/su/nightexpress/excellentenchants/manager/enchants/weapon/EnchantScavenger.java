@@ -75,23 +75,30 @@ public class EnchantScavenger extends IEnchantChanceTemplate implements DeathEnc
 
     @Override
     public boolean use(@NotNull EntityDeathEvent e, @NotNull LivingEntity dead, int level) {
-        if (!this.isEnchantmentAvailable(dead)) return false;
+        if (!this.isEnchantmentAvailable(dead))
+            return false;
 
         Map<Material, Map.Entry<int[], Double>> items = this.loot.get(dead.getType());
-        if (items == null) return false;
+        if (items == null)
+            return false;
 
         Player killer = dead.getKiller();
-        if (killer == null) return false;
+        if (killer == null)
+            return false;
 
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(killer)) return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(killer))
+            return false;
 
         items.forEach((material, data) -> {
             double chance = data.getValue();
-            if (Rnd.get(true) > chance) return;
+            if (Rnd.get(true) > chance)
+                return;
 
             int amount = Rnd.get(data.getKey()[0], data.getKey()[1]);
-            if (amount <= 0) return;
+            if (amount <= 0)
+                return;
 
             ItemStack item = new ItemStack(material);
             e.getDrops().add(item);

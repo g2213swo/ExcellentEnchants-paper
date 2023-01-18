@@ -95,5 +95,5 @@ Settings:
   # Message to display for a player with a list of received items.
   Message:
     Drop_Received: '{message: ~type: ACTION_BAR; ~prefix: false;}%items%'
-    Item_Name: '&7x%item_amount% &f%item_name%'
-    Item_Separator: '&7, '
+    Item_Name: '<gray>x%item_amount% <white>%item_name%'
+    Item_Separator: '<gray>, '

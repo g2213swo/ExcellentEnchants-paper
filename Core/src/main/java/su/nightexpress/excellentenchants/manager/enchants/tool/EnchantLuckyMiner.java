@@ -47,9 +47,9 @@ public class EnchantLuckyMiner extends IEnchantChanceTemplate implements BlockBr
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_EXP_MODIFIER, NumberUtil.format(this.getExpModifier(level) * 100D - 100D))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_EXP_MODIFIER, NumberUtil.format(this.getExpModifier(level) * 100D - 100D));
     }
 
     @Override
@@ -66,10 +66,14 @@ public class EnchantLuckyMiner extends IEnchantChanceTemplate implements BlockBr
 
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (e.isCancelled()) return false;
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (e.isCancelled())
+            return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         double expMod = this.getExpModifier(level);
         e.setExpToDrop((int) ((double) e.getExpToDrop() * expMod));

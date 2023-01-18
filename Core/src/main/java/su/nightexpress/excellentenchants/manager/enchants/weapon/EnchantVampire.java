@@ -24,9 +24,9 @@ import java.util.function.UnaryOperator;
 
 public class EnchantVampire extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private String  particleName;
-    private String  particleData;
-    private Scaler  healAmount;
+    private String particleName;
+    private String particleData;
+    private Scaler healAmount;
     private boolean healMultiplier;
 
     public static final String ID = "vampire";
@@ -76,28 +76,33 @@ public class EnchantVampire extends IEnchantChanceTemplate implements CombatEnch
     public UnaryOperator<String> replacePlaceholders(int level) {
         double healAmount = this.getHealAmount(level);
 
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_HEAL_AMOUNT, NumberUtil.format(this.isHealMultiplier() ? healAmount * 100D : healAmount))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_HEAL_AMOUNT, NumberUtil.format(this.isHealMultiplier() ? healAmount * 100D : healAmount));
     }
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
 
         double healthMax = EntityUtil.getAttribute(damager, Attribute.GENERIC_MAX_HEALTH);
         double healthHas = damager.getHealth();
-        if (healthHas == healthMax) return false;
+        if (healthHas == healthMax)
+            return false;
 
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         double healAmount = this.getHealAmount(level);
         double healFinal = this.isHealMultiplier() ? e.getDamage() * healAmount : healAmount;
 
         EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(damager, healFinal, EntityRegainHealthEvent.RegainReason.CUSTOM);
         plugin.getPluginManager().callEvent(healthEvent);
-        if (healthEvent.isCancelled()) return false;
+        if (healthEvent.isCancelled())
+            return false;
 
         damager.setHealth(Math.min(healthMax, healthHas + healthEvent.getAmount()));
 

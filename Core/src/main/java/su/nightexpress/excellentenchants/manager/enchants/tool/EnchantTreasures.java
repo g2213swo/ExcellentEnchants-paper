@@ -35,7 +35,7 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
     private String particleData;
     private Sound sound;
     private Map<Material, Map<Material, Double>> treasures;
-    private final Predicate<Block>                     blockTracker;
+    private final Predicate<Block> blockTracker;
 
     public static final String ID = "treasures";
 
@@ -43,9 +43,7 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
         super(plugin, cfg, EnchantPriority.MEDIUM);
 
         PlayerBlockTracker.initialize(plugin);
-        PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> {
-           return this.getTreasure(block.getType()) != null;
-        });
+        PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> this.getTreasure(block.getType()) != null);
     }
 
     @Override
@@ -109,15 +107,20 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
     public void handleDrop(@NotNull EnchantDropContainer e, @NotNull Player player, @NotNull ItemStack item, int level) {
         BlockDropItemEvent parent = e.getParent();
         Block block = parent.getBlockState().getBlock();
-        if (!this.isEnchantmentAvailable(player)) return;
-        if (PlayerBlockTracker.isTracked(block)) return;
-        if (!this.checkTriggerChance(level)) return;
-        if (!this.takeCostItem(player)) return;
+        if (!this.isEnchantmentAvailable(player))
+            return;
+        if (PlayerBlockTracker.isTracked(block))
+            return;
+        if (!this.checkTriggerChance(level))
+            return;
+        if (!this.takeCostItem(player))
+            return;
 
         ItemStack treasure = this.getTreasure(parent.getBlockState().getType());
-        if (treasure == null) return;
+        if (treasure == null)
+            return;
 
-        e.getDrop().add(treasure);
+        e.getDrops().add(treasure);
         this.playEffect(block);
     }
 
@@ -132,7 +135,7 @@ public class EnchantTreasures extends IEnchantChanceTemplate implements CustomDr
 
     public void playEffect(@NotNull Block block) {
         Location location = LocationUtil.getCenter(block.getLocation());
-        MessageUtil.sound(location, this.sound);
+        MessageUtil.playSound(location, this.sound);
         EffectUtil.playEffect(location, this.particleName, this.particleData, 0.2f, 0.2f, 0.2f, 0.12f, 20);
     }
 }

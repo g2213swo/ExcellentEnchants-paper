@@ -39,11 +39,16 @@ public class EnchantThunder extends IEnchantChanceTemplate implements CombatEnch
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (this.isInThunderstormOnly() && !victim.getWorld().isThundering()) return false;
-        if (victim.getLocation().getBlock().getLightFromSky() != 15) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (this.isInThunderstormOnly() && !victim.getWorld().isThundering())
+            return false;
+        if (victim.getLocation().getBlock().getLightFromSky() != 15)
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         plugin.getServer().getScheduler().runTask(plugin, () -> {
             victim.setNoDamageTicks(0);

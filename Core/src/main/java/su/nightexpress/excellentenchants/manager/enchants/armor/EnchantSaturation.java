@@ -21,9 +21,9 @@ import java.util.function.UnaryOperator;
 
 public class EnchantSaturation extends IEnchantChanceTemplate implements PassiveEnchant, ICleanable {
 
-    private long   saturationInterval;
+    private long saturationInterval;
     private Scaler saturationAmount;
-    private Task   saturationTask;
+    private Task saturationTask;
 
     public static final String ID = "saturation";
 
@@ -62,10 +62,10 @@ public class EnchantSaturation extends IEnchantChanceTemplate implements Passive
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
+        return str -> str
+            .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_SATURATION_AMOUNT, NumberUtil.format(this.getSaturationAmount(level)))
-            .replace(PLACEHOLDER_SATURATION_INTERVAL, NumberUtil.format((double) this.saturationInterval / 20D))
-        );
+            .replace(PLACEHOLDER_SATURATION_INTERVAL, NumberUtil.format((double) this.saturationInterval / 20D));
     }
 
     @Override
@@ -84,15 +84,21 @@ public class EnchantSaturation extends IEnchantChanceTemplate implements Passive
 
     @Override
     public boolean use(@NotNull LivingEntity entity, int level) {
-        if (!this.isEnchantmentAvailable(entity)) return false;
-        if (!(entity instanceof Player player)) return false;
-        if (player.getFoodLevel() >= 20) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.isEnchantmentAvailable(entity))
+            return false;
+        if (!(entity instanceof Player player))
+            return false;
+        if (player.getFoodLevel() >= 20)
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         float amount = (float) this.getSaturationAmount(level);
         player.setFoodLevel((int) Math.min(20, player.getFoodLevel() + amount));
         player.setSaturation(Math.min(20, player.getSaturation() + amount));
+
         return true;
     }
 

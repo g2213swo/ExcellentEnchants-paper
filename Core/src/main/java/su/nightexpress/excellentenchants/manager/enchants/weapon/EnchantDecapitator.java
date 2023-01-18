@@ -1,18 +1,21 @@
 package su.nightexpress.excellentenchants.manager.enchants.weapon;
 
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.*;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.ItemUtil;
-import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantChanceTemplate;
@@ -26,10 +29,10 @@ import java.util.stream.Collectors;
 
 public class EnchantDecapitator extends IEnchantChanceTemplate implements DeathEnchant {
 
-    private String      particleName;
-    private String      particleData;
+    private String particleName;
+    private String particleData;
     private Set<String> ignoredEntityTypes;
-    private String      headName;
+    private String headName;
     private Map<String, String> headTextures;
 
     public static final String ID = "decapitator";
@@ -44,7 +47,7 @@ public class EnchantDecapitator extends IEnchantChanceTemplate implements DeathE
         this.particleName = cfg.getString("Settings.Particle.Name", Particle.BLOCK_CRACK.name());
         this.particleData = cfg.getString("Settings.Particle.Data", Material.REDSTONE_BLOCK.name());
         this.ignoredEntityTypes = cfg.getStringSet("Settings.Ignored_Entity_Types").stream().map(String::toUpperCase).collect(Collectors.toSet());
-        this.headName = StringUtil.color(cfg.getString("Settings.Head_Item.Name", "&c%entity%'s Head"));
+        this.headName = cfg.getString("Settings.Head_Item.Name", "<red>%entity%'s Head");
         this.headTextures = new HashMap<>();
         for (String sType : cfg.getSection("Settings.Head_Item.Textures")) {
             String texture = cfg.getString("Settings.Head_Item.Textures." + sType);
@@ -70,52 +73,51 @@ public class EnchantDecapitator extends IEnchantChanceTemplate implements DeathE
 
     @Override
     public boolean use(@NotNull EntityDeathEvent e, @NotNull LivingEntity victim, int level) {
-        if (!this.isEnchantmentAvailable(victim)) return false;
+        if (!this.isEnchantmentAvailable(victim))
+            return false;
 
         EntityType entityType = victim.getType();
-        if (this.ignoredEntityTypes.contains(entityType.name())) return false;
-        if (!this.checkTriggerChance(level)) return false;
+        if (this.ignoredEntityTypes.contains(entityType.name()))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
 
         Player killer = victim.getKiller();
-        if (killer == null) return false;
-        if (!this.takeCostItem(killer)) return false;
+        if (killer == null)
+            return false;
+        if (!this.takeCostItem(killer))
+            return false;
 
         ItemStack item;
         if (entityType == EntityType.WITHER_SKELETON || entityType == EntityType.WITHER) {
             item = new ItemStack(Material.WITHER_SKELETON_SKULL);
-        }
-        else if (entityType == EntityType.ZOMBIE || entityType == EntityType.GIANT) {
+        } else if (entityType == EntityType.ZOMBIE || entityType == EntityType.GIANT) {
             item = new ItemStack(Material.ZOMBIE_HEAD);
-        }
-        else if (entityType == EntityType.SKELETON) {
+        } else if (entityType == EntityType.SKELETON) {
             item = new ItemStack(Material.SKELETON_SKULL);
-        }
-        else if (entityType == EntityType.CREEPER) {
+        } else if (entityType == EntityType.CREEPER) {
             item = new ItemStack(Material.CREEPER_HEAD);
-        }
-        else if (entityType == EntityType.ENDER_DRAGON) {
+        } else if (entityType == EntityType.ENDER_DRAGON) {
             item = new ItemStack(Material.DRAGON_HEAD);
-        }
-        else {
+        } else {
             item = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) item.getItemMeta();
             if (meta == null) return false;
 
-            String entityName;
+            Component entityName = Component.text(this.headName);
             if (victim instanceof Player player) {
-                entityName = this.headName.replace("%entity%", victim.getName());
+                entityName = ComponentUtil.replace(entityName, "%entity%", victim.getName());
                 meta.setOwningPlayer(player);
-            }
-            else {
+            } else {
                 String texture = this.headTextures.get(victim.getType().name());
                 if (texture == null) return false;
 
-                entityName = this.headName.replace("%entity%", plugin.getLangManager().getEnum(victim.getType()));
+                entityName = ComponentUtil.replace(entityName, "%entity%", Component.translatable(victim.getType()));
                 ItemUtil.setSkullTexture(item, texture);
                 meta = (SkullMeta) item.getItemMeta();
             }
 
-            meta.setDisplayName(entityName);
+            meta.displayName(entityName);
             item.setItemMeta(meta);
         }
 

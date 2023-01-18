@@ -57,21 +57,24 @@ public class EnchantCure extends IEnchantChanceTemplate implements CombatEnchant
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (!MOBS_TO_CURE.contains(victim.getType())) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (!MOBS_TO_CURE.contains(victim.getType()))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         e.setCancelled(true);
 
         EffectUtil.playEffect(victim.getLocation(), this.particleName, this.particleData, 0.25, 0.25, 0.25, 0.1f, 20);
-        MessageUtil.sound(victim.getLocation(), this.sound);
+        MessageUtil.playSound(victim.getLocation(), this.sound);
 
-        if (victim instanceof PigZombie pigZombie) {
+        if (victim instanceof PigZombie) {
             victim.getWorld().spawn(victim.getLocation(), Piglin.class);
             victim.remove();
-        }
-        else if (victim instanceof ZombieVillager zombieVillager) {
+        } else if (victim instanceof ZombieVillager zombieVillager) {
             zombieVillager.setConversionTime(1);
         }
         return true;

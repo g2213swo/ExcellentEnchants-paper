@@ -30,9 +30,9 @@ public class EnchantFireShield extends IEnchantChanceTemplate implements CombatE
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level)));
     }
 
     @Override
@@ -53,11 +53,18 @@ public class EnchantFireShield extends IEnchantChanceTemplate implements CombatE
     }
 
     @Override
-    public boolean use(@NotNull EntityDamageByEntityEvent e,
-                       @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(victim)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(victim)) return false;
+    public boolean use(
+        @NotNull EntityDamageByEntityEvent e,
+        @NotNull LivingEntity damager,
+        @NotNull LivingEntity victim,
+        @NotNull ItemStack weapon,
+        int level) {
+        if (!this.isEnchantmentAvailable(victim))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(victim))
+            return false;
 
         int fireTicks = (int) (this.getFireDuration(level) * 20);
         damager.setFireTicks(fireTicks);

@@ -46,15 +46,9 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
-        if (arg == 1) {
-            return PlayerUtil.getPlayerNames();
-        }
-        if (arg == 2) {
-            return EnchantManager.getTierIds();
-        }
-        if (arg == 3) {
-            return Arrays.asList("-1", "1", "5", "10");
-        }
+        if (arg == 1) return PlayerUtil.getPlayerNames();
+        if (arg == 2) return EnchantManager.getTierIds();
+        if (arg == 3) return Arrays.asList("-1", "1", "5", "10");
         return super.getTab(player, arg, args);
     }
 
@@ -94,6 +88,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
         plugin.getMessage(Lang.COMMAND_TIER_BOOK_DONE)
             .replace("%tier%", tier.getName())
-            .replace("%player%", player.getName()).send(sender);
+            .replace("%player%", player.getName())
+            .send(sender);
     }
 }

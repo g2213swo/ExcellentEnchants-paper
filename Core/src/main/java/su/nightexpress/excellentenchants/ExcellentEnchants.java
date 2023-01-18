@@ -26,7 +26,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     public static boolean isLoaded = false;
 
-    private EnchantNMS     enchantNMS;
+    private EnchantNMS enchantNMS;
     private EnchantManager enchantManager;
 
     @Override
@@ -91,8 +91,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     public void registerHooks() {
         if (Hooks.hasPlugin("ProtocolLib")) {
             ProtocolHook.setup();
-        }
-        else {
+        } else {
             this.warn("ProtocolLib is not installed. Enchantments won't be displayed on items.");
         }
     }

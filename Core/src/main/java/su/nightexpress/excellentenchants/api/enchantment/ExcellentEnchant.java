@@ -1,11 +1,18 @@
 package su.nightexpress.excellentenchants.api.enchantment;
 
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
@@ -14,6 +21,7 @@ import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.*;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
@@ -21,39 +29,40 @@ import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 import su.nightexpress.excellentenchants.manager.object.EnchantTier;
 import su.nightexpress.excellentenchants.manager.type.FitItemType;
 import su.nightexpress.excellentenchants.manager.type.ObtainType;
-import su.nightexpress.excellentenchants.Placeholders;
 
 import java.util.*;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class ExcellentEnchant extends Enchantment implements IListener {
 
+    private static final String NAMEPSPACE = "excellentenchants";
+
     protected final ExcellentEnchants plugin;
-    protected final JYML              cfg;
-    protected final String            id;
+    protected final JYML cfg;
+    @Subst("enchantment_id")
+    protected final String id;
     protected final EnchantPriority priority;
 
-    protected String       displayName;
-    protected EnchantTier  tier;
+    protected String displayName;
     protected List<String> description;
+    protected EnchantTier tier;
 
-    private final Set<Enchantment>        conflicts;
-    protected     boolean                 isTreasure;
-    protected     int                     levelMin;
-    protected     int                     levelMax;
-    protected     Scaler                  levelByEnchantCost;
-    protected     Scaler                  anvilMergeCost;
-    protected     Map<ObtainType, Double> obtainChance;
+    private final Set<Enchantment> conflicts;
+    protected boolean isTreasure;
+    protected int levelMin;
+    protected int levelMax;
+    protected Scaler levelByEnchantCost;
+    protected Scaler anvilMergeCost;
+    protected Map<ObtainType, Double> obtainChance;
     protected Map<ObtainType, Pair<Integer, Integer>> obtainLevelCap;
-    protected ItemStack                   costItem;
-    protected boolean                     costEnabled;
+    protected ItemStack costItem;
+    protected boolean costEnabled;
 
     public ExcellentEnchant(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg, @NotNull EnchantPriority priority) {
         super(NamespacedKey.minecraft(cfg.getFile().getName().replace(".yml", "").toLowerCase()));
         this.plugin = plugin;
-        this.id = this.getKey().getKey();
+        this.id = this.key().asString();
         this.cfg = cfg;
         this.updateConfig();
         this.cfg.saveChanges();
@@ -66,13 +75,13 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
     public void loadConfig() {
         this.cfg.reload();
 
-        this.displayName = StringUtil.color(cfg.getString("Name", this.getId()));
+        this.displayName = cfg.getString("Name", this.getId());
         this.tier = EnchantManager.getTierById(cfg.getString("Tier", Placeholders.DEFAULT));
         if (this.tier == null) {
             throw new IllegalStateException("Invalid tier provided for the '" + id + "' enchantment!");
         }
         this.tier.getEnchants().add(this);
-        this.description = StringUtil.color(cfg.getStringList("Description"));
+        this.description = cfg.getStringList("Description");
 
         this.isTreasure = cfg.getBoolean("Is_Treasure");
         this.levelMin = cfg.getInt("Level.Min");
@@ -122,7 +131,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
             ));*/
         }
 
-        /*String scalabe = "Scalable. Placeholder: " + PLACEHOLDER_LEVEL + ". See: http://77.222.60.131:8080/plugin/engine/config/formats";
+        /*
+        String scalabe = "Scalable. Placeholder: " + PLACEHOLDER_LEVEL + ". See: http://77.222.60.131:8080/plugin/engine/config/formats";
         cfg.setComments("Is_Treasure", Arrays.asList("Defines if this enchantment is a treasure enchantment.", "Treasure enchantments can only be received via looting, trading, or fishing."));
         cfg.setComments("Name", Arrays.asList("Enchantment display name. This name will be displayed in item lore and in enchantments list GUI."));
         cfg.setComments("Tier", Arrays.asList("Enchantment tier. Must be a valid tier from the 'config.yml'. Enchantments with invalid tier won't be loaded."));
@@ -167,29 +177,28 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
             String name = StringUtil.capitalizeFully(value.replace("%", "").replace("_", " "));
             placeholders.add("- " + value + ": " + name.trim());
         }
-        cfg.options().setHeader(placeholders);*/
+        cfg.options().setHeader(placeholders);
+        */
     }
 
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        String conflicts = this.getConflicts().isEmpty() ? plugin.getMessage(Lang.OTHER_NONE).getLocalized() : this.getConflicts().stream().filter(Objects::nonNull).map(LangManager::getEnchantment).collect(Collectors.joining("\n"));
-
         return str -> str
             .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
-            .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
+            .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, ComponentUtil.asMiniMessage(this.displayName(level)))
             .replace(Placeholders.ENCHANTMENT_LEVEL, NumberUtil.toRoman(level))
             .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
             .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
             .replace(Placeholders.ENCHANTMENT_TARGET, plugin.getLangManager().getEnum(this.getItemTarget()))
             .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
-            .replace(Placeholders.ENCHANTMENT_CONFLICTS, conflicts)
+            // .replace(Placeholders.ENCHANTMENT_CONFLICTS, conflicts)
             .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-            .replace(Placeholders.ENCHANTMENT_COST_ITEM, this.hasCostItem() ? ItemUtil.getItemName(this.costItem) : plugin.getMessage(Lang.OTHER_NONE).getLocalized())
+            .replace(Placeholders.ENCHANTMENT_COST_ITEM, this.hasCostItem() ? ComponentUtil.asMiniMessage(ItemUtil.getName(this.costItem)) : plugin.getMessage(Lang.OTHER_NONE).getLocalized())
             ;
     }
 
@@ -201,9 +210,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     @NotNull
     public UnaryOperator<String> formatString(int level) {
-        return str -> this.replacePlaceholders(level).apply(str
-            .replace(Placeholders.ENCHANTMENT_DESCRIPTION, String.join("\n", Config.formatDescription(this.getDescription())))
-        );
+        return this.replacePlaceholders(level);
     }
 
     @NotNull
@@ -262,19 +269,29 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
     }
 
     @NotNull
-    public String getNameFormatted(int level) {
-        return this.getTier().getColor() + this.getDisplayName() + " " + NumberUtil.toRoman(level);
-    }
-
-    @NotNull
     public List<String> getDescription() {
         return this.description;
     }
 
+    /**
+     * Gets the enchantment description for the given enchantment level.
+     *
+     * @param level the enchantment level
+     *
+     * @return a copy of the enchantment description for the given level
+     */
     @NotNull
     public List<String> getDescription(int level) {
         List<String> description = new ArrayList<>(this.description);
+
         description.replaceAll(this.replacePlaceholders(level));
+
+        // Replace list placeholder `enchantment_conflicts` in the string list
+        List<String> conflicts = this.getConflicts().isEmpty()
+            ? List.of(plugin.getMessage(Lang.OTHER_NONE).getLocalized())
+            : this.getConflicts().stream().filter(Objects::nonNull).map(LangManager::getEnchantment).toList();
+        description = StringUtil.replacePlaceholderList(Placeholders.ENCHANTMENT_CONFLICTS, description, conflicts);
+
         return description;
     }
 
@@ -300,8 +317,10 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     public int getLevelByEnchantCost(int expLevel) {
         int get = this.levelByEnchantCost.getValues().entrySet().stream()
-            .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey))
-            .map(Map.Entry::getKey).orElse(0);
+            .filter(en -> expLevel >= en.getValue().intValue())
+            .max(Comparator.comparingInt(Map.Entry::getKey))
+            .map(Map.Entry::getKey)
+            .orElse(0);
 
         return get != 0 ? this.fineLevel(get, ObtainType.ENCHANTING) : 0;
     }
@@ -353,14 +372,14 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
 
     @Override
     public final boolean canEnchantItem(@Nullable ItemStack item) {
-        if (item == null || item.getType().isAir()) return false;
-        if (EnchantManager.getItemEnchants(item).keySet().stream().anyMatch(e -> e.conflictsWith(this) || this.conflictsWith(e))) return false;
-        if (EnchantManager.getEnchantmentLevel(item, this) <= 0 && EnchantManager.getItemCustomEnchantsAmount(item) >= Config.ENCHANTMENTS_ITEM_CUSTOM_MAX) {
+        if (item == null || item.getType().isAir())
             return false;
-        }
-        if (item.getType() == Material.BOOK || item.getType() == Material.ENCHANTED_BOOK) {
+        if (EnchantManager.getItemEnchants(item).keySet().stream().anyMatch(e -> e.conflictsWith(this) || this.conflictsWith(e)))
+            return false;
+        if (EnchantManager.getEnchantmentLevel(item, this) <= 0 && EnchantManager.getItemCustomEnchantsAmount(item) >= Config.ENCHANTMENTS_ITEM_CUSTOM_MAX)
+            return false;
+        if (item.getType() == Material.BOOK || item.getType() == Material.ENCHANTED_BOOK)
             return true;
-        }
         return Stream.of(this.getFitItemTypes()).anyMatch(fitItemType -> fitItemType.isIncluded(item));
     }
 
@@ -372,5 +391,52 @@ public abstract class ExcellentEnchant extends Enchantment implements IListener 
     @Override
     public final boolean isTreasure() {
         return this.isTreasure;
+    }
+
+    @Override
+    public @NotNull Component displayName(final int level) {
+        TextComponent.Builder builder = Component.text()
+            .append(ComponentUtil.asComponent(this.getDisplayName()))
+            .color(this.getTier().getColor());
+
+        return level == 1
+            ? builder.asComponent()
+            : builder.appendSpace().append(Component.text(NumberUtil.toRoman(level))).asComponent();
+    }
+
+    @Override
+    public boolean isTradeable() {
+        // Not compatible with this Paper API as we already have a feature to handle it
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        // Not compatible with this Paper API as we already have a feature to handle it
+        return false;
+    }
+
+    @Override
+    public @NotNull EnchantmentRarity getRarity() {
+        // Not compatible with this Paper API as we already have a feature to handle it
+        return EnchantmentRarity.VERY_RARE;
+    }
+
+    @Override
+    public float getDamageIncrease(final int level, @NotNull final EntityCategory entityCategory) {
+        // Not compatible with this Paper API
+        return 0.0F;
+    }
+
+    @Override
+    public @NotNull Set<EquipmentSlot> getActiveSlots() {
+        // Not compatible with this Paper API
+        return Collections.emptySet();
+    }
+
+    @Override
+    public @NotNull String translationKey() {
+        // Not compatible with this Paper API
+        return Key.key(NAMEPSPACE, id).asString();
     }
 }

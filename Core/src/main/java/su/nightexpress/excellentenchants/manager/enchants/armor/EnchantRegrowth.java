@@ -28,11 +28,11 @@ public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEn
 
     private String particleName;
     private String particleData;
-    private long   healthInterval;
+    private long healthInterval;
     private Scaler healthAmount;
-    private Task   healthTask;
+    private Task healthTask;
 
-    private static final String PLACEHOLDER_HEALTH_AMOUNT   = "%enchantment_health_amount%";
+    private static final String PLACEHOLDER_HEALTH_AMOUNT = "%enchantment_health_amount%";
     private static final String PLACEHOLDER_HEALTH_INTERVAL = "%enchantment_health_interval%";
 
     public EnchantRegrowth(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
@@ -71,10 +71,10 @@ public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEn
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
+        return str -> str
+            .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_HEALTH_AMOUNT, NumberUtil.format(this.getHealthAmount(level)))
-            .replace(PLACEHOLDER_HEALTH_INTERVAL, NumberUtil.format((double) this.healthInterval / 20D))
-        );
+            .replace(PLACEHOLDER_HEALTH_INTERVAL, NumberUtil.format((double) this.healthInterval / 20D));
     }
 
     @NotNull
@@ -93,18 +93,23 @@ public class EnchantRegrowth extends IEnchantChanceTemplate implements PassiveEn
 
     @Override
     public boolean use(@NotNull LivingEntity entity, int level) {
-        if (!this.isEnchantmentAvailable(entity)) return false;
-        if (!this.checkTriggerChance(level)) return false;
+        if (!this.isEnchantmentAvailable(entity))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
 
         double healthMax = EntityUtil.getAttribute(entity, Attribute.GENERIC_MAX_HEALTH);
         double healthHas = entity.getHealth();
-        if (healthHas >= healthMax) return false;
-        if (!this.takeCostItem(entity)) return false;
+        if (healthHas >= healthMax)
+            return false;
+        if (!this.takeCostItem(entity))
+            return false;
 
         double amount = Math.min(healthMax, healthHas + this.getHealthAmount(level));
 
         entity.setHealth(amount);
         EffectUtil.playEffect(entity.getEyeLocation(), this.particleName, this.particleData, 0.3, 0.3, 0.3, 0.1, 15);
+
         return true;
     }
 

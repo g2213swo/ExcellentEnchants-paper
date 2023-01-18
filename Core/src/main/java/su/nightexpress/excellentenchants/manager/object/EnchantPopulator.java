@@ -8,19 +8,23 @@ import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.manager.type.ObtainType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EnchantPopulator {
 
-    private final ObtainType                              obtainType;
+    private final ObtainType obtainType;
     private final ItemStack item;
     private final Map<EnchantTier, Set<ExcellentEnchant>> enchants;
 
     public EnchantPopulator(@NotNull ObtainType obtainType, @NotNull ItemStack item) {
         this.obtainType = obtainType;
         this.item = item;
-        this.enchants = Config.getTiers().stream()
+        this.enchants = Config.getTiers()
+            .stream()
             .collect(Collectors.toMap(k -> k, v -> v.getEnchants(obtainType, item), (prev, add) -> add, HashMap::new));
     }
 
@@ -63,7 +67,8 @@ public class EnchantPopulator {
 
     @Nullable
     public EnchantTier getTierByChance() {
-        Map<EnchantTier, Double> map = this.getEnchants().keySet().stream()
+        Map<EnchantTier, Double> map = this.getEnchants().keySet()
+            .stream()
             .collect(Collectors.toMap(k -> k, v -> v.getChance(this.getObtainType())));
         return Rnd.get(map);
     }

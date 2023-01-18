@@ -55,23 +55,28 @@ public class EnchantThrifty extends IEnchantChanceTemplate implements DeathEncha
 
     @Override
     public boolean use(@NotNull EntityDeathEvent e, @NotNull LivingEntity dead, int level) {
-        if (!this.isEnchantmentAvailable(dead)) return false;
+        if (!this.isEnchantmentAvailable(dead))
+            return false;
 
         Player killer = dead.getKiller();
-        if (killer == null) return false;
+        if (killer == null)
+            return false;
 
-        if (this.ignoredEntityTypes.contains(dead.getType().name())) return false;
-        if (PDCUtil.getBooleanData(dead, this.keyEntityIgnored)) return false;
-        if (!this.checkTriggerChance(level)) return false;
+        if (this.ignoredEntityTypes.contains(dead.getType().name()))
+            return false;
+        if (PDCUtil.getBooleanData(dead, this.keyEntityIgnored))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
 
         Material material = Material.getMaterial(dead.getType().name() + "_SPAWN_EGG");
         if (material == null) {
             if (dead.getType() == EntityType.MUSHROOM_COW) {
                 material = Material.MOOSHROOM_SPAWN_EGG;
-            }
-            else return false;
+            } else return false;
         }
-        if (!this.takeCostItem(killer)) return false;
+        if (!this.takeCostItem(killer))
+            return false;
 
         ItemStack egg = new ItemStack(material);
         e.getDrops().add(egg);
@@ -80,7 +85,8 @@ public class EnchantThrifty extends IEnchantChanceTemplate implements DeathEncha
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSettingCreatureSpawnReason(CreatureSpawnEvent e) {
-        if (!this.ignoredSpawnReasons.contains(e.getSpawnReason().name())) return;
+        if (!this.ignoredSpawnReasons.contains(e.getSpawnReason().name()))
+            return;
 
         PDCUtil.setData(e.getEntity(), this.keyEntityIgnored, true);
     }

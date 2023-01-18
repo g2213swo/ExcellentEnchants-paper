@@ -30,7 +30,7 @@ public abstract class AbstractEnchantPassiveTask extends AbstractTask<ExcellentE
     }
 
     @NotNull
-    protected Collection<@NotNull ? extends LivingEntity> getEntities() {
+    protected Collection<? extends LivingEntity> getEntities() {
         Set<LivingEntity> list = new HashSet<>(plugin.getServer().getOnlinePlayers());
 
         if (Config.ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS) {

@@ -38,10 +38,10 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
 
     public static final String ID = "flame_walker";
 
-    private static final BlockFace[]      FACES             = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST};
+    private static final BlockFace[] FACES = {BlockFace.SOUTH, BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST};
     private static final Map<Block, Long> BLOCKS_TO_DESTROY = new HashMap<>();
 
-    private Scaler        blockDecayTime;
+    private Scaler blockDecayTime;
     private BlockTickTask blockTickTask;
 
     public EnchantFlameWalker(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
@@ -90,9 +90,12 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
 
     @Override
     public boolean use(@NotNull PlayerMoveEvent e, @NotNull LivingEntity entity, int level) {
-        if (!this.isEnchantmentAvailable(entity)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(entity)) return false;
+        if (!this.isEnchantmentAvailable(entity))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(entity))
+            return false;
 
         plugin.getEnchantNMS().handleFlameWalker(entity, entity.getLocation(), level).forEach(block -> {
             addBlock(block, Rnd.getDouble(this.getBlockDecayTime(level)) + 1);
@@ -103,24 +106,31 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEnchantFlameWalker(PlayerMoveEvent e) {
         Player player = e.getPlayer();
-        if (player.isFlying()) return;
-        if (!this.isEnchantmentAvailable(player)) return;
+        if (player.isFlying())
+            return;
+        if (!this.isEnchantmentAvailable(player))
+            return;
 
         Location from = e.getFrom();
         Location to = e.getTo();
-        if (to == null) return;
-        if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) return;
+        if (to == null)
+            return;
+        if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ())
+            return;
 
         ItemStack boots = player.getInventory().getBoots();
-        if (boots == null || boots.getType().isAir()) return;
+        if (boots == null || boots.getType().isAir())
+            return;
 
-        //int level = boots.getEnchantmentLevel(this);
+        // int level = boots.getEnchantmentLevel(this);
         int level = EnchantManager.getEnchantmentLevel(boots, this);
-        if (level < 1) return;
+        if (level < 1)
+            return;
 
         Block bTo = to.getBlock().getRelative(BlockFace.DOWN);
         boolean hasLava = Stream.of(FACES).anyMatch(face -> bTo.getRelative(face).getType() == Material.LAVA);
-        if (!hasLava) return;
+        if (!hasLava)
+            return;
 
         this.use(e, player, level);
     }
@@ -136,19 +146,26 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onFlameWalkerMagmaDamage(EntityDamageEvent e) {
-        if (e.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR) return;
-        if (!(e.getEntity() instanceof LivingEntity livingEntity)) return;
-        if (!this.isEnchantmentAvailable(livingEntity)) return;
+        if (e.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR)
+            return;
+        if (!(e.getEntity() instanceof LivingEntity livingEntity))
+            return;
+        if (!this.isEnchantmentAvailable(livingEntity))
+            return;
 
         EntityEquipment equipment = livingEntity.getEquipment();
-        if (equipment == null) return;
+        if (equipment == null)
+            return;
 
         ItemStack boots = equipment.getBoots();
-        if (boots == null || boots.getType().isAir()) return;
+        if (boots == null || boots.getType().isAir())
+            return;
 
         int level = EnchantManager.getEnchantmentLevel(boots, this);
-        if (level < 1) return;
-        if (!this.checkTriggerChance(level)) return;
+        if (level < 1)
+            return;
+        if (!this.checkTriggerChance(level))
+            return;
 
         e.setCancelled(true);
     }
@@ -164,7 +181,8 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
             long now = System.currentTimeMillis();
 
             BLOCKS_TO_DESTROY.keySet().removeIf(block -> {
-                if (block.isEmpty()) return true;
+                if (block.isEmpty())
+                    return true;
 
                 long time = BLOCKS_TO_DESTROY.get(block);
                 if (now >= time) {
@@ -172,6 +190,7 @@ public class EnchantFlameWalker extends IEnchantChanceTemplate implements MoveEn
                     EffectUtil.playEffect(block.getLocation(), Particle.BLOCK_CRACK.name(), Material.MAGMA_BLOCK.name(), 0.5, 0.7, 0.5, 0.03, 50);
                     return true;
                 }
+
                 return false;
             });
         }

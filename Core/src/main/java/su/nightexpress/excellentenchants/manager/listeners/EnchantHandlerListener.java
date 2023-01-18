@@ -25,8 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
+import su.nightexpress.excellentenchants.api.enchantment.type.*;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 
 public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> {
@@ -96,7 +96,8 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         ItemStack weaponDamager = equipDamager.getItemInMainHand();
 
         for (ItemStack armor : EntityUtil.getEquippedArmor(victim).values()) {
-            if (armor == null || armor.getType().isAir()) continue;
+            if (armor == null || armor.getType().isAir())
+                continue;
 
             EnchantManager.getItemCustomEnchants(armor, CombatEnchant.class).forEach((combatEnchant, level) -> {
                 combatEnchant.use(e, damager, victim, weaponDamager, level);
@@ -183,7 +184,8 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     public void onEnchantDeath(EntityDeathEvent e) {
         LivingEntity dead = e.getEntity();
         for (ItemStack armor : EntityUtil.getEquippedArmor(dead).values()) {
-            if (armor == null || armor.getType().isAir()) continue;
+            if (armor == null || armor.getType().isAir())
+                continue;
 
             EnchantManager.getItemCustomEnchants(armor, DeathEnchant.class).forEach((deathEnchant, level) -> {
                 deathEnchant.use(e, dead, level);
@@ -191,10 +193,12 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
         }
 
         Player killer = dead.getKiller();
-        if (killer == null) return;
+        if (killer == null)
+            return;
 
         ItemStack weapon = killer.getInventory().getItemInMainHand();
-        if (weapon.getType().isAir() || weapon.getType() == Material.ENCHANTED_BOOK) return;
+        if (weapon.getType().isAir() || weapon.getType() == Material.ENCHANTED_BOOK)
+            return;
 
         EnchantManager.getItemCustomEnchants(weapon, DeathEnchant.class).forEach((deathEnchant, level) -> {
             deathEnchant.use(e, dead, level);
@@ -205,10 +209,12 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEnchantBlockBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
-        if (player.getGameMode() == GameMode.CREATIVE) return;
+        if (player.getGameMode() == GameMode.CREATIVE)
+            return;
 
         ItemStack tool = player.getInventory().getItemInMainHand();
-        if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK) return;
+        if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK)
+            return;
 
         EnchantManager.getItemCustomEnchants(tool, BlockBreakEnchant.class).forEach((blockEnchant, level) -> {
             blockEnchant.use(e, player, tool, level);
@@ -218,10 +224,12 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEnchantBlockDropItem(BlockDropItemEvent e) {
         Player player = e.getPlayer();
-        if (player.getGameMode() == GameMode.CREATIVE) return;
+        if (player.getGameMode() == GameMode.CREATIVE)
+            return;
 
         ItemStack tool = player.getInventory().getItemInMainHand();
-        if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK) return;
+        if (tool.getType().isAir() || tool.getType() == Material.ENCHANTED_BOOK)
+            return;
 
         EnchantManager.getItemCustomEnchants(tool, BlockDropEnchant.class).forEach((blockEnchant, level) -> {
             blockEnchant.use(e, player, tool, level);
@@ -232,7 +240,7 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             blockEnchant.handleDrop(dropContainer, player, tool, level);
         });
 
-        dropContainer.getDrop().forEach(item -> {
+        dropContainer.getDrops().forEach(item -> {
             e.getBlockState().getBlock().getWorld().dropItem(e.getBlockState().getLocation(), item);
         });
     }

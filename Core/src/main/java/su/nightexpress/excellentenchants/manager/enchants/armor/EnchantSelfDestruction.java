@@ -41,9 +41,9 @@ public class EnchantSelfDestruction extends IEnchantChanceTemplate implements De
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)));
     }
 
     @Override
@@ -58,21 +58,27 @@ public class EnchantSelfDestruction extends IEnchantChanceTemplate implements De
 
     @Override
     public boolean use(@NotNull EntityDeathEvent e, @NotNull LivingEntity dead, int level) {
-        if (!this.isEnchantmentAvailable(dead)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(dead)) return false;
+        if (!this.isEnchantmentAvailable(dead))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(dead))
+            return false;
 
         float size = (float) this.getExplosionSize(level);
         dead.setMetadata(META_EXPLOSION_SOURCE, new FixedMetadataValue(plugin, true));
         boolean exploded = dead.getWorld().createExplosion(dead.getLocation(), size, false, false, dead);
         dead.removeMetadata(META_EXPLOSION_SOURCE, plugin);
+
         return exploded;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onItemDamage(EntityDamageByEntityEvent e) {
-        if (!e.getDamager().hasMetadata(META_EXPLOSION_SOURCE)) return;
-        if (!(e.getEntity() instanceof Item item)) return;
+        if (!e.getDamager().hasMetadata(META_EXPLOSION_SOURCE))
+            return;
+        if (!(e.getEntity() instanceof Item))
+            return;
 
         e.setCancelled(true);
     }

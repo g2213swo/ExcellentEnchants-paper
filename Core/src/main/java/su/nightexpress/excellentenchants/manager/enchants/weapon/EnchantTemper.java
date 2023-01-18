@@ -19,10 +19,10 @@ import java.util.function.UnaryOperator;
 
 public class EnchantTemper extends IEnchantChanceTemplate implements CombatEnchant {
 
-    public static final String ID                          = "temper";
-    public static final String PLACEHOLDER_DAMAGE_AMOUNT   = "%enchantment_damage_amount%";
+    public static final String ID = "temper";
+    public static final String PLACEHOLDER_DAMAGE_AMOUNT = "%enchantment_damage_amount%";
     public static final String PLACEHOLDER_DAMAGE_CAPACITY = "%enchantment_damage_capacity%";
-    public static final String PLACEHOLDER_HEALTH_POINT    = "%enchantment_health_point%";
+    public static final String PLACEHOLDER_HEALTH_POINT = "%enchantment_health_point%";
 
     private EnchantScaler damageAmount;
     private EnchantScaler damageCapacity;
@@ -55,11 +55,11 @@ public class EnchantTemper extends IEnchantChanceTemplate implements CombatEncha
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
+        return str -> str
+            .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAmount(level) * 100D))
             .replace(PLACEHOLDER_DAMAGE_CAPACITY, NumberUtil.format(this.getDamageCapacity(level) * 100D))
-            .replace(PLACEHOLDER_HEALTH_POINT, NumberUtil.format(this.getHealthPoint(level)))
-        );
+            .replace(PLACEHOLDER_HEALTH_POINT, NumberUtil.format(this.getHealthPoint(level)));
     }
 
     @NotNull
@@ -70,19 +70,24 @@ public class EnchantTemper extends IEnchantChanceTemplate implements CombatEncha
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (!this.checkTriggerChance(level)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
 
         double healthPoint = this.getHealthPoint(level);
         double healthHas = damager.getHealth();
         double healthMax = EntityUtil.getAttribute(damager, Attribute.GENERIC_MAX_HEALTH);
         double healthDiff = healthMax - healthHas;
-        if (healthHas >= healthMax || healthDiff < healthPoint) return false;
+        if (healthHas >= healthMax || healthDiff < healthPoint)
+            return false;
 
         int pointAmount = (int) (healthDiff / healthPoint);
-        if (pointAmount == 0) return false;
+        if (pointAmount == 0)
+            return false;
 
-        if (!this.takeCostItem(damager)) return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         double damageAmount = this.getDamageAmount(level);
         double damageCap = this.getDamageCapacity(level);

@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.manager.enchants.tool;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -18,12 +19,11 @@ import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantDropContainer;
 import su.nightexpress.excellentenchants.api.enchantment.EnchantPriority;
@@ -54,7 +54,7 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
     @Override
     public void loadConfig() {
         super.loadConfig();
-        this.chestName = StringUtil.color(cfg.getString("Settings.Chest_Item.Name", "%name% &7(%items% items)"));
+        this.chestName = cfg.getString("Settings.Chest_Item.Name", "%name% <gray>(%items% items)");
     }
 
     @Override
@@ -94,7 +94,8 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
             else amount++;
 
             String base64 = ItemUtil.toBase64(itemInv);
-            if (base64 == null) continue;
+            if (base64 == null)
+                continue;
             if (base64.length() >= Short.MAX_VALUE) {
                 chest.getWorld().dropItemNaturally(chest.getLocation(), itemInv);
                 continue;
@@ -103,13 +104,14 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
         }
 
         // Apply item meta name and items data string.
-        ItemMeta meta = chestItem.getItemMeta();
-        if (meta != null) {
-            String nameOrig = ItemUtil.getItemName(chestItem);
-            String nameChest = this.chestName.replace("%name%", nameOrig).replace("%items%", String.valueOf(amount));
-            meta.setDisplayName(nameChest);
-            chestItem.setItemMeta(meta);
-        }
+        final int finalAmount = amount;
+        chestItem.editMeta(meta -> {
+            Component nameOrig = ItemUtil.getName(chestItem);
+            Component nameChest = ComponentUtil.asComponent(this.chestName)
+                .replaceText(conf -> conf.matchLiteral("%name%").replacement(nameOrig))
+                .replaceText(conf -> conf.matchLiteral("%items%").replacement(Component.text(finalAmount)));
+            meta.displayName(nameChest);
+        });
 
         return chestItem;
     }
@@ -118,19 +120,22 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
     public void handleDrop(@NotNull EnchantDropContainer e, @NotNull Player player, @NotNull ItemStack item, int level) {
         BlockDropItemEvent parent = e.getParent();
         BlockState state = parent.getBlockState();
-        Block block = state.getBlock();
 
-        if (!this.isEnchantmentAvailable(player)) return;
-        if (!(state instanceof Chest chest)) return;
-        if (!this.checkTriggerChance(level)) return;
-        if (!this.takeCostItem(player)) return;
+        if (!this.isEnchantmentAvailable(player))
+            return;
+        if (!(state instanceof Chest chest))
+            return;
+        if (!this.checkTriggerChance(level))
+            return;
+        if (!this.takeCostItem(player))
+            return;
 
         // Добавляем в сундук обратно предметы из дроп листа, кроме самого сундука.
         parent.getItems().removeIf(drop -> drop.getItemStack().getType() == state.getType() && drop.getItemStack().getAmount() == 1);
         chest.getBlockInventory().addItem(parent.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
 
         // Добавляем кастомный сундук в кастомный дроп лист.
-        e.getDrop().add(this.getSilkChest(chest));
+        e.getDrops().add(this.getSilkChest(chest));
 
         // Очищаем инвентарь сундука и дефолтный дроп лист.
         chest.getBlockInventory().clear();
@@ -140,13 +145,15 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSilkChestPlace(BlockPlaceEvent e) {
         ItemStack item = e.getItemInHand();
-        if (item.getType().isAir()) return;
+        if (item.getType().isAir())
+            return;
 
         Block block = e.getBlockPlaced();
         BlockState state = block.getState();
-        if (!(state instanceof Chest chest)) return;
+        if (!(state instanceof Chest chest))
+            return;
 
-        chest.setCustomName(null);
+        chest.customName(null);
         chest.update(true);
 
         Inventory inventory = chest.getBlockInventory();
@@ -162,21 +169,24 @@ public class EnchantSilkChest extends IEnchantChanceTemplate implements CustomDr
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSilkChestStore(InventoryClickEvent e) {
         Inventory inventory = e.getInventory();
-        if (inventory.getType() == InventoryType.CRAFTING || inventory.getType() == InventoryType.CREATIVE) return;
+
+        if (inventory.getType() == InventoryType.CRAFTING || inventory.getType() == InventoryType.CREATIVE)
+            return;
 
         Player player = (Player) e.getWhoClicked();
         ItemStack item;
         if (e.getHotbarButton() >= 0) {
             item = player.getInventory().getItem(e.getHotbarButton());
+        } else {
+            item = e.getCurrentItem();
         }
-        else item = e.getCurrentItem();
 
-        if (item == null || item.getType().isAir() || !this.isSilkChest(item)) return;
+        if (item == null || item.getType().isAir() || !this.isSilkChest(item))
+            return;
 
         Inventory clicked = e.getClickedInventory();
-        if (e.getClick() != ClickType.NUMBER_KEY) {
-            if (clicked != null && clicked.equals(e.getView().getTopInventory())) return;
-        }
+        if (e.getClick() != ClickType.NUMBER_KEY && clicked != null && clicked.equals(e.getView().getTopInventory()))
+            return;
 
         e.setCancelled(true);
     }

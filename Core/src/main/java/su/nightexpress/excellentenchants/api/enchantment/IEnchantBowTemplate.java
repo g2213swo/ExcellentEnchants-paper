@@ -21,7 +21,10 @@ public abstract class IEnchantBowTemplate extends IEnchantChanceTemplate impleme
     protected String arrowTrailData;
     protected final String arrowMeta;
 
-    public IEnchantBowTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg, @NotNull EnchantPriority priority) {
+    public IEnchantBowTemplate(
+        @NotNull ExcellentEnchants plugin,
+        @NotNull JYML cfg,
+        @NotNull EnchantPriority priority) {
         super(plugin, cfg, priority);
         this.arrowMeta = this.getId() + "_arrow";
     }
@@ -62,17 +65,19 @@ public abstract class IEnchantBowTemplate extends IEnchantChanceTemplate impleme
 
     @Override
     public boolean use(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
-        if (!this.isThisArrow(projectile)) return false;
-
-        return true;
+        return this.isThisArrow(projectile);
     }
 
     @Override
     public boolean use(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isEnchantmentAvailable(shooter)) return false;
-        if (!(e.getProjectile() instanceof Projectile arrow)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!this.isEnchantmentAvailable(shooter))
+            return false;
+        if (!(e.getProjectile() instanceof Projectile arrow))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter))
+            return false;
 
         this.setThisArrow(arrow);
         if (!this.arrowTrailName.isEmpty()) {
@@ -83,9 +88,12 @@ public abstract class IEnchantBowTemplate extends IEnchantChanceTemplate impleme
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(victim)) return false;
-        if (!(e.getDamager() instanceof Projectile projectile)) return false;
-        if (!this.isThisArrow(projectile)) return false;
+        if (!this.isEnchantmentAvailable(victim))
+            return false;
+        if (!(e.getDamager() instanceof Projectile projectile))
+            return false;
+        if (!this.isThisArrow(projectile))
+            return false;
 
         return true;
     }

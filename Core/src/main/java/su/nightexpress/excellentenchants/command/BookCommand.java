@@ -47,15 +47,9 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
-        if (arg == 1) {
-            return PlayerUtil.getPlayerNames();
-        }
-        if (arg == 2) {
-            return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();
-        }
-        if (arg == 3) {
-            return Arrays.asList("-1", "1", "5", "10");
-        }
+        if (arg == 1) return PlayerUtil.getPlayerNames();
+        if (arg == 2) return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();
+        if (arg == 3) return Arrays.asList("-1", "1", "5", "10");
         return super.getTab(player, arg, args);
     }
 
@@ -90,11 +84,12 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
         meta.addStoredEnchant(enchantment, level, true);
         item.setItemMeta(meta);
 
-        //EnchantManager.updateItemLoreEnchants(item);
+        // EnchantManager.updateItemLoreEnchants(item);
         PlayerUtil.addItem(player, item);
 
         plugin.getMessage(Lang.COMMAND_BOOK_DONE)
             .replace("%enchant%", LangManager.getEnchantment(enchantment))
-            .replace("%player%", player.getName()).send(sender);
+            .replace("%player%", player.getName())
+            .send(sender);
     }
 }

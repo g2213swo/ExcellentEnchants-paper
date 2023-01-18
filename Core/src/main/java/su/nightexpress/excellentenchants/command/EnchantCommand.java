@@ -45,12 +45,8 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     @NotNull
     public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
-        if (arg == 1) {
-            return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();
-        }
-        if (arg == 2) {
-            return Arrays.asList("-1", "1", "5", "10");
-        }
+        if (arg == 1) return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();
+        if (arg == 2) return Arrays.asList("-1", "1", "5", "10");
         return super.getTab(player, arg, args);
     }
 
@@ -85,21 +81,18 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
         if (meta instanceof EnchantmentStorageMeta storageMeta) {
             if (level == 0) {
                 storageMeta.removeStoredEnchant(enchantment);
-            }
-            else {
+            } else {
                 storageMeta.addStoredEnchant(enchantment, level, true);
             }
-        }
-        else {
+        } else {
             if (level == 0) {
                 meta.removeEnchant(enchantment);
-            }
-            else {
+            } else {
                 meta.addEnchant(enchantment, level, true);
             }
         }
         item.setItemMeta(meta);
-        //EnchantManager.updateItemLoreEnchants(item);
+        // EnchantManager.updateItemLoreEnchants(item);
 
         plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
     }

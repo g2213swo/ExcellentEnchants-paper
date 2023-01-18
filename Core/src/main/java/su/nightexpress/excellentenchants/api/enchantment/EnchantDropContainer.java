@@ -10,11 +10,11 @@ import java.util.List;
 public class EnchantDropContainer {
 
     private final BlockDropItemEvent parent;
-    private final List<ItemStack>    drop;
+    private final List<ItemStack> drops;
 
     public EnchantDropContainer(@NotNull BlockDropItemEvent parent) {
         this.parent = parent;
-        this.drop = new ArrayList<>();
+        this.drops = new ArrayList<>();
     }
 
     @NotNull
@@ -23,7 +23,7 @@ public class EnchantDropContainer {
     }
 
     @NotNull
-    public List<ItemStack> getDrop() {
-        return drop;
+    public List<ItemStack> getDrops() {
+        return drops;
     }
 }

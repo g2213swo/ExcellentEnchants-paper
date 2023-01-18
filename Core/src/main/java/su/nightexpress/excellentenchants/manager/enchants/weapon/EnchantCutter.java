@@ -28,7 +28,7 @@ import java.util.function.UnaryOperator;
 public class EnchantCutter extends IEnchantChanceTemplate implements CombatEnchant {
 
     protected Scaler durabilityReduction;
-    protected Sound  sound;
+    protected Sound sound;
 
     public static final String ID = "cutter";
 
@@ -59,9 +59,9 @@ public class EnchantCutter extends IEnchantChanceTemplate implements CombatEncha
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_DURABILITY_DAMAGE, NumberUtil.format(this.getDurabilityReduction(level) * 100D))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_DURABILITY_DAMAGE, NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
 
     @Override
@@ -72,23 +72,30 @@ public class EnchantCutter extends IEnchantChanceTemplate implements CombatEncha
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
 
         EntityEquipment equipment = victim.getEquipment();
-        if (equipment == null) return false;
+        if (equipment == null)
+            return false;
 
         ItemStack[] armor = equipment.getArmorContents();
-        if (armor.length == 0) return false;
+        if (armor.length == 0)
+            return false;
 
         int get = Rnd.get(armor.length);
         ItemStack itemCut = armor[get];
 
-        if (itemCut == null || itemCut.getType().isAir() || itemCut.getType().getMaxDurability() == 0) return false;
+        if (itemCut == null || itemCut.getType().isAir() || itemCut.getType().getMaxDurability() == 0)
+            return false;
 
         ItemMeta meta = itemCut.getItemMeta();
-        if (!(meta instanceof Damageable damageable)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+        if (!(meta instanceof Damageable damageable))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         damageable.setDamage((int) (itemCut.getType().getMaxDurability() * this.getDurabilityReduction(level)));
         itemCut.setItemMeta(damageable);
@@ -101,7 +108,7 @@ public class EnchantCutter extends IEnchantChanceTemplate implements CombatEncha
         drop.getVelocity().multiply(3D);
 
         EffectUtil.playEffect(victim.getEyeLocation(), Particle.ITEM_CRACK.name(), itemCut.getType().name(), 0.2f, 0.15f, 0.2f, 0.15f, 40);
-        MessageUtil.sound(victim.getLocation(), this.sound);
+        MessageUtil.playSound(victim.getLocation(), this.sound);
         return true;
     }
 }

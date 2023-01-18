@@ -45,9 +45,9 @@ public class EnchantExpHunter extends IEnchantChanceTemplate implements DeathEnc
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_EXP_MODIFIER, NumberUtil.format(this.getExpModifier(level) * 100D - 100D))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_EXP_MODIFIER, NumberUtil.format(this.getExpModifier(level) * 100D - 100D));
     }
 
     @Override
@@ -58,13 +58,17 @@ public class EnchantExpHunter extends IEnchantChanceTemplate implements DeathEnc
 
     @Override
     public boolean use(@NotNull EntityDeathEvent e, @NotNull LivingEntity dead, int level) {
-        if (!this.isEnchantmentAvailable(dead)) return false;
+        if (!this.isEnchantmentAvailable(dead))
+            return false;
 
         Player killer = dead.getKiller();
-        if (killer == null) return false;
+        if (killer == null)
+            return false;
 
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(killer)) return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(killer))
+            return false;
 
         double expModifier = this.getExpModifier(level);
         double expFinal = Math.ceil((double) e.getDroppedExp() * expModifier);

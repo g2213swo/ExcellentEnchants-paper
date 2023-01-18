@@ -10,6 +10,11 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://repo.purpurmc.org/snapshots") {
+        content {
+            includeGroup("org.purpurmc.purpur")
+        }
+    }
     maven("https://repo.papermc.io/repository/maven-public/") {
         content {
             includeGroup("io.papermc.paper")

@@ -21,7 +21,12 @@ public class EnchantSurprise extends IEnchantCombatPotionTemplate {
     }
 
     @Override
-    public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean use(
+        @NotNull EntityDamageByEntityEvent e,
+        @NotNull LivingEntity damager,
+        @NotNull LivingEntity victim,
+        @NotNull ItemStack weapon,
+        int level) {
         this.potionEffectType = Rnd.get(PotionEffectType.values());
         return super.use(e, damager, victim, weapon, level);
     }

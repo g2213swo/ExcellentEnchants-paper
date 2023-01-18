@@ -47,10 +47,10 @@ public class EnchantDragonfireArrows extends IEnchantBowTemplate {
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
+        return str -> str
+            .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level) / 20D))
-            .replace(PLACEHOLDER_FIRE_RADIUS, NumberUtil.format(this.getFireRadius(level)))
-        );
+            .replace(PLACEHOLDER_FIRE_RADIUS, NumberUtil.format(this.getFireRadius(level)));
     }
 
     public int getFireDuration(int level) {
@@ -63,23 +63,28 @@ public class EnchantDragonfireArrows extends IEnchantBowTemplate {
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!super.use(e, damager, victim, weapon, level)) return false;
+        if (!super.use(e, damager, victim, weapon, level))
+            return false;
 
         this.createCloud(damager, victim.getLocation(), level);
+
         return true;
     }
 
     @Override
     public boolean use(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
-        if (!super.use(e, projectile, bow, level)) return false;
+        if (!super.use(e, projectile, bow, level))
+            return false;
 
-        this.createCloud(projectile.getShooter(), projectile.getLocation() , level);
+        this.createCloud(projectile.getShooter(), projectile.getLocation(), level);
+
         return true;
     }
 
     private void createCloud(@Nullable ProjectileSource shooter, @NotNull Location location, int level) {
         World world = location.getWorld();
-        if (world == null) return;
+        if (world == null)
+            return;
 
         AreaEffectCloud cloud = world.spawn(location, AreaEffectCloud.class);
         cloud.clearCustomEffects();

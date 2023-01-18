@@ -1,5 +1,9 @@
 package su.nightexpress.excellentenchants.manager.object;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.format.TextDecorationAndState;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,6 +19,7 @@ import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.manager.EnchantRegister;
 
@@ -23,9 +28,9 @@ import java.util.*;
 public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
 
     private final ItemStack enchantIcon;
-    private final int[]     enchantSlots;
+    private final int[] enchantSlots;
 
-    private final NamespacedKey                        keyLevel;
+    private final NamespacedKey keyLevel;
     private final Map<String, Map<Integer, ItemStack>> iconCache;
 
     public EnchantListGUI(@NotNull ExcellentEnchants plugin) {
@@ -48,7 +53,6 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
 
         for (String sId : cfg.getSection("Content")) {
             MenuItem menuItem = cfg.getMenuItem("Content." + sId);
-
             if (menuItem.getType() != null) {
                 menuItem.setClickHandler(click);
             }
@@ -57,21 +61,51 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
     }
 
     private ItemStack getEnchantIcon(@NotNull ExcellentEnchant enchant, int level) {
-        return this.iconCache.computeIfAbsent(enchant.getId(), k -> new HashMap<>()).computeIfAbsent(level, k -> this.buildEnchantIcon(enchant, level));
+        return this.iconCache
+            .computeIfAbsent(enchant.getId(), k -> new HashMap<>())
+            .computeIfAbsent(level, k -> this.buildEnchantIcon(enchant, level));
     }
 
     @NotNull
     private ItemStack buildEnchantIcon(@NotNull ExcellentEnchant enchant, int level) {
-        ItemStack icon = new ItemStack(this.enchantIcon);
+        final ItemStack icon = this.enchantIcon.clone();
 
         // Override the conflicts placeholder display to make it in a list.
-        List<String> conflicts = enchant.getConflicts().isEmpty()
-            ? plugin.getMessage(Lang.OTHER_NONE).asList()
-            : enchant.getConflicts().stream().filter(Objects::nonNull)
-                .map(LangManager::getEnchantment).toList();
+        final List<Component> conflicts;
+        if (enchant.getConflicts().isEmpty()) {
+            // This enchantment has no conflicts
+            conflicts = List.of(Component.text()
+                .append(Component.text("▸ ").color(NamedTextColor.RED))
+                .append(plugin.getMessage(Lang.OTHER_NONE).getLocalizedComponent())
+                .asComponent()
+            );
+        } else {
+            // This enchantment has some conflicts
+            conflicts = enchant.getConflicts().stream()
+                .filter(Objects::nonNull)
+                .map(LangManager::getEnchantment)
+                .map(string -> Component.text()
+                    .append(Component.text("▸ ").color(NamedTextColor.RED))
+                    .append(Component.text(string).color(NamedTextColor.DARK_RED))
+                    .asComponent())
+                .toList();
+        }
 
-        ItemUtil.replaceLore(icon, Placeholders.ENCHANTMENT_CONFLICTS, conflicts);
-        ItemUtil.replace(icon, enchant.formatString(level));
+        icon.editMeta(meta -> {
+            // Replace placeholders in the icon
+            ItemUtil.replacePlaceholderListComponent(meta, Placeholders.ENCHANTMENT_CONFLICTS, conflicts);
+            ItemUtil.replacePlaceholderListString(meta, Placeholders.ENCHANTMENT_DESCRIPTION, Config.formatDescription(enchant.getDescription(level)));
+            ItemUtil.replaceNameAndLore(meta, enchant.formatString(level)); // This has to be the last as the line of code above creates new placeholder
+
+            // Fix the issue where the italic deco would be back when switching the level
+            TextDecorationAndState removeItalic = TextDecoration.ITALIC.withState(TextDecoration.State.FALSE);
+            List<Component> lore = Objects.requireNonNull(meta.lore(), "lore");
+            List<Component> loreWithoutItalic = lore.stream().map(component -> component.applyFallbackStyle(removeItalic)).toList();
+            meta.lore(loreWithoutItalic);
+            Component nameWithoutItalic = Objects.requireNonNull(meta.displayName(), "displayName").applyFallbackStyle(removeItalic);
+            meta.displayName(nameWithoutItalic);
+        });
+
         return icon;
     }
 
@@ -79,16 +113,15 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
     public boolean onPrepare(@NotNull Player player, @NotNull Inventory inventory) {
         int page = this.getPage(player);
         int length = this.enchantSlots.length;
-        List<ExcellentEnchant> list = new ArrayList<>(EnchantRegister.ENCHANT_REGISTRY.values().stream().
-            sorted(Comparator.comparing(ExcellentEnchant::getName)).toList());
-        List<List<ExcellentEnchant>> split = CollectionsUtil.split(list, length);
+        List<ExcellentEnchant> enchants = new ArrayList<>(EnchantRegister.ENCHANT_REGISTRY.values().stream().sorted(Comparator.comparing(ExcellentEnchant::getName)).toList());
+        List<List<ExcellentEnchant>> split = CollectionsUtil.split(enchants, length);
 
         int pages = split.size();
-        if (pages < 1 || pages < page) list = Collections.emptyList();
-        else list = split.get(page - 1);
+        if (pages < 1 || pages < page) enchants = Collections.emptyList();
+        else enchants = split.get(page - 1);
 
         int count = 0;
-        for (ExcellentEnchant enchant : list) {
+        for (ExcellentEnchant enchant : enchants) {
             ItemStack icon = this.getEnchantIcon(enchant, 1);
             PDCUtil.setData(icon, this.keyLevel, 1);
 
@@ -108,7 +141,7 @@ public class EnchantListGUI extends AbstractMenu<ExcellentEnchants> {
                 e.setCurrentItem(itemClick);
             };
 
-            MenuItem menuItem = new MenuItem(icon, this.enchantSlots[count++]);
+            MenuItem menuItem = new MenuItemImpl(icon, this.enchantSlots[count++]);
             menuItem.setClickHandler(click);
             this.addItem(player, menuItem);
         }

@@ -1,11 +1,12 @@
 package su.nightexpress.excellentenchants.config;
 
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.utils.Placeholders;
-import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
@@ -18,24 +19,25 @@ import java.util.stream.Collectors;
 public class Config {
 
     public static long TASKS_ARROW_TRAIL_TICKS_INTERVAL;
-    public static final JOption<Integer> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("General.Tasks.Passive_Potion_Effects.Apply_Interval", 150,
+    public static final JOption<Integer> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create(
+        "General.Tasks.Passive_Potion_Effects.Apply_Interval", 150,
         "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them.",
         "This setting does NOT refreshes currently active effects, but only attempts to add them if absent."
     );
 
-    public static  Set<String> ENCHANTMENTS_DISABLED;
+    public static Set<String> ENCHANTMENTS_DISABLED;
     public static Map<String, Set<String>> ENCHANTMENTS_DISABLED_IN_WORLDS;
-    public static  boolean     ENCHANTMENTS_DESCRIPTION_ENABLED;
-    private static String      ENCHANTMENTS_DESCRIPTION_FORMAT;
+    public static boolean ENCHANTMENTS_DESCRIPTION_ENABLED;
+    private static String ENCHANTMENTS_DESCRIPTION_FORMAT;
 
-    public static int     ENCHANTMENTS_ITEM_CUSTOM_MAX;
+    public static int ENCHANTMENTS_ITEM_CUSTOM_MAX;
     public static boolean ENCHANTMENTS_ITEM_AXES_AS_SWORDS;
     public static boolean ENCHANTMENTS_ITEM_CROSSBOWS_AS_BOWS;
     public static boolean ENCHANTMENTS_ITEM_ELYTRA_AS_CHESTPLATE;
     public static boolean ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS;
 
     private static Map<ObtainType, ObtainSettings> OBTAIN_SETTINGS;
-    private static Map<String, EnchantTier>        TIERS;
+    private static Map<String, EnchantTier> TIERS;
 
     public static void load(@NotNull ExcellentEnchants plugin) {
         JYML cfg = plugin.getConfig();
@@ -51,12 +53,17 @@ public class Config {
         ENCHANTMENTS_DISABLED = cfg.getStringSet(path + "Disabled").stream().map(String::toLowerCase).collect(Collectors.toSet());
         ENCHANTMENTS_DISABLED_IN_WORLDS = new HashMap<>();
         for (String worldName : cfg.getSection(path + "Disabled_In_Worlds")) {
-            ENCHANTMENTS_DISABLED_IN_WORLDS.put(worldName, cfg.getStringSet(path + "Disabled_In_Worlds." + worldName)
-                .stream().map(String::toLowerCase).collect(Collectors.toSet()));
+            ENCHANTMENTS_DISABLED_IN_WORLDS.put(
+                worldName,
+                cfg.getStringSet(path + "Disabled_In_Worlds." + worldName)
+                    .stream()
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toSet())
+            );
         }
 
         ENCHANTMENTS_DESCRIPTION_ENABLED = cfg.getBoolean(path + "Description.Enabled");
-        ENCHANTMENTS_DESCRIPTION_FORMAT = StringUtil.color(cfg.getString(path + "Description.Format", ""));
+        ENCHANTMENTS_DESCRIPTION_FORMAT = cfg.getString(path + "Description.Format", "");
 
         path = "General.Enchantments.Item.";
         ENCHANTMENTS_ITEM_CUSTOM_MAX = cfg.getInt(path + "Max_Custom_Enchants", 3);
@@ -77,7 +84,8 @@ public class Config {
             cfg.addMissing(path2 + "Enchantments.Custom_Minimum", 0);
             cfg.addMissing(path2 + "Enchantments.Custom_Maximum", 2);
 
-            if (!cfg.getBoolean(path2 + "Enabled")) continue;
+            if (!cfg.getBoolean(path2 + "Enabled"))
+                continue;
 
             int enchantsTotalMax = cfg.getInt(path2 + "Enchantments.Total_Maximum", 4);
             double enchantsCustomGenerationChance = cfg.getDouble(path2 + "Enchantments.Custom_Generation_Chance", 50D);
@@ -102,8 +110,8 @@ public class Config {
         // Every enchantment must have a tier.
         if (cfg.getSection("Tiers").isEmpty()) {
             plugin.info("No tiers defined! Creating a default one for you...");
-            cfg.set("Tiers.default.Name", "&7Default");
-            cfg.set("Tiers.default.Color", "&7");
+            cfg.set("Tiers.default.Name", "<gray>Default");
+            cfg.set("Tiers.default.Color", "<gray>");
             for (ObtainType obtainType : ObtainType.values()) {
                 cfg.set("Tiers.default.Obtain_Chance." + obtainType.name(), 100D);
             }
@@ -116,12 +124,16 @@ public class Config {
 
             int priority = cfg.getInt(path + "Priority");
             String name = cfg.getString(path + "Name", sId);
-            String color = cfg.getString(path + "Color", "&f");
+            TextColor color = Optional.ofNullable(cfg.getString(path + "Color"))
+                .map(val -> {
+                    NamedTextColor namedColor = NamedTextColor.NAMES.value(val);
+                    return namedColor == null ? TextColor.fromHexString(val) : namedColor;
+                })
+                .orElse(NamedTextColor.WHITE);
             Map<ObtainType, Double> chance = new HashMap<>();
 
             for (ObtainType obtainType : ObtainType.values()) {
                 cfg.addMissing(path + "Obtain_Chance." + obtainType.name(), 50D);
-
                 double chanceType = cfg.getDouble(path + "Obtain_Chance." + obtainType.name());
                 chance.put(obtainType, chanceType);
             }
@@ -166,6 +178,7 @@ public class Config {
 
     @NotNull
     public static List<String> formatDescription(@NotNull List<String> description) {
-        return new ArrayList<>(description.stream().map(line -> ENCHANTMENTS_DESCRIPTION_FORMAT.replace("%description%", line)).toList());
+        description.replaceAll(line -> ENCHANTMENTS_DESCRIPTION_FORMAT.replace("%description%", line));
+        return description;
     }
 }

@@ -28,13 +28,17 @@ public class EnchantNimble extends IEnchantChanceTemplate implements DeathEnchan
 
     @Override
     public boolean use(@NotNull EntityDeathEvent e, @NotNull LivingEntity dead, int level) {
-        if (!this.isEnchantmentAvailable(dead)) return false;
+        if (!this.isEnchantmentAvailable(dead))
+            return false;
 
         Player player = dead.getKiller();
-        if (player == null) return false;
+        if (player == null)
+            return false;
 
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         e.getDrops().forEach(item -> PlayerUtil.addItem(player, item));
         e.getDrops().clear();

@@ -51,14 +51,22 @@ public class EnchantDoubleStrike extends IEnchantChanceTemplate implements Comba
     }
 
     @Override
-    public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+    public boolean use(
+        @NotNull EntityDamageByEntityEvent e,
+        @NotNull LivingEntity damager,
+        @NotNull LivingEntity victim,
+        @NotNull ItemStack weapon,
+        int level) {
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         e.setDamage(e.getDamage() * 2D);
         EffectUtil.playEffect(victim.getEyeLocation(), this.particleName, this.particleData, 0.2f, 0.15f, 0.2f, 0.15f, 20);
-        if (this.sound != null) MessageUtil.sound(victim.getLocation(), this.sound);
+        if (this.sound != null) MessageUtil.playSound(victim.getLocation(), this.sound);
         return true;
     }
 }

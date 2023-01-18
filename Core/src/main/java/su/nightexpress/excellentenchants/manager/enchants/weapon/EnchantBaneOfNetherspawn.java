@@ -23,10 +23,10 @@ import java.util.function.UnaryOperator;
 
 public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements CombatEnchant {
 
-    private       String          particleName;
-    private       String          particleData;
-    private       boolean         damageModifier;
-    private       Scaler          damageFormula;
+    private String particleName;
+    private String particleData;
+    private boolean damageModifier;
+    private Scaler damageFormula;
     private final Set<EntityType> entityTypes;
 
     public static final String ID = "bane_of_netherspawn";
@@ -36,15 +36,17 @@ public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements 
     public EnchantBaneOfNetherspawn(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
         super(plugin, cfg, EnchantPriority.MEDIUM);
 
-        this.entityTypes = Sets.newHashSet(EntityType.BLAZE, EntityType.MAGMA_CUBE,
-            EntityType.WITHER_SKELETON, EntityType.GHAST, EntityType.WITHER);
-
-        this.entityTypes.add(EntityType.PIGLIN);
-        this.entityTypes.add(EntityType.PIGLIN_BRUTE);
-        this.entityTypes.add(EntityType.ZOGLIN);
-        this.entityTypes.add(EntityType.HOGLIN);
-        this.entityTypes.add(EntityType.STRIDER);
-        this.entityTypes.add(EntityType.ZOMBIFIED_PIGLIN);
+        this.entityTypes = Sets.newHashSet(
+            EntityType.BLAZE,
+            EntityType.MAGMA_CUBE,
+            EntityType.WITHER_SKELETON,
+            EntityType.GHAST,
+            EntityType.WITHER,
+            EntityType.PIGLIN, EntityType.PIGLIN_BRUTE, EntityType.ZOMBIFIED_PIGLIN,
+            EntityType.ZOGLIN,
+            EntityType.HOGLIN,
+            EntityType.STRIDER
+        );
     }
 
     @Override
@@ -72,9 +74,9 @@ public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements 
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_DAMAGE, NumberUtil.format(this.getDamageModifier(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_DAMAGE, NumberUtil.format(this.getDamageModifier(level)));
     }
 
     @Override
@@ -85,10 +87,14 @@ public class EnchantBaneOfNetherspawn extends IEnchantChanceTemplate implements 
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (!this.entityTypes.contains(victim.getType())) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (!this.entityTypes.contains(victim.getType()))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         double damageEvent = e.getDamage();
         double damageAdd = this.getDamageModifier(level);

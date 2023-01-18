@@ -17,7 +17,11 @@ public abstract class IEnchantChanceTemplate extends ExcellentEnchant {
 
     protected Scaler triggerChance;
 
-    public IEnchantChanceTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg, @NotNull EnchantPriority priority) {
+    public IEnchantChanceTemplate(
+        @NotNull ExcellentEnchants plugin,
+        @NotNull JYML cfg,
+        @NotNull EnchantPriority priority
+    ) {
         super(plugin, cfg, priority);
     }
 
@@ -33,7 +37,6 @@ public abstract class IEnchantChanceTemplate extends ExcellentEnchant {
 
         if (cfg.contains("settings.enchant-trigger-chance")) {
             String triggerChance = cfg.getString("settings.enchant-trigger-chance", "100").replace("%level%", Placeholders.ENCHANTMENT_LEVEL);
-
             cfg.set("Settings.Trigger_Chance", triggerChance);
             cfg.set("settings.enchant-trigger-chance", null);
         }
@@ -41,9 +44,9 @@ public abstract class IEnchantChanceTemplate extends ExcellentEnchant {
 
     @Override
     public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-                .replace(PLACEHOLDER_CHANCE, NumberUtil.format(this.getTriggerChance(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_CHANCE, NumberUtil.format(this.getTriggerChance(level)));
     }
 
     public final double getTriggerChance(int level) {

@@ -110,35 +110,44 @@ public class EnchantReplanter extends IEnchantChanceTemplate implements Interact
 
     @Override
     public boolean use(@NotNull PlayerInteractEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (!this.isReplantOnRightClick()) return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (!this.isReplantOnRightClick())
+            return false;
 
         // Check for a event hand. We dont want to trigger it twice.
-        if (e.getHand() != EquipmentSlot.HAND) return false;
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return false;
+        if (e.getHand() != EquipmentSlot.HAND)
+            return false;
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK)
+            return false;
 
         // Check if player holds seeds to plant them by offhand interaction.
         ItemStack off = player.getInventory().getItemInOffHand();
-        if (!off.getType().isAir() && CROPS.contains(off.getType())) return false;
+        if (!off.getType().isAir() && CROPS.contains(off.getType()))
+            return false;
 
         // Check if clicked block is a farmland.
         Block blockGround = e.getClickedBlock();
-        if (blockGround == null) return false;
-        if (blockGround.getType() != Material.FARMLAND && blockGround.getType() != Material.SOUL_SAND) return false;
+        if (blockGround == null)
+            return false;
+        if (blockGround.getType() != Material.FARMLAND && blockGround.getType() != Material.SOUL_SAND)
+            return false;
 
         // Check enchantment trigger chance.
-        if (!this.checkTriggerChance(level)) return false;
+        if (!this.checkTriggerChance(level))
+            return false;
 
         // Check if someting is already growing on the farmland.
         Block blockPlant = blockGround.getRelative(BlockFace.UP);
-        if (!blockPlant.isEmpty()) return false;
+        if (!blockPlant.isEmpty())
+            return false;
 
         // Get the first crops from player's inventory and plant them.
         for (Material seed : CROPS) {
-            if (seed == Material.NETHER_WART && blockGround.getType() == Material.SOUL_SAND
-                || seed != Material.NETHER_WART && blockGround.getType() == Material.FARMLAND) {
+            if (seed == Material.NETHER_WART && blockGround.getType() == Material.SOUL_SAND ||
+                seed != Material.NETHER_WART && blockGround.getType() == Material.FARMLAND) {
                 if (this.takeSeeds(player, seed)) {
-                    MessageUtil.sound(player, seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT);
+                    MessageUtil.playSound(player, seed == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT);
                     plugin.getNMS().sendAttackPacket(player, 0);
                     blockPlant.setType(this.fineSeedsToBlock(seed));
                     break;
@@ -150,22 +159,29 @@ public class EnchantReplanter extends IEnchantChanceTemplate implements Interact
 
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (!this.isReplantOnPlantBreak()) return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (!this.isReplantOnPlantBreak())
+            return false;
 
         Block blockPlant = e.getBlock();
-        //if (EnchantTelekinesis.isDropHandled(blockPlant)) return false;
-        //if (EnchantRegister.TELEKINESIS != null && item.containsEnchantment(EnchantRegister.TELEKINESIS)) return false;
+        // if (EnchantTelekinesis.isDropHandled(blockPlant))
+        //     return false;
+        // if (EnchantRegister.TELEKINESIS != null && item.containsEnchantment(EnchantRegister.TELEKINESIS))
+        //     return false;
 
         // Check if broken block is supported crop(s).
-        if (!CROPS.contains(this.fineBlockToSeeds(blockPlant.getType()))) return false;
+        if (!CROPS.contains(this.fineBlockToSeeds(blockPlant.getType())))
+            return false;
 
         // Check if broken block is actually can grow.
         BlockData dataPlant = blockPlant.getBlockData();
-        if (!(dataPlant instanceof Ageable plant)) return false;
+        if (!(dataPlant instanceof Ageable plant))
+            return false;
 
         // Check enchantment trigger chance.
-        if (!this.checkTriggerChance(level)) return false;
+        if (!this.checkTriggerChance(level))
+            return false;
 
         // Check if crop is not at its maximal age to prevent accidient replant.
         /*if (plant.getAge() < plant.getMaximumAge()) {

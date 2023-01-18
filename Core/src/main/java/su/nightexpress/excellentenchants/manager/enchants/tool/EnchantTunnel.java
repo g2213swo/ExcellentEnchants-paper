@@ -29,8 +29,8 @@ public class EnchantTunnel extends IEnchantChanceTemplate implements BlockBreakE
 
     private boolean disableOnSneak;
 
-    public static final String   ID                   = "tunnel";
-    private static final String  META_BLOCK_TUNNEL    = ID + "_block_tunneled";
+    public static final String ID = "tunnel";
+    private static final String META_BLOCK_TUNNEL = ID + "_block_tunneled";
     // X and Z offsets for each block AoE mined
     private static final int[][] MINING_COORD_OFFSETS = new int[][]{{0, 0}, {0, -1}, {-1, 0}, {0, 1}, {1, 0}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1},};
     private static final Set<Material> INTERACTABLE_BLOCKS = new HashSet<>();
@@ -70,15 +70,24 @@ public class EnchantTunnel extends IEnchantChanceTemplate implements BlockBreakE
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         Block block = e.getBlock();
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (this.disableOnSneak && player.isSneaking()) return false;
-        if (EnchantRegister.VEINMINER != null && EnchantManager.hasEnchantment(item, EnchantRegister.VEINMINER)) return false;
-        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(item, EnchantRegister.BLAST_MINING)) return false;
-        if (block.hasMetadata(META_BLOCK_TUNNEL)) return false;
-        if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
-        if (block.getDrops(item).isEmpty()) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (this.disableOnSneak && player.isSneaking())
+            return false;
+        if (EnchantRegister.VEINMINER != null && EnchantManager.hasEnchantment(item, EnchantRegister.VEINMINER))
+            return false;
+        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(item, EnchantRegister.BLAST_MINING))
+            return false;
+        if (block.hasMetadata(META_BLOCK_TUNNEL))
+            return false;
+        if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType()))
+            return false;
+        if (block.getDrops(item).isEmpty())
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         BlockFace dir = LocationUtil.getDirection(player);
         boolean isY = dir != null && block.getRelative(dir.getOppositeFace()).isEmpty();
@@ -101,22 +110,27 @@ public class EnchantTunnel extends IEnchantChanceTemplate implements BlockBreakE
             Block blockAdd;
             if (isY) {
                 blockAdd = block.getLocation().clone().add(isZ ? 0 : xAdd, zAdd, isZ ? xAdd : 0).getBlock();
-            }
-            else {
+            } else {
                 blockAdd = block.getLocation().clone().add(xAdd, 0, zAdd).getBlock();
             }
 
             // Skip blocks that should not be mined
-            if (blockAdd.equals(block)) continue;
-            if (blockAdd.getDrops(item).isEmpty()) continue;
-            if (blockAdd.isLiquid()) continue;
+            if (blockAdd.equals(block))
+                continue;
+            if (blockAdd.getDrops(item).isEmpty())
+                continue;
+            if (blockAdd.isLiquid())
+                continue;
 
             Material addType = blockAdd.getType();
 
             // Some extra block checks.
-            if (addType.isInteractable() && !INTERACTABLE_BLOCKS.contains(addType)) continue;
-            if (addType == Material.BEDROCK || addType == Material.END_PORTAL || addType == Material.END_PORTAL_FRAME) continue;
-            if (addType == Material.OBSIDIAN && addType != block.getType()) continue;
+            if (addType.isInteractable() && !INTERACTABLE_BLOCKS.contains(addType))
+                continue;
+            if (addType == Material.BEDROCK || addType == Material.END_PORTAL || addType == Material.END_PORTAL_FRAME)
+                continue;
+            if (addType == Material.OBSIDIAN && addType != block.getType())
+                continue;
 
             // Play block break particles before it's broken.
             EffectUtil.playEffect(LocationUtil.getCenter(blockAdd.getLocation()), Particle.BLOCK_CRACK.name(), blockAdd.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);

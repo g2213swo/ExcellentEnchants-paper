@@ -16,9 +16,10 @@ public abstract class IEnchantCombatPotionTemplate extends IEnchantPotionTemplat
     protected String particleName;
     protected String particleData;
 
-    public IEnchantCombatPotionTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg,
-                                        @NotNull EnchantPriority priority,
-                                        @NotNull PotionEffectType effectType) {
+    public IEnchantCombatPotionTemplate(
+        @NotNull ExcellentEnchants plugin, @NotNull JYML cfg,
+        @NotNull EnchantPriority priority,
+        @NotNull PotionEffectType effectType) {
         super(plugin, cfg, priority, effectType);
     }
 
@@ -46,10 +47,14 @@ public abstract class IEnchantCombatPotionTemplate extends IEnchantPotionTemplat
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
-        if (!this.addEffect(victim, level)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
+        if (!this.addEffect(victim, level))
+            return false;
 
         EffectUtil.playEffect(victim.getEyeLocation(), this.particleName, this.particleData, 0.25f, 0.25f, 0.25f, 0.1f, 50);
         return true;

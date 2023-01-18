@@ -22,9 +22,9 @@ import java.util.function.UnaryOperator;
 public class EnchantVillageDefender extends IEnchantChanceTemplate implements CombatEnchant {
 
     private boolean damageMultiplier;
-    private Scaler  damageAmount;
-    private String  particleName;
-    private String  particleData;
+    private Scaler damageAmount;
+    private String particleName;
+    private String particleData;
 
     public static final String ID = "village_defender";
     public static final String PLACEHOLDER_DAMAGE_AMOUNT = "%enchantment_damage_amount%";
@@ -53,9 +53,9 @@ public class EnchantVillageDefender extends IEnchantChanceTemplate implements Co
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAddict(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAddict(level)));
     }
 
     @Override
@@ -75,10 +75,14 @@ public class EnchantVillageDefender extends IEnchantChanceTemplate implements Co
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (!(victim instanceof Illager)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (!(victim instanceof Illager))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         double damageAdd = this.getDamageAddict(level);
         double damageHas = e.getDamage();

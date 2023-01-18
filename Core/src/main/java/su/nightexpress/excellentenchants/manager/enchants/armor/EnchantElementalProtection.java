@@ -22,15 +22,15 @@ import java.util.function.UnaryOperator;
 
 public class EnchantElementalProtection extends IEnchantChanceTemplate {
 
-    public static final String ID                            = "elemental_protection";
+    public static final String ID = "elemental_protection";
     public static final String PLACEHOLDER_PROTECTION_AMOUNT = "%enchantment_protection_amount%";
     public static final String PLACEHOLDER_PROTECTION_CAPACITY = "%enchantment_protection_capacity%";
 
-    private static final EntityDamageEvent.DamageCause[] DAMAGE_CAUSES = new EntityDamageEvent.DamageCause[] {
+    private static final EntityDamageEvent.DamageCause[] DAMAGE_CAUSES = new EntityDamageEvent.DamageCause[]{
         EntityDamageEvent.DamageCause.POISON, EntityDamageEvent.DamageCause.WITHER,
         EntityDamageEvent.DamageCause.MAGIC, EntityDamageEvent.DamageCause.FREEZE,
-        /*EntityDamageEvent.DamageCause.SONIC_BOOM, */EntityDamageEvent.DamageCause.LIGHTNING,
-    };
+        /*EntityDamageEvent.DamageCause.SONIC_BOOM,*/ EntityDamageEvent.DamageCause.LIGHTNING,
+        };
 
     private Scaler protectionAmount;
     private double protectionCapacity;
@@ -43,10 +43,10 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
+        return str -> str
+            .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_PROTECTION_AMOUNT, NumberUtil.format(this.getProtectionAmount(level)))
-            .replace(PLACEHOLDER_PROTECTION_CAPACITY, NumberUtil.format(this.getProtectionCapacity()))
-        );
+            .replace(PLACEHOLDER_PROTECTION_CAPACITY, NumberUtil.format(this.getProtectionCapacity()));
     }
 
     @Override
@@ -78,9 +78,12 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onDamage(EntityDamageEvent e) {
-        if (!ArrayUtil.contains(DAMAGE_CAUSES, e.getCause())) return;
-        if (!(e.getEntity() instanceof LivingEntity victim)) return;
-        if (!this.isEnchantmentAvailable(victim)) return;
+        if (!ArrayUtil.contains(DAMAGE_CAUSES, e.getCause()))
+            return;
+        if (!(e.getEntity() instanceof LivingEntity victim))
+            return;
+        if (!this.isEnchantmentAvailable(victim))
+            return;
 
         double protectionAmount = 0D;
         for (ItemStack armor : EntityUtil.getEquippedArmor(victim).values()) {
@@ -91,8 +94,10 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
                 protectionAmount += this.getProtectionAmount(level);
             }
         }
-        if (protectionAmount <= 0D) return;
-        if (!this.takeCostItem(victim)) return;
+        if (protectionAmount <= 0D)
+            return;
+        if (!this.takeCostItem(victim))
+            return;
 
         if (protectionAmount > this.getProtectionCapacity()) {
             protectionAmount = this.getProtectionCapacity();
@@ -100,8 +105,7 @@ public class EnchantElementalProtection extends IEnchantChanceTemplate {
 
         if (this.isProtectionAsModifier()) {
             e.setDamage(Math.max(0, e.getDamage() * (1D - protectionAmount)));
-        }
-        else {
+        } else {
             e.setDamage(Math.max(0, e.getDamage() - protectionAmount));
         }
     }

@@ -47,9 +47,9 @@ public class EnchantCurseOfBreaking extends IEnchantChanceTemplate {
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-        .replace(PLACEHOLDER_DURABILITY_AMOUNT, NumberUtil.format(this.getDurabilityAmount(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_DURABILITY_AMOUNT, NumberUtil.format(this.getDurabilityAmount(level)));
     }
 
     @NotNull
@@ -61,17 +61,22 @@ public class EnchantCurseOfBreaking extends IEnchantChanceTemplate {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemDurability(PlayerItemDamageEvent e) {
         Player player = e.getPlayer();
-        if (!this.isEnchantmentAvailable(player)) return;
+        if (!this.isEnchantmentAvailable(player))
+            return;
 
         ItemStack item = e.getItem();
         int level = EnchantManager.getItemEnchantLevel(item, this);
 
-        if (level < 1) return;
-        if (!this.checkTriggerChance(level)) return;
-        if (!this.takeCostItem(player)) return;
+        if (level < 1)
+            return;
+        if (!this.checkTriggerChance(level))
+            return;
+        if (!this.takeCostItem(player))
+            return;
 
         int durabilityAmount = this.getDurabilityAmount(level);
-        if (durabilityAmount <= 0) return;
+        if (durabilityAmount <= 0)
+            return;
 
         e.setDamage(e.getDamage() + durabilityAmount);
     }

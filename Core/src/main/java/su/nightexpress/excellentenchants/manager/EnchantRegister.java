@@ -21,70 +21,70 @@ import java.util.Map;
 
 public class EnchantRegister {
 
-    private static final ExcellentEnchants                   PLUGIN;
+    private static final ExcellentEnchants PLUGIN;
     public static final Map<NamespacedKey, ExcellentEnchant> ENCHANT_REGISTRY;
 
     public static final EnchantBlastMining BLAST_MINING;
     public static final EnchantCurseOfBreaking CURSE_OF_BREAKING;
     public static final EnchantCurseOfMisfortune CURSE_OF_MISFORTUNE;
     public static final EnchantDivineTouch DIVINE_TOUCH;
-    public static final EnchantHaste       HASTE;
-    public static final EnchantLuckyMiner  LUCKY_MINER;
-    public static final EnchantReplanter   REPLANTER;
-    public static final EnchantSilkChest   SILK_CHEST;
-    public static final EnchantSmelter     SMELTER;
+    public static final EnchantHaste HASTE;
+    public static final EnchantLuckyMiner LUCKY_MINER;
+    public static final EnchantReplanter REPLANTER;
+    public static final EnchantSilkChest SILK_CHEST;
+    public static final EnchantSmelter SMELTER;
     public static final EnchantTelekinesis TELEKINESIS;
-    public static final EnchantTreasures   TREASURES;
-    public static final EnchantTunnel      TUNNEL;
-    public static final EnchantVeinminer   VEINMINER;
+    public static final EnchantTreasures TREASURES;
+    public static final EnchantTunnel TUNNEL;
+    public static final EnchantVeinminer VEINMINER;
 
     public static final EnchantBaneOfNetherspawn BANE_OF_NETHERSPAWN;
-    public static final EnchantIceAspect         ICE_ASPECT;
-    public static final EnchantInfernus          INFERNUS;
-    public static final EnchantVenom             VENOM;
-    public static final EnchantExhaust           EXHAUST;
-    public static final EnchantWither            WITHER;
-    public static final EnchantParalyze          PARALYZE;
-    public static final EnchantExpHunter   EXP_HUNTER;
+    public static final EnchantIceAspect ICE_ASPECT;
+    public static final EnchantInfernus INFERNUS;
+    public static final EnchantVenom VENOM;
+    public static final EnchantExhaust EXHAUST;
+    public static final EnchantWither WITHER;
+    public static final EnchantParalyze PARALYZE;
+    public static final EnchantExpHunter EXP_HUNTER;
     public static final EnchantDecapitator DECAPITATOR;
-    public static final EnchantCutter      CUTTER;
-    public static final EnchantConfusion         CONFUSION;
-    public static final EnchantDoubleStrike      DOUBLE_STRIKE;
+    public static final EnchantCutter CUTTER;
+    public static final EnchantConfusion CONFUSION;
+    public static final EnchantDoubleStrike DOUBLE_STRIKE;
     public static final EnchantNimble NIMBLE;
-    public static final EnchantBlindness         BLINDNESS;
+    public static final EnchantBlindness BLINDNESS;
     public static final EnchantVampire VAMPIRE;
-    public static final EnchantCure    CURE;
-    public static final EnchantRage    RAGE;
+    public static final EnchantCure CURE;
+    public static final EnchantRage RAGE;
     public static final EnchantScavenger SCAVENGER;
-    public static final EnchantSurprise  SURPRISE;
-    public static final EnchantTemper            TEMPER;
-    public static final EnchantThrifty           THRIFTY;
-    public static final EnchantThunder           THUNDER;
-    public static final EnchantVillageDefender   VILLAGE_DEFENDER;
-    public static final EnchantRocket            ROCKET;
+    public static final EnchantSurprise SURPRISE;
+    public static final EnchantTemper TEMPER;
+    public static final EnchantThrifty THRIFTY;
+    public static final EnchantThunder THUNDER;
+    public static final EnchantVillageDefender VILLAGE_DEFENDER;
+    public static final EnchantRocket ROCKET;
 
     public static final EnchantElementalProtection ELEMENTAL_PROTECTION;
-    public static final EnchantFireShield      FIRE_SHIELD;
-    public static final EnchantFlameWalker     FLAME_WALKER;
-    public static final EnchantHardened        HARDENED;
-    public static final EnchantColdSteel       COLD_STEEL;
+    public static final EnchantFireShield FIRE_SHIELD;
+    public static final EnchantFlameWalker FLAME_WALKER;
+    public static final EnchantHardened HARDENED;
+    public static final EnchantColdSteel COLD_STEEL;
     public static final EnchantSelfDestruction SELF_DESTRUCTION;
-    public static final EnchantSaturation      SATURATION;
-    public static final EnchantAquaman         AQUAMAN;
-    public static final EnchantNightVision     NIGHT_VISION;
-    public static final EnchantBunnyHop        BUNNY_HOP;
-    public static final EnchantSonic           SONIC;
-    public static final EnchantRegrowth         REGROWTH;
+    public static final EnchantSaturation SATURATION;
+    public static final EnchantAquaman AQUAMAN;
+    public static final EnchantNightVision NIGHT_VISION;
+    public static final EnchantBunnyHop BUNNY_HOP;
+    public static final EnchantSonic SONIC;
+    public static final EnchantRegrowth REGROWTH;
 
-    public static final EnchantBomber          BOMBER;
+    public static final EnchantBomber BOMBER;
     public static final EnchantConfusingArrows CONFUSING_ARROWS;
     public static final EnchantDragonfireArrows DRAGONFIRE_ARROWS;
     public static final EnchantElectrifiedArrows ELECTRIFIED_ARROWS;
-    public static final EnchantEnderBow        ENDER_BOW;
-    public static final EnchantGhast           GHAST;
-    public static final EnchantHover           HOVER;
-    public static final EnchantPoisonedArrows  POISONED_ARROWS;
-    public static final EnchantWitheredArrows  WITHERED_ARROWS;
+    public static final EnchantEnderBow ENDER_BOW;
+    public static final EnchantGhast GHAST;
+    public static final EnchantHover HOVER;
+    public static final EnchantPoisonedArrows POISONED_ARROWS;
+    public static final EnchantWitheredArrows WITHERED_ARROWS;
     public static final EnchantExplosiveArrows EXPLOSIVE_ARROWS;
 
     static {
@@ -168,7 +168,7 @@ public class EnchantRegister {
             return;
         }
 
-        //ENCHANT_LIST.clear();
+        // ENCHANT_LIST.clear();
         Reflex.setFieldValue(Enchantment.class, "acceptingNew", true);
 
         for (Field field : EnchantRegister.class.getFields()) {
@@ -178,8 +178,7 @@ public class EnchantRegister {
             try {
                 enchant = (ExcellentEnchant) field.get(null);
                 EnchantRegister.register(enchant);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -224,8 +223,7 @@ public class EnchantRegister {
         JYML enchantCfg = JYML.loadOrExtract(PLUGIN, "/enchants/" + enchantId + ".yml");
         try {
             return clazz.getConstructor(ExcellentEnchants.class, JYML.class).newInstance(PLUGIN, enchantCfg);
-        }
-        catch (ReflectiveOperationException ex) {
+        } catch (ReflectiveOperationException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -238,6 +236,6 @@ public class EnchantRegister {
         ENCHANT_REGISTRY.put(enchant.getKey(), enchant);
         enchant.registerListeners();
         PLUGIN.info("Registered enchantment: " + enchant.getId());
-        //IRegistry.a(IRegistry.ENCHANTMENT, enchant.getId(), CraftEnchantment.getRaw(enchant));
+        // IRegistry.a(IRegistry.ENCHANTMENT, enchant.getId(), CraftEnchantment.getRaw(enchant));
     }
 }

@@ -43,7 +43,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         player.getActivePotionEffects().stream()
             .filter(effect -> EnchantManager.isEnchantmentEffect(player, effect)).forEach(effect -> {
                 player.removePotionEffect(effect.getType());
-        });
+            });
     }
 
     // ---------------------------------------------------------------
@@ -102,7 +102,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         }
 
         if (!first.equals(result)) {
-            //EnchantManager.updateItemLoreEnchants(result);
+            // EnchantManager.updateItemLoreEnchants(result);
             e.setResult(result);
 
             // NMS ContainerAnvil will set level cost to 0 right after calling the event
@@ -135,23 +135,22 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     private void updateGrindstone(@NotNull Inventory inventory) {
         this.plugin.getServer().getScheduler().runTask(plugin, () -> {
             ItemStack result = inventory.getItem(2);
-            if (result == null || result.getType().isAir()) return;
+            if (result == null || result.getType().isAir())
+                return;
 
             Map<ExcellentEnchant, Integer> curses = new HashMap<>();
             for (int slot = 0; slot < 2; slot++) {
                 ItemStack source = inventory.getItem(slot);
-                if (source == null || source.getType().isAir()) continue;
+                if (source == null || source.getType().isAir())
+                    continue;
 
                 curses.putAll(EnchantManager.getItemCustomEnchants(source));
             }
             curses.entrySet().removeIf(entry -> !entry.getKey().isCursed());
-            curses.forEach((excellentEnchant, level) -> {
-                EnchantManager.addEnchant(result, excellentEnchant, level, true);
-            });
-            //EnchantManager.updateItemLoreEnchants(result);
+            curses.forEach((excellentEnchant, level) -> EnchantManager.addEnchant(result, excellentEnchant, level, true));
+            // EnchantManager.updateItemLoreEnchants(result);
         });
     }
-
 
     // ---------------------------------------------------------------
     // Handle Enchanting Table
@@ -181,7 +180,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
                 result.setItemMeta(storageMeta);
             }
 
-            //EnchantManager.updateItemLoreEnchants(result);
+            // EnchantManager.updateItemLoreEnchants(result);
             e.getInventory().setItem(0, result);
         });
     }

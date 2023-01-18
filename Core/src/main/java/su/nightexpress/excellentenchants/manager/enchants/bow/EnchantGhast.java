@@ -24,7 +24,7 @@ import su.nightexpress.excellentenchants.manager.object.EnchantScaler;
 public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
 
     private boolean fireSpread;
-    private Scaler  yield;
+    private Scaler yield;
 
     public static final String ID = "ghast";
 
@@ -63,10 +63,14 @@ public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
 
     @Override
     public boolean use(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isEnchantmentAvailable(shooter)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!(e.getProjectile() instanceof Projectile projectile)) return false;
-        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!this.isEnchantmentAvailable(shooter))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!(e.getProjectile() instanceof Projectile projectile))
+            return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter))
+            return false;
 
         Fireball fireball;
 
@@ -75,8 +79,7 @@ public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
         if (EnchantManager.hasEnchantment(bow, Enchantment.MULTISHOT)) {
             fireball = shooter.launchProjectile(SmallFireball.class);
             fireball.setVelocity(projectile.getVelocity().normalize().multiply(0.5f));
-        }
-        else {
+        } else {
             fireball = shooter.launchProjectile(Fireball.class);
             fireball.setDirection(projectile.getVelocity());
         }
@@ -93,10 +96,16 @@ public class EnchantGhast extends IEnchantChanceTemplate implements BowEnchant {
     }
 
     @Override
-    public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
+    public boolean use(
+        @NotNull EntityDamageByEntityEvent e,
+        @NotNull LivingEntity damager,
+        @NotNull LivingEntity victim,
+        @NotNull ItemStack weapon,
+        int level) {
         // Support for the 'Power' enchantment.
         int power = EnchantManager.getEnchantmentLevel(weapon, Enchantment.ARROW_DAMAGE);
-        if (power < 1) return false;
+        if (power < 1)
+            return false;
 
         double damagePower = 0.5 + power * 0.5;
         e.setDamage(e.getDamage() + damagePower);

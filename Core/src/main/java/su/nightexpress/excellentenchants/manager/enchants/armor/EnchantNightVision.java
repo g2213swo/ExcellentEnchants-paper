@@ -26,9 +26,12 @@ public class EnchantNightVision extends IEnchantPotionTemplate implements Passiv
 
     @Override
     public boolean use(@NotNull LivingEntity entity, int level) {
-        if (!this.isEnchantmentAvailable(entity)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(entity)) return false;
+        if (!this.isEnchantmentAvailable(entity))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(entity))
+            return false;
 
         return this.addEffect(entity, level);
     }

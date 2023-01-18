@@ -45,10 +45,18 @@ public class EnchantRocket extends IEnchantChanceTemplate implements CombatEncha
     }
 
     @Override
-    public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(damager)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(damager)) return false;
+    public boolean use(
+        @NotNull EntityDamageByEntityEvent e,
+        @NotNull LivingEntity damager,
+        @NotNull LivingEntity victim,
+        @NotNull ItemStack weapon,
+        int level) {
+        if (!this.isEnchantmentAvailable(damager))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(damager))
+            return false;
 
         if (victim.isInsideVehicle()) {
             victim.leaveVehicle();
@@ -60,7 +68,7 @@ public class EnchantRocket extends IEnchantChanceTemplate implements CombatEncha
         firework.setFireworkMeta(meta);
         firework.addPassenger(victim);
 
-        MessageUtil.sound(victim.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH);
+        MessageUtil.playSound(victim.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH);
         return true;
     }
 }

@@ -112,7 +112,7 @@ Settings:
   # Settings for the head item.
   Head_Item:
     # Item display name. Use '%entity%' for entity name.
-    Name: '&cHead of &e%entity%'
+    Name: '<red>Head of <yellow>%entity%'
     # Head texture values for each entity type.
     # You can take some from http://minecraft-heads.com
     # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html

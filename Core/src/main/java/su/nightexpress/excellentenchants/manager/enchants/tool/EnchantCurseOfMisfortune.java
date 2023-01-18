@@ -38,7 +38,7 @@ public class EnchantCurseOfMisfortune extends IEnchantChanceTemplate implements 
     @Override
     @NotNull
     public FitItemType[] getFitItemTypes() {
-        return new FitItemType[] {FitItemType.WEAPON, FitItemType.TOOL};
+        return new FitItemType[]{FitItemType.WEAPON, FitItemType.TOOL};
     }
 
     @NotNull
@@ -54,9 +54,12 @@ public class EnchantCurseOfMisfortune extends IEnchantChanceTemplate implements 
 
     @Override
     public boolean use(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         e.setDropItems(false);
         if (!this.isDropExp()) e.setExpToDrop(0);
@@ -66,11 +69,15 @@ public class EnchantCurseOfMisfortune extends IEnchantChanceTemplate implements 
     @Override
     public boolean use(@NotNull EntityDeathEvent e, @NotNull LivingEntity dead, int level) {
         Player player = dead.getKiller();
-        if (player == null) return false;
-        if (!this.isEnchantmentAvailable(player)) return false;
+        if (player == null)
+            return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
 
-        if (!this.checkTriggerChance(level)) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         e.getDrops().clear();
         if (!this.isDropExp()) e.setDroppedExp(0);

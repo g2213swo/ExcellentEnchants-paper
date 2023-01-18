@@ -27,9 +27,9 @@ public class EnchantExplosiveArrows extends IEnchantBowTemplate {
     private boolean explosionFireSpread;
     private boolean explosionDamageItems;
     private boolean explosionDamageBlocks;
-    private Scaler  explosionSize;
+    private Scaler explosionSize;
 
-    public static final String ID                          = "explosive_arrows";
+    public static final String ID = "explosive_arrows";
     public static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
 
     private static final String META_EXPLOSION_SOURCE = ID + "_source";
@@ -59,9 +59,9 @@ public class EnchantExplosiveArrows extends IEnchantBowTemplate {
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)));
     }
 
     public final double getExplosionSize(int level) {
@@ -78,7 +78,8 @@ public class EnchantExplosiveArrows extends IEnchantBowTemplate {
 
     @Override
     public boolean use(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
-        if (!super.use(e, projectile, bow, level)) return false;
+        if (!super.use(e, projectile, bow, level))
+            return false;
 
         Entity shooter = null;
         if (projectile.getShooter() instanceof Entity entity) {
@@ -97,10 +98,14 @@ public class EnchantExplosiveArrows extends IEnchantBowTemplate {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onItemDamage(EntityDamageByEntityEvent e) {
-        if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) return;
-        if (this.explosionDamageItems) return;
-        if (!e.getDamager().hasMetadata(META_EXPLOSION_SOURCE)) return;
-        if (!(e.getEntity() instanceof Item item)) return;
+        if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)
+            return;
+        if (this.explosionDamageItems)
+            return;
+        if (!e.getDamager().hasMetadata(META_EXPLOSION_SOURCE))
+            return;
+        if (!(e.getEntity() instanceof Item))
+            return;
 
         e.setCancelled(true);
     }

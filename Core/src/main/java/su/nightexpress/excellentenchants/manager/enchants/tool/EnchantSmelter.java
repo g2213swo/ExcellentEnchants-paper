@@ -28,9 +28,9 @@ public class EnchantSmelter extends IEnchantChanceTemplate implements BlockDropE
 
     public static final String ID = "smelter";
 
-    private Sound                   sound;
-    private String                  particleName;
-    private String                  particleData;
+    private Sound sound;
+    private String particleName;
+    private String particleData;
     private Map<Material, Material> smeltingTable;
 
     public EnchantSmelter(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg) {
@@ -91,11 +91,16 @@ public class EnchantSmelter extends IEnchantChanceTemplate implements BlockDropE
 
     @Override
     public boolean use(@NotNull BlockDropItemEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (e.getBlockState() instanceof Container) return false;
-        if (!this.isEnchantmentAvailable(player)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (e.getItems().stream().noneMatch(drop -> this.isSmeltable(drop.getItemStack().getType()))) return false;
-        if (!this.takeCostItem(player)) return false;
+        if (e.getBlockState() instanceof Container)
+            return false;
+        if (!this.isEnchantmentAvailable(player))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (e.getItems().stream().noneMatch(drop -> this.isSmeltable(drop.getItemStack().getType())))
+            return false;
+        if (!this.takeCostItem(player))
+            return false;
 
         e.getItems().forEach(drop -> {
             Material material = this.smeltingTable.get(drop.getItemStack().getType());
@@ -113,7 +118,7 @@ public class EnchantSmelter extends IEnchantChanceTemplate implements BlockDropE
 
     public void playEffect(@NotNull Block block) {
         Location location = LocationUtil.getCenter(block.getLocation(), true);
-        MessageUtil.sound(location, this.sound);
+        MessageUtil.playSound(location, this.sound);
         EffectUtil.playEffect(location, this.particleName, this.particleData, 0.2f, 0.2f, 0.2f, 0.05f, 30);
     }
 }

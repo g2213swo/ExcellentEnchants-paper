@@ -50,9 +50,9 @@ public class EnchantInfernus extends IEnchantChanceTemplate {
     @Override
     @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> super.replacePlaceholders(level).apply(str
-            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format((double) this.getFireTicks(level) / 20D))
-        );
+        return str -> str
+            .transform(super.replacePlaceholders(level))
+            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format((double) this.getFireTicks(level) / 20D));
     }
 
     @Override
@@ -64,29 +64,37 @@ public class EnchantInfernus extends IEnchantChanceTemplate {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onInfernusTridentLaunch(ProjectileLaunchEvent e) {
         Entity entity = e.getEntity();
-        if (!(entity instanceof Trident trident)) return;
-        if (!(trident.getShooter() instanceof LivingEntity shooter)) return;
-        if (!this.isEnchantmentAvailable(shooter)) return;
+        if (!(entity instanceof Trident trident))
+            return;
+        if (!(trident.getShooter() instanceof LivingEntity shooter))
+            return;
+        if (!this.isEnchantmentAvailable(shooter))
+            return;
 
         ItemStack item = trident.getItem();
 
         int level = EnchantManager.getItemEnchantLevel(item, this);
-        if (level <= 0) return;
+        if (level <= 0)
+            return;
 
-        if (!this.checkTriggerChance(level)) return;
-        if (!this.takeCostItem(shooter)) return;
+        if (!this.checkTriggerChance(level))
+            return;
+        if (!this.takeCostItem(shooter))
+            return;
+
         trident.setFireTicks(Integer.MAX_VALUE);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInfernusDamageApply(EntityDamageByEntityEvent e) {
         Entity entity = e.getDamager();
-        if (!(entity instanceof Trident trident)) return;
+        if (!(entity instanceof Trident trident))
+            return;
 
         ItemStack item = trident.getItem();
-
         int level = EnchantManager.getItemEnchantLevel(item, this);
-        if (level <= 0 || trident.getFireTicks() <= 0) return;
+        if (level <= 0 || trident.getFireTicks() <= 0)
+            return;
 
         int ticks = this.getFireTicks(level);
         e.getEntity().setFireTicks(ticks);

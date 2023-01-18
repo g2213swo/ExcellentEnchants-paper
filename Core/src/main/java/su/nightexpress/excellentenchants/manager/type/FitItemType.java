@@ -36,7 +36,8 @@ public enum FitItemType {
     public boolean isIncluded(@NotNull ItemStack item) {
         return switch (this) {
             case HELMET -> ItemUtil.isHelmet(item);
-            case CHESTPLATE -> ItemUtil.isChestplate(item) || (Config.ENCHANTMENTS_ITEM_ELYTRA_AS_CHESTPLATE && ELYTRA.isIncluded(item));
+            case CHESTPLATE ->
+                ItemUtil.isChestplate(item) || (Config.ENCHANTMENTS_ITEM_ELYTRA_AS_CHESTPLATE && ELYTRA.isIncluded(item));
             case LEGGINGS -> ItemUtil.isLeggings(item);
             case BOOTS -> ItemUtil.isBoots(item);
             case ELYTRA -> item.getType() == Material.ELYTRA;
@@ -46,7 +47,8 @@ public enum FitItemType {
             case SWORD -> ItemUtil.isSword(item) || (Config.ENCHANTMENTS_ITEM_AXES_AS_SWORDS && AXE.isIncluded(item));
             case TRIDENT -> ItemUtil.isTrident(item);
             case AXE -> ItemUtil.isAxe(item);
-            case BOW -> item.getType() == Material.BOW || (Config.ENCHANTMENTS_ITEM_CROSSBOWS_AS_BOWS && CROSSBOW.isIncluded(item));
+            case BOW ->
+                item.getType() == Material.BOW || (Config.ENCHANTMENTS_ITEM_CROSSBOWS_AS_BOWS && CROSSBOW.isIncluded(item));
             case CROSSBOW -> item.getType() == Material.CROSSBOW;
             case HOE -> ItemUtil.isHoe(item);
             case PICKAXE -> ItemUtil.isPickaxe(item);

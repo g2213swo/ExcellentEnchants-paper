@@ -20,9 +20,11 @@ public abstract class IEnchantBowPotionTemplate extends IEnchantPotionTemplate i
 
     protected final String arrowMeta;
 
-    public IEnchantBowPotionTemplate(@NotNull ExcellentEnchants plugin, @NotNull JYML cfg,
-                                     @NotNull EnchantPriority priority,
-                                     @NotNull PotionEffectType type) {
+    public IEnchantBowPotionTemplate(
+        @NotNull ExcellentEnchants plugin,
+        @NotNull JYML cfg,
+        @NotNull EnchantPriority priority,
+        @NotNull PotionEffectType type) {
         super(plugin, cfg, priority, type);
         this.arrowMeta = this.getId() + "_potion_arrow";
     }
@@ -43,17 +45,19 @@ public abstract class IEnchantBowPotionTemplate extends IEnchantPotionTemplate i
 
     @Override
     public boolean use(@NotNull ProjectileHitEvent e, @NotNull Projectile projectile, @NotNull ItemStack bow, int level) {
-        if (!this.isThisArrow(projectile)) return false;
-
-        return true;
+        return this.isThisArrow(projectile);
     }
 
     @Override
     public boolean use(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isEnchantmentAvailable(shooter)) return false;
-        if (!(e.getProjectile() instanceof Arrow arrow)) return false;
-        if (!this.checkTriggerChance(level)) return false;
-        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter)) return false;
+        if (!this.isEnchantmentAvailable(shooter))
+            return false;
+        if (!(e.getProjectile() instanceof Arrow arrow))
+            return false;
+        if (!this.checkTriggerChance(level))
+            return false;
+        if (!EnchantManager.hasEnchantment(bow, ARROW_INFINITE) && !this.takeCostItem(shooter))
+            return false;
 
         this.setThisArrow(arrow);
         arrow.addCustomEffect(this.getEffect(level), true);
@@ -62,11 +66,14 @@ public abstract class IEnchantBowPotionTemplate extends IEnchantPotionTemplate i
 
     @Override
     public boolean use(@NotNull EntityDamageByEntityEvent e, @NotNull LivingEntity damager, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
-        if (!this.isEnchantmentAvailable(victim)) return false;
-        if (!(e.getDamager() instanceof Projectile projectile)) return false;
-        if (!this.isThisArrow(projectile)) return false;
+        if (!this.isEnchantmentAvailable(victim))
+            return false;
+        if (!(e.getDamager() instanceof Projectile projectile))
+            return false;
+        if (!this.isThisArrow(projectile))
+            return false;
 
-        //this.addEffect(victim, level);
+        // this.addEffect(victim, level);
         return true;
     }
 }

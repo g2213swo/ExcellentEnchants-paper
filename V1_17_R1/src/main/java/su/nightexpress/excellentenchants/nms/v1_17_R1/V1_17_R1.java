@@ -57,19 +57,26 @@ public class V1_17_R1 implements EnchantNMS {
 
         Set<Block> blocks = new HashSet<>();
         for (BlockPos posNear : BlockPos.betweenClosed(pos.offset(-radius, -1.0, -radius), pos.offset(radius, -1.0, radius))) {
-            if (!posNear.closerThan(entity.position(), radius)) continue;
+            if (!posNear.closerThan(entity.position(), radius))
+                continue;
 
             posAbove.set(posNear.getX(), posNear.getY() + 1, posNear.getZ());
 
             BlockState bLavaAbove = world.getBlockState(posAbove);
             BlockState bLava = world.getBlockState(posNear);
 
-            if (!bLavaAbove.isAir()) continue;
-            if (!bLava.getBlock().equals(Blocks.LAVA)) continue;
-            if (bLava.getValue(LiquidBlock.LEVEL) != 0) continue;
-            if (!bStone.canSurvive(world, posNear)) continue;
-            if (!world.isUnobstructed(bStone, posNear, CollisionContext.empty())) continue;
-            if (!CraftEventFactory.handleBlockFormEvent(world, posNear, bStone, entity)) continue;
+            if (!bLavaAbove.isAir())
+                continue;
+            if (!bLava.getBlock().equals(Blocks.LAVA))
+                continue;
+            if (bLava.getValue(LiquidBlock.LEVEL) != 0)
+                continue;
+            if (!bStone.canSurvive(world, posNear))
+                continue;
+            if (!world.isUnobstructed(bStone, posNear, CollisionContext.empty()))
+                continue;
+            if (!CraftEventFactory.handleBlockFormEvent(world, posNear, bStone, entity))
+                continue;
             // world.scheduleTick(posNear, Blocks.STONE, Rnd.get(60, 120));
 
             Location bukkitLoc = new Location(world.getWorld(), posNear.getX(), posNear.getY(), posNear.getZ());

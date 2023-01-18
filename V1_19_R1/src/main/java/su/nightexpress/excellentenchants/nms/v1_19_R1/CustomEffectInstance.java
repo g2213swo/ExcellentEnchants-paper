@@ -46,5 +46,5 @@ public class CustomEffectInstance extends MobEffectInstance {
             return true;
         }
         return false;
-     }
+    }
 }
