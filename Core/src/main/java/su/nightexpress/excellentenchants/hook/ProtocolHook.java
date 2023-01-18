@@ -20,10 +20,7 @@ import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.manager.EnchantManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ProtocolHook {
 
@@ -42,9 +39,11 @@ public class ProtocolHook {
             @Override public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
+                // Packet is buggy with creative mode, we just don't handle it
+                if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+
                 ItemStack item = packet.getItemModifier().read(0);
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
-                packet.getItemModifier().write(0, update(item, isCreative));
+                packet.getItemModifier().write(0, update(item));
             }
         });
 
@@ -52,10 +51,11 @@ public class ProtocolHook {
             @Override public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
-                List<ItemStack> items = packet.getItemListModifier().readSafely(0);
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
+                // Packet is buggy with creative mode, we just don't handle it
+                if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 
-                items.replaceAll(itemStack -> update(itemStack, isCreative));
+                List<ItemStack> items = packet.getItemListModifier().readSafely(0);
+                items.replaceAll(ProtocolHook::update);
                 packet.getItemListModifier().write(0, items);
             }
         });
@@ -63,20 +63,20 @@ public class ProtocolHook {
         isRegistered = true;
     }
 
-    private static @Nullable ItemStack update(@Nullable ItemStack item, boolean isCreative) {
+    private static @Nullable ItemStack update(@Nullable ItemStack item) {
         if (item == null || item.getType().isAir()) return item;
 
-        if (!item.hasItemMeta()) return item; // Return earlier for simple items
+        if (!item.hasItemMeta()) return item; // if this is simple item
         // final ItemStack copy = item.clone(); // TODO avoid redundant copy?
         final ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
-        final List<Component> lore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
         final Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
-        if (enchants.isEmpty()) return item; // Return earlier if no enchants on this item
+        if (enchants.isEmpty()) return item; // if no enchants on this item
+        final List<Component> lore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
 
         // Add verbose enchantment description lore
-        if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED && !isCreative) {
+        if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED) {
             enchants.forEach((enchant, level) -> {
                 List<Component> desc = new ArrayList<>(ComponentUtil.asComponent(Config.formatDescription(enchant.getDescription(level))));
                 desc.replaceAll(component -> component.applyFallbackStyle(FALLBACK_STYLE));
