@@ -1,7 +1,7 @@
 # Plugin engine settings.
 Plugin:
   # Name(s) for the main plugin command.
-  Command_Aliases: excellentenchants,eenchants
+  Command_Aliases: excellentenchants,eenchants,exenchants
   # Plugin language config.
   #
   # In 'lang' folder there are configs for different languages with a format like 'messages_code.yml',
@@ -116,7 +116,7 @@ Tiers:
     # Tier display name.
     Name: '<white>Common'
     # Tier color.
-    Color: '<white>'
+    Color: 'white'
     # Tier obtain chances.
     Obtain_Chance:
       ENCHANTING: 80.0
@@ -126,7 +126,7 @@ Tiers:
       MOB_SPAWNING: 80.0
   rare:
     Name: '<green>Rare'
-    Color: '<green>'
+    Color: 'green'
     Obtain_Chance:
       ENCHANTING: 50.0
       VILLAGER: 50.0
@@ -135,7 +135,7 @@ Tiers:
       MOB_SPAWNING: 50.0
   exotic:
     Name: '<yellow>Exotic'
-    Color: '<yellow>'
+    Color: 'yellow'
     Obtain_Chance:
       ENCHANTING: 25.0
       VILLAGER: 25.0
@@ -144,7 +144,7 @@ Tiers:
       MOB_SPAWNING: 25.0
   legendary:
     Name: '<gold>Legendary'
-    Color: '<gold>'
+    Color: 'gold'
     Obtain_Chance:
       ENCHANTING: 10.0
       VILLAGER: 10.0
@@ -153,7 +153,7 @@ Tiers:
       MOB_SPAWNING: 10.0
   cursed:
     Name: '<red>Cursed'
-    Color: '<red>'
+    Color: 'red'
     Obtain_Chance:
       ENCHANTING: 7.0
       VILLAGER: 5.0
