@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
+import su.nexmedia.engine.utils.Placeholders;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
@@ -13,8 +14,8 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Lang;
-import su.nightexpress.excellentenchants.manager.EnchantManager;
-import su.nightexpress.excellentenchants.manager.object.EnchantTier;
+import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +48,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
     @NotNull
     public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
         if (arg == 1) return PlayerUtil.getPlayerNames();
-        if (arg == 2) return EnchantManager.getTierIds();
+        if (arg == 2) return plugin.getTierManager().getTierIds();
         if (arg == 3) return Arrays.asList("-1", "1", "5", "10");
         return super.getTab(player, arg, args);
     }
@@ -65,7 +66,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
             return;
         }
 
-        EnchantTier tier = EnchantManager.getTierById(args[2].toLowerCase());
+        Tier tier = plugin.getTierManager().getTierById(args[2].toLowerCase());
         if (tier == null) {
             plugin.getMessage(Lang.COMMAND_TIER_BOOK_ERROR).send(sender);
             return;
@@ -83,12 +84,12 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
         }
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
-        EnchantManager.addEnchant(item, enchant, level, true);
+        EnchantManager.addEnchantment(item, enchant, level, true);
         PlayerUtil.addItem(player, item);
 
         plugin.getMessage(Lang.COMMAND_TIER_BOOK_DONE)
-            .replace("%tier%", tier.getName())
-            .replace("%player%", player.getName())
+            .replace(tier.replacePlaceholders())
+            .replace(Placeholders.Player.replacer(player))
             .send(sender);
     }
 }

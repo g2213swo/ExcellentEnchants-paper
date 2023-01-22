@@ -48,7 +48,7 @@ dependencies {
 }
 
 group = "su.nightexpress.excellentenchants"
-version = "3.2.13"
+version = "3.3.0"
 
 java {
     toolchain {

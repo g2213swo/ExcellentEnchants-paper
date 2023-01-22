@@ -50,11 +50,7 @@ bukkit {
     depend = listOf("NexEngine")
     softDepend = listOf(
         "ProtocolLib",
-        "Towny",
-        "Residence",
-        "WorldGuard",
-        "GriefPrevention",
-        "Lands"
+        "NoCheatPlus"
     )
     permissions {
         register("excellentenchants.admin") {
