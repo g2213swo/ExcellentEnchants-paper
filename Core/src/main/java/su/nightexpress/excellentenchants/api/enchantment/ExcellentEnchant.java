@@ -1,9 +1,15 @@
 package su.nightexpress.excellentenchants.api.enchantment;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.papermc.paper.enchantments.EnchantmentRarity;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
@@ -41,7 +47,39 @@ import java.util.stream.Stream;
 
 public abstract class ExcellentEnchant extends Enchantment implements IEnchantment, IListener {
 
-    private static final String NAMEPSPACE = "excellentenchants";
+    private static final String NAMESPACE = "excellentenchants";
+    private static final LoadingCache<ExcellentEnchant, Map<Integer, String>> STRING_NAME_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+        @Override public @NotNull Map<Integer, String> load(final @NotNull ExcellentEnchant key) {
+            int startLvl = key.getStartLevel();
+            int maxLvl = key.getMaxLevel();
+            if (startLvl == 1 && startLvl == maxLvl) // only has single level
+                return Map.of(1, key.getDisplayName());
+            return new Int2ObjectArrayMap<>() {{
+                for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
+                    put(lvl, key.getDisplayName() + " " + NumberUtil.toRoman(lvl));
+                }
+            }};
+        }
+    });
+    private static final LoadingCache<ExcellentEnchant, Map<Integer, Component>> COMPONENT_NAME_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+        @Override public @NotNull Map<Integer, Component> load(final @NotNull ExcellentEnchant key) {
+            int startLvl = key.getStartLevel();
+            int maxLvl = key.getMaxLevel();
+            TextComponent.Builder builder = Component.text()
+                .append(Component.text(key.getDisplayName()))
+                .style(b -> {
+                    b.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+                    b.colorIfAbsent(NamedTextColor.GRAY);
+                });
+            if (startLvl == 1 && startLvl == maxLvl) // only has single level
+                return Map.of(1, builder.asComponent());
+            return new Int2ObjectArrayMap<>() {{
+                for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
+                    put(lvl, builder.appendSpace().append(Component.text(NumberUtil.toRoman(lvl))).asComponent());
+                }
+            }};
+        }
+    });
 
     protected final ExcellentEnchants plugin;
     protected final JYML cfg;
@@ -242,17 +280,23 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return this.displayName;
     }
 
+    /**
+     * Only used in GUIs.
+     */
     @NotNull
-    public String getNameFormatted(int level) { // Shouldn't contain legacy color code here
-        if (level == 1 && this.levelMax == 1) {
-            return this.getDisplayName();
-        } else {
-            return this.getDisplayName() + " " + NumberUtil.toRoman(level);
-        }
+    public String getNameFormatted(int level) {
+        // Shouldn't contain legacy color code here, only MiniMessage strings allowed
+
+        return STRING_NAME_CACHE.getUnchecked(this).get(level);
     }
 
+    /**
+     * Only used in GUIs.
+     */
     @NotNull
     public String getNameFormatted(int level, int charges) {
+        // Shouldn't contain legacy color code here, only MiniMessage strings allowed
+
         if (!this.isChargesEnabled()) return this.getNameFormatted(level);
 
         int chargesMax = this.getChargesMax(level);
@@ -445,14 +489,27 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         EnchantManager.consumeEnchantmentCharges(item, this);
     }
 
+    /**
+     * Can be directly used in item meta.
+     */
+    public @NotNull Component displayName(final int level, final int charges) {
+        if (!this.isChargesEnabled()) return this.displayName(level);
+
+        int chargesMax = this.getChargesMax(level);
+        double percent = (double) charges / (double) chargesMax * 100D;
+        Map.Entry<Double, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
+        if (entry == null) return this.displayName(level);
+
+        String format = entry.getValue().replace(Placeholders.GENERIC_AMOUNT, String.valueOf(charges));
+        return this.displayName(level).appendSpace().append(ComponentUtil.asComponent(format));
+    }
+
+    /**
+     * Can be directly used in item meta.
+     */
     @Override
     public @NotNull Component displayName(final int level) {
-        TextComponent.Builder builder = Component.text().append(Component.text(this.displayName)).color(this.tier.getColor());
-        if (level == 1 && this.levelMax == 1) {
-            return builder.asComponent();
-        } else {
-            return builder.appendSpace().append(Component.text(NumberUtil.toRoman(level))).asComponent();
-        }
+        return COMPONENT_NAME_CACHE.getUnchecked(this).get(level);
     }
 
     @Override
@@ -488,6 +545,6 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     @Override
     public @NotNull String translationKey() {
         // Not compatible with this Paper API
-        return Key.key(NAMEPSPACE, id).asString();
+        return Key.key(NAMESPACE, id).asString();
     }
 }
