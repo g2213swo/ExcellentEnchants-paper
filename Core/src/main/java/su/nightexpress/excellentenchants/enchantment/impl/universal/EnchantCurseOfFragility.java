@@ -33,8 +33,8 @@ public class EnchantCurseOfFragility extends ExcellentEnchant {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onItemAnvil(PrepareAnvilEvent e) {
         AnvilInventory inventory = e.getInventory();
-        ItemStack first = inventory.getItem(0);
-        ItemStack second = inventory.getItem(1);
+        ItemStack first = inventory.getFirstItem();
+        ItemStack second = inventory.getSecondItem();
 
         boolean cursedFirst = (first != null && EnchantManager.getEnchantmentLevel(first, this) >= 1);
         boolean cursedSecond = (second != null && EnchantManager.getEnchantmentLevel(second, this) >= 1);
