@@ -21,10 +21,8 @@ import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProtocolHook {
 
@@ -89,13 +87,17 @@ public class ProtocolHook {
         if (item == null || item.getType().isAir()) return item;
 
         if (!item.hasItemMeta()) return item; // if this is simple item
-        // final ItemStack copy = item.clone(); // TODO avoid redundant copy?
-        final ItemMeta meta = item.getItemMeta();
+        ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
 
-        final Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
+        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
         if (enchants.isEmpty()) return item; // if no enchants on this item
-        final List<Component> lore = Objects.requireNonNullElse(meta.lore(), new ArrayList<>());
+        List<Component> lore = Optional.ofNullable(meta.lore()).orElseGet(ArrayList::new);
+
+        // Sort enchantments by tier
+        enchants = enchants.entrySet().stream()
+            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
 
         // Add verbose enchantment description lore
         if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get()) {
