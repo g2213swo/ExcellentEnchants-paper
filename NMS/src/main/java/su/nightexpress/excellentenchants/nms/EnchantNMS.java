@@ -38,8 +38,10 @@ public interface EnchantNMS {
         equipment.entrySet().removeIf(entry -> {
             ItemStack item = entry.getValue();
             EquipmentSlot slot = entry.getKey();
-            if (item == null || item.getType().isAir() || item.getType() == Material.ENCHANTED_BOOK) return true;
-            if ((slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND) && ItemUtil.isArmor(item)) return true;
+            if (item == null || item.getType().isAir() || item.getType() == Material.ENCHANTED_BOOK)
+                return true;
+            if ((slot == EquipmentSlot.HAND || slot == EquipmentSlot.OFF_HAND) && ItemUtil.isArmor(item))
+                return true;
             return !item.hasItemMeta();
         });
         return equipment;
@@ -49,7 +51,9 @@ public interface EnchantNMS {
     @Deprecated
     static int getEquippedEnchantLevel(@NotNull LivingEntity entity, @NotNull Enchantment enchant) {
         return getEquipmentEnchanted(entity).values().stream()
-            .map(item -> getEnchantmentLevel(item, enchant)).max(Integer::compareTo).orElse(0);
+            .map(item -> getEnchantmentLevel(item, enchant))
+            .max(Integer::compareTo)
+            .orElse(0);
     }
 
     void addEnchantmentEffect(@NotNull LivingEntity entity, @NotNull Enchantment enchant, @NotNull PotionEffect effect);
