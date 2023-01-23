@@ -47,6 +47,7 @@ bukkit {
     apiVersion = "1.17"
     authors = listOf("NightExpress")
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
+    loadBefore = listOf("HuskSync")
     depend = listOf("NexEngine")
     softDepend = listOf(
         "ProtocolLib",
