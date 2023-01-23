@@ -466,7 +466,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     public boolean isChargesFuel(@NotNull ItemStack item) {
-        return item.isSimilar(this.getChargesFuel());
+        ItemStack fuel = this.getChargesFuel();
+        return item.isSimilar(fuel);
     }
 
     @NotNull
