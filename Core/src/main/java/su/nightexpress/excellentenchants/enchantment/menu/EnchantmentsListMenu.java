@@ -127,8 +127,7 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
         ItemMeta meta = icon.getItemMeta();
         if (meta == null) return icon;
 
-        List<Component> lore = meta.lore();
-        if (lore == null) lore = new ArrayList<>();
+        List<Component> lore = Optional.ofNullable(meta.lore()).orElseGet(ArrayList::new);
 
         List<String> conflicts = enchant.getConflicts().isEmpty() ? Collections.emptyList() : new ArrayList<>(this.enchantLoreConflicts);
         List<String> conflictNames = enchant.getConflicts()
