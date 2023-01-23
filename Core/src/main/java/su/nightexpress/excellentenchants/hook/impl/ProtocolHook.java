@@ -10,7 +10,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,13 +21,13 @@ import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ProtocolHook {
 
-    private static final Style FALLBACK_STYLE = Style.empty()
-        .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)
-        .colorIfAbsent(NamedTextColor.GRAY);
+    private static final Style FALLBACK_STYLE = Style.style(config -> {
+        config.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+        config.colorIfAbsent(NamedTextColor.GRAY);
+    });
 
     private static boolean isRegistered = false;
 
@@ -37,32 +36,46 @@ public class ProtocolHook {
 
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 
+        manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, PacketType.Play.Client.SET_CREATIVE_SLOT) {
+            // modifying the items received from creative players
+            @Override public void onPacketReceiving(final PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+
+                ItemStack item = packet.getItemModifier().read(0);
+                ItemStack modified = revert(item);
+                packet.getItemModifier().write(0, modified);
+            }
+        });
+
         manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, PacketType.Play.Server.SET_SLOT) {
+            // write lore when the server sets an item in a slot
             @Override public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
                 // Packet is buggy with creative mode, we just don't handle it
-                if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+                // if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 
                 ItemStack item = packet.getItemModifier().read(0);
-                packet.getItemModifier().write(0, update(item));
+                packet.getItemModifier().write(0, update(item)); // TODO directly use modify
             }
         });
 
         manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, PacketType.Play.Server.WINDOW_ITEMS) {
+            // write lore when the server sets a window of items
             @Override public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
                 // Packet is buggy with creative mode, we just don't handle it
-                if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+                // if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
                 items.replaceAll(ProtocolHook::update);
-                packet.getItemListModifier().write(0, items);
+                packet.getItemListModifier().write(0, items); // TODO directly use modify
             }
         });
 
         manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, PacketType.Play.Server.OPEN_WINDOW_MERCHANT) {
+            // write lore when the server sends the merchant recipes
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
@@ -83,6 +96,23 @@ public class ProtocolHook {
         isRegistered = true;
     }
 
+    private static @Nullable ItemStack revert(@Nullable ItemStack item) {
+        if (item == null || item.getType().isAir()) return item;
+
+        if (!item.hasItemMeta()) return item; // if this is simple item
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.hasLore()) return item; // if no lore on this item
+
+        List<Component> lore = Objects.requireNonNull(meta.lore());
+        int size = EnchantManager.getExcellentEnchantments(item).size();
+        if (size == 0) return item; // if no custom enchantment on this item
+        List<Component> reverted = lore.subList(size, lore.size());
+        meta.lore(reverted.isEmpty() ? null : reverted); // remove the custom enchantment lore
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
     private static @Nullable ItemStack update(@Nullable ItemStack item) {
         if (item == null || item.getType().isAir()) return item;
 
@@ -95,9 +125,9 @@ public class ProtocolHook {
         List<Component> lore = Optional.ofNullable(meta.lore()).orElseGet(ArrayList::new);
 
         // Sort enchantments by tier
-        enchants = enchants.entrySet().stream()
-            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
+        // enchants = enchants.entrySet().stream()
+        //     .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
+        //     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
 
         // Add verbose enchantment description lore
         if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get()) {
