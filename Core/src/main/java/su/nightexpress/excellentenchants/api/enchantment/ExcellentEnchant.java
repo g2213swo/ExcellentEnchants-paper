@@ -7,8 +7,7 @@ import io.papermc.paper.enchantments.EnchantmentRarity;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -52,8 +51,10 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         @Override public @NotNull Map<Integer, String> load(final @NotNull ExcellentEnchant key) {
             int startLvl = key.getStartLevel();
             int maxLvl = key.getMaxLevel();
+
             if (startLvl == 1 && startLvl == maxLvl) // only has single level
                 return Map.of(1, key.getDisplayName());
+
             return new Int2ObjectArrayMap<>() {{
                 for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
                     put(lvl, key.getDisplayName() + " " + NumberUtil.toRoman(lvl));
@@ -65,17 +66,19 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         @Override public @NotNull Map<Integer, Component> load(final @NotNull ExcellentEnchant key) {
             int startLvl = key.getStartLevel();
             int maxLvl = key.getMaxLevel();
-            TextComponent.Builder builder = Component.text()
-                .append(Component.text(key.getDisplayName()))
-                .style(b -> {
-                    b.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
-                    b.colorIfAbsent(NamedTextColor.GRAY);
-                });
+
+            Component displayName = Component.text(key.getDisplayName());
+            Style displayStyle = Style.style(b -> {
+                b.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+                b.colorIfAbsent(key.getTier().getColor());
+            });
+
             if (startLvl == 1 && startLvl == maxLvl) // only has single level
-                return Map.of(1, builder.asComponent());
+                return Map.of(1, displayName.style(displayStyle));
+
             return new Int2ObjectArrayMap<>() {{
                 for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
-                    put(lvl, builder.appendSpace().append(Component.text(NumberUtil.toRoman(lvl))).asComponent());
+                    put(lvl, displayName.appendSpace().append(Component.text(NumberUtil.toRoman(lvl))).style(displayStyle));
                 }
             }};
         }
