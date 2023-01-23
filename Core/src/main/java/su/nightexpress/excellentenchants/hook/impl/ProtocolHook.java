@@ -109,7 +109,10 @@ public class ProtocolHook {
         }
 
         // Add basic enchantment lore (mimic vanilla one)
-        enchants.forEach((enchant, level) -> lore.add(0, enchant.displayName(level).applyFallbackStyle(FALLBACK_STYLE)));
+        enchants.forEach((enchant, level) -> {
+            int charges = EnchantManager.getEnchantmentCharges(item, enchant);
+            lore.add(0, enchant.displayName(level, charges));
+        });
 
         meta.lore(lore);
         item.setItemMeta(meta);
