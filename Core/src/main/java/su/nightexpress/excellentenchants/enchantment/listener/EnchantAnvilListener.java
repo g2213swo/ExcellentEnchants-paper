@@ -36,8 +36,8 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
     public void onAnvilRename(PrepareAnvilEvent e) {
         AnvilInventory inventory = e.getInventory();
 
-        ItemStack first = inventory.getItem(0);
-        ItemStack second = inventory.getItem(1);
+        ItemStack first = inventory.getFirstItem();
+        ItemStack second = inventory.getSecondItem();
         ItemStack result = e.getResult();
 
         if (first == null) first = new ItemStack(Material.AIR);
@@ -53,22 +53,29 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         this.handleEnchantMerging(e, first, second, result);
     }
 
-    private boolean handleRename(@NotNull PrepareAnvilEvent e,
-        @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
-
+    private boolean handleRename(
+        @NotNull PrepareAnvilEvent e,
+        @NotNull ItemStack first,
+        @NotNull ItemStack second,
+        @NotNull ItemStack result
+    ) {
         if (!second.getType().isAir()) return false;
         if (result.getType() != first.getType()) return false;
 
-        ItemStack result2 = new ItemStack(result);
+        ItemStack resultCopy = result.clone();
         EnchantManager.getExcellentEnchantments(first).forEach((hasEnch, hasLevel) -> {
-            EnchantManager.addEnchantment(result2, hasEnch, hasLevel, true);
+            EnchantManager.addEnchantment(resultCopy, hasEnch, hasLevel, true);
         });
-        e.setResult(result2);
+        e.setResult(resultCopy);
         return true;
     }
 
-    private boolean handleRecharge(@NotNull PrepareAnvilEvent e,
-        @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
+    private boolean handleRecharge(
+        @NotNull PrepareAnvilEvent e,
+        @NotNull ItemStack first,
+        @NotNull ItemStack second,
+        @NotNull ItemStack result
+    ) {
         if (second.getType().isAir()) return false;
 
         Set<ExcellentEnchant> chargeable = EnchantManager.getExcellentEnchantments(first).keySet().stream()
@@ -76,7 +83,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
             .collect(Collectors.toSet());
         if (chargeable.isEmpty()) return false;
 
-        ItemStack result2 = new ItemStack(first);
+        ItemStack result2 = first.clone();
         chargeable.forEach(enchant -> EnchantManager.rechargeEnchantmentCharges(result2, enchant));
         PDCUtil.setData(result2, RECHARGED, true);
         e.setResult(result2);
@@ -84,13 +91,17 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         return true;
     }
 
-    private boolean handleEnchantMerging(@NotNull PrepareAnvilEvent e,
-        @NotNull ItemStack first, @NotNull ItemStack second, @NotNull ItemStack result) {
+    private boolean handleEnchantMerging(
+        @NotNull PrepareAnvilEvent e,
+        @NotNull ItemStack first,
+        @NotNull ItemStack second,
+        @NotNull ItemStack result
+    ) {
         // Validate items in the first two slots.
         if (second.getType().isAir() || second.getAmount() > 1 || !EnchantManager.isEnchantable(second)) return false;
         if (first.getType() == Material.ENCHANTED_BOOK && second.getType() != first.getType()) return false;
 
-        ItemStack result2 = new ItemStack(result.getType().isAir() ? first : result);
+        ItemStack copy = result.getType().isAir() ? first.clone() : result.clone();
         Map<ExcellentEnchant, Integer> enchantments = EnchantManager.getExcellentEnchantments(first);
         AtomicInteger repairCost = new AtomicInteger(e.getInventory().getRepairCost());
 
@@ -103,14 +114,14 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
 
         // Recalculate operation cost depends on enchantments merge cost.
         enchantments.forEach((enchant, level) -> {
-            if (EnchantManager.addEnchantment(result2, enchant, level, false)) {
+            if (EnchantManager.addEnchantment(copy, enchant, level, false)) {
                 repairCost.addAndGet(enchant.getAnvilMergeCost(level));
             }
         });
 
-        if (first.equals(result2)) return false;
+        if (first.equals(copy)) return false;
 
-        e.setResult(result2);
+        e.setResult(copy);
 
         // NMS ContainerAnvil will set level cost to 0 right after calling the event, need 1 tick delay.
         this.plugin.runTask((c) -> e.getInventory().setRepairCost(repairCost.get()), false);
@@ -135,12 +146,11 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
 
         MessageUtil.playSound(player, Sound.BLOCK_ENCHANTMENT_TABLE_USE);
 
-        ItemStack second = inventory.getItem(1);
+        ItemStack second = inventory.getSecondItem();
         if (second != null && !second.getType().isAir()) {
             second.setAmount(second.getAmount() - 1);
         }
-        inventory.setItem(0, null);
-        // inventory.setItem(1, null);
-        inventory.setItem(2, null);
+        inventory.setFirstItem(null);
+        inventory.setResult(null);
     }
 }
