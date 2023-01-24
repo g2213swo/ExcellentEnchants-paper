@@ -36,7 +36,6 @@ public class ProtocolHook {
     });
 
     private static boolean isRegistered = false;
-    private static boolean showDescription = false;
 
     public static void setup() {
         if (isRegistered) return;
@@ -96,7 +95,6 @@ public class ProtocolHook {
         });
 
         isRegistered = true;
-        showDescription = Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get();
     }
 
     private static @Nullable ItemStack update(@Nullable ItemStack item) {
@@ -111,13 +109,13 @@ public class ProtocolHook {
         List<Component> lore = Optional.ofNullable(meta.lore()).orElseGet(ArrayList::new);
 
         enchants = enchants.entrySet().stream() // sort enchantments by tier
-            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
+            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority(), Comparator.reverseOrder()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
 
         AtomicInteger descSize = new AtomicInteger(0); // used to revert the description lore
         enchants.forEach((enchant, level) -> {
             // Add enchantment description lore (if enabled in the config)
-            if (showDescription) {
+            if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get()) {
                 List<Component> desc = new ArrayList<>(ComponentUtil.asComponent(enchant.formatDescription(level)));
                 desc.replaceAll(component -> component.applyFallbackStyle(FALLBACK_STYLE));
                 lore.addAll(0, desc);
@@ -127,7 +125,7 @@ public class ProtocolHook {
             int charges = EnchantManager.getEnchantmentCharges(item, enchant);
             lore.add(0, enchant.displayName(level, charges));
         });
-        if (showDescription) PDCUtil.setData(meta, DESCRIPTION_SIZE, descSize.get());
+        PDCUtil.setData(meta, DESCRIPTION_SIZE, descSize.get());
 
         meta.lore(lore);
         item.setItemMeta(meta);
@@ -144,7 +142,7 @@ public class ProtocolHook {
         List<Component> lore = Objects.requireNonNull(meta.lore());
         int size = EnchantManager.getExcellentEnchantments(item).size();
         if (size == 0) return item; // if no custom enchantment on this item
-        if (showDescription) size += PDCUtil.getIntData(meta, DESCRIPTION_SIZE);
+        size += PDCUtil.getIntData(meta, DESCRIPTION_SIZE);
         List<Component> reverted = lore.subList(size, lore.size()); // gets the part without any enchantment lore
         meta.lore(reverted.isEmpty() ? null : reverted);
 
