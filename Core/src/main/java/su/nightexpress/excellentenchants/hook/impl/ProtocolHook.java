@@ -11,27 +11,32 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.ComponentUtil;
+import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class ProtocolHook {
 
+    private static final NamespacedKey DESCRIPTION_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "description.size");
     private static final Style FALLBACK_STYLE = Style.style(config -> {
         config.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
         config.colorIfAbsent(NamedTextColor.GRAY);
     });
 
     private static boolean isRegistered = false;
+    private static boolean showDescription = false;
 
     public static void setup() {
         if (isRegistered) return;
@@ -54,9 +59,8 @@ public class ProtocolHook {
             @Override public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
                 ItemStack item = packet.getItemModifier().read(0);
-                ItemStack updated = update(item, isCreative);
+                ItemStack updated = update(item);
                 packet.getItemModifier().write(0, updated);
             }
         });
@@ -66,9 +70,8 @@ public class ProtocolHook {
             @Override public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
-                items.replaceAll(item -> update(item, isCreative));
+                items.replaceAll(ProtocolHook::update);
                 packet.getItemListModifier().write(0, items);
             }
         });
@@ -80,9 +83,8 @@ public class ProtocolHook {
                 PacketContainer packet = event.getPacket();
 
                 List<MerchantRecipe> list = new ArrayList<>();
-                boolean isCreative = event.getPlayer().getGameMode() == GameMode.CREATIVE;
                 packet.getMerchantRecipeLists().read(0).forEach(recipe -> {
-                    ItemStack result = update(recipe.getResult(), isCreative);
+                    ItemStack result = update(recipe.getResult());
                     if (result == null) return;
 
                     MerchantRecipe r2 = new MerchantRecipe(result, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice());
@@ -94,9 +96,10 @@ public class ProtocolHook {
         });
 
         isRegistered = true;
+        showDescription = Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get();
     }
 
-    private static @Nullable ItemStack update(@Nullable ItemStack item, boolean isCreative) {
+    private static @Nullable ItemStack update(@Nullable ItemStack item) {
         if (item == null || item.getType().isAir()) return item;
 
         if (!item.hasItemMeta()) return item; // if this is simple item
@@ -107,25 +110,24 @@ public class ProtocolHook {
         if (enchants.isEmpty()) return item; // if no enchants on this item
         List<Component> lore = Optional.ofNullable(meta.lore()).orElseGet(ArrayList::new);
 
-        // Sort enchantments by tier
-        // enchants = enchants.entrySet().stream()
-        //     .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
-        //     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
+        enchants = enchants.entrySet().stream() // sort enchantments by tier
+            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
 
-        // Add verbose enchantment description lore (except for creative mode)
-        if (Config.ENCHANTMENTS_DESCRIPTION_ENABLED.get() && !isCreative) {
-            enchants.forEach((enchant, level) -> {
+        AtomicInteger descSize = new AtomicInteger(0); // used to revert the description lore
+        enchants.forEach((enchant, level) -> {
+            // Add enchantment description lore (if enabled in the config)
+            if (showDescription) {
                 List<Component> desc = new ArrayList<>(ComponentUtil.asComponent(enchant.formatDescription(level)));
                 desc.replaceAll(component -> component.applyFallbackStyle(FALLBACK_STYLE));
                 lore.addAll(0, desc);
-            });
-        }
-
-        // Add vanilla-like enchantment lore
-        enchants.forEach((enchant, level) -> {
+                descSize.addAndGet(desc.size());
+            }
+            // Add vanilla-like enchantment lore
             int charges = EnchantManager.getEnchantmentCharges(item, enchant);
             lore.add(0, enchant.displayName(level, charges));
         });
+        if (showDescription) PDCUtil.setData(meta, DESCRIPTION_SIZE, descSize.get());
 
         meta.lore(lore);
         item.setItemMeta(meta);
@@ -142,8 +144,9 @@ public class ProtocolHook {
         List<Component> lore = Objects.requireNonNull(meta.lore());
         int size = EnchantManager.getExcellentEnchantments(item).size();
         if (size == 0) return item; // if no custom enchantment on this item
-        List<Component> reverted = lore.subList(size, lore.size());
-        meta.lore(reverted.isEmpty() ? null : reverted); // remove the custom enchantment lore
+        if (showDescription) size += PDCUtil.getIntData(meta, DESCRIPTION_SIZE);
+        List<Component> reverted = lore.subList(size, lore.size()); // gets the part without any enchantment lore
+        meta.lore(reverted.isEmpty() ? null : reverted);
 
         item.setItemMeta(meta);
         return item;
