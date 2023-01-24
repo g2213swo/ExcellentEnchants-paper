@@ -198,7 +198,9 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         ItemMeta meta = item.getItemMeta();
         if (meta == null || !meta.hasEnchants()) return Collections.emptyMap();
 
-        return (meta instanceof EnchantmentStorageMeta meta2) ? meta2.getStoredEnchants() : meta.getEnchants();
+        return (meta instanceof EnchantmentStorageMeta storageMeta)
+            ? storageMeta.getStoredEnchants()
+            : meta.getEnchants();
     }
 
     public static int getEnchantmentsAmount(@NotNull ItemStack item) {
