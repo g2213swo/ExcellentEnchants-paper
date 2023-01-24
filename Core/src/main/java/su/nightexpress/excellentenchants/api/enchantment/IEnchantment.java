@@ -12,11 +12,7 @@ import su.nightexpress.excellentenchants.tier.Tier;
 import java.util.List;
 import java.util.Set;
 
-public interface IEnchantment extends Comparable<IEnchantment> {
-
-    @Override default int compareTo(@NotNull IEnchantment o) {
-        return -this.getPriority().compareTo(o.getPriority()); // we always want the reverse ordering
-    }
+public interface IEnchantment {
 
     @NotNull JYML getConfig();
 
