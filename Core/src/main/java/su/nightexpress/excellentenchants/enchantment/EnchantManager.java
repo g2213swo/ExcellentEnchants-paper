@@ -15,7 +15,6 @@ import su.nexmedia.engine.api.manager.AbstractManager;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
@@ -36,7 +35,6 @@ import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EnchantManager extends AbstractManager<ExcellentEnchants> {
@@ -198,7 +196,9 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return Collections.emptyMap();
 
-        return (meta instanceof EnchantmentStorageMeta meta2) ? meta2.getStoredEnchants() : meta.getEnchants();
+        return (meta instanceof EnchantmentStorageMeta storageMeta)
+            ? storageMeta.getStoredEnchants()
+            : meta.getEnchants();
     }
 
     public static int getEnchantmentsAmount(@NotNull ItemStack item) {
@@ -269,28 +269,25 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     @NotNull
     public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemStack item) {
-        return EnchantManager.getEnchantments(item).entrySet().stream()
-            .map(entry -> {
-                ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
-                return enchant == null ? null : Pair.of(enchant, entry.getValue());
-            })
-            .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
-            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
+        Map<ExcellentEnchant, Integer> custom = new TreeMap<>(); // sort while inserting
+        EnchantManager.getEnchantments(item).forEach((k, v) -> {
+            ExcellentEnchant enchant = EnchantRegister.get(k.getKey());
+            if (enchant != null)
+                custom.put(enchant, v);
+        });
+        return custom;
     }
 
     @SuppressWarnings("unchecked")
     @NotNull
     public static <T extends IEnchantment> Map<T, Integer> getExcellentEnchantments(@NotNull ItemStack item, @NotNull Class<T> clazz) {
-        return EnchantManager.getEnchantments(item).entrySet().stream()
-            .map(entry -> {
-                ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
-                if (enchant == null || !clazz.isAssignableFrom(enchant.getClass())) return null;
-                return Pair.of((T) enchant, entry.getValue());
-            })
-            .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
-            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
+        Map<T, Integer> custom = new TreeMap<>(); // sort while inserting
+        EnchantManager.getEnchantments(item).forEach((k, v) -> {
+            ExcellentEnchant enchant = EnchantRegister.get(k.getKey());
+            if (enchant != null && clazz.isAssignableFrom(enchant.getClass()))
+                custom.put((T) enchant, v);
+        });
+        return custom;
     }
 
     @Nullable
