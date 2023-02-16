@@ -203,6 +203,28 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     @NotNull
+    public UnaryOperator<String> replaceAllPlaceholders(int level) {
+        return str -> str.transform(this.replacePlaceholders(level))
+            .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
+            .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
+            .replace(Placeholders.ENCHANTMENT_LEVEL, NumberUtil.toRoman(level))
+            .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
+            .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
+            .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
+            .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
+            .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, String.valueOf(this.getChargesMax(level)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, String.valueOf(this.getChargesConsumeAmount(level)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, String.valueOf(this.getChargesRechargeAmount(level)))
+            .replace(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, ComponentUtil.asMiniMessage(ItemUtil.getName(this.getChargesFuel())))
+            ;
+    }
+
+    @NotNull
     public UnaryOperator<String> replacePlaceholders(int level) {
         return str -> {
             str = str.replace(Placeholders.ENCHANTMENT_DESCRIPTION, String.join("\n", this.getDescription()));
@@ -216,24 +238,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
                     .replace(PotionImplementation.PLACEHOLDER_POTION_DURATION, NumberUtil.format((double) potioned.getEffectDuration(level) / 20D))
                     .replace(PotionImplementation.PLACEHOLDER_POTION_TYPE, LangManager.getPotionType(potioned.getEffectType()));
             }
-            return str
-                .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
-                .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
-                .replace(Placeholders.ENCHANTMENT_LEVEL, NumberUtil.toRoman(level))
-                .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
-                .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
-                .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
-                .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
-                .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, String.valueOf(this.getChargesMax(level)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, String.valueOf(this.getChargesConsumeAmount(level)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, String.valueOf(this.getChargesRechargeAmount(level)))
-                .replace(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, ComponentUtil.asMiniMessage(ItemUtil.getName(this.getChargesFuel())))
-                ;
+            return str;
         };
     }
 
@@ -300,7 +305,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     public String getNameFormatted(int level, int charges) {
         // Shouldn't contain legacy color code here, only MiniMessage strings allowed
 
-        if (!this.isChargesEnabled()) return this.getNameFormatted(level);
+        if (!this.isChargesEnabled() || charges < 0) return this.getNameFormatted(level);
 
         int chargesMax = this.getChargesMax(level);
         double percent = (double) charges / (double) chargesMax * 100D;
@@ -469,8 +474,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     public boolean isChargesFuel(@NotNull ItemStack item) {
-        ItemStack fuel = this.getChargesFuel();
-        return item.isSimilar(fuel);
+        return item.isSimilar(this.getChargesFuel());
     }
 
     @NotNull
@@ -486,6 +490,11 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     @Override
     public boolean isFullOfCharges(@NotNull ItemStack item) {
         return EnchantManager.isEnchantmentFullOfCharges(item, this);
+    }
+
+    @Override
+    public int getCharges(@NotNull ItemStack item) {
+        return EnchantManager.getEnchantmentCharges(item, this);
     }
 
     @Override
@@ -551,4 +560,5 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         // Not compatible with this Paper API
         return Key.key(NAMESPACE, id).asString();
     }
+
 }

@@ -147,7 +147,7 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
         meta.lore(lore);
 
         ItemUtil.removeItalic(meta);
-        ItemUtil.replaceNameAndLore(meta, enchant.replacePlaceholders(level));
+        ItemUtil.replaceNameAndLore(meta, enchant.replaceAllPlaceholders(level));
 
         icon.setItemMeta(meta);
         return icon;

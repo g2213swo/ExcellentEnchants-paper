@@ -26,7 +26,8 @@ public class Config {
     );
 
     public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled", false,
-        "Enables the enchantment Charges feature."); // TODO Wiki link
+        "Enables the enchantment Charges feature.",
+        Placeholders.URL_WIKI + "Charges-System");
 
     public static final JOption<TreeMap<Double, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Double, String>>("Enchantments.Charges.Format",
         (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> StringUtil.getDouble(k, 0), v -> cfg.getString(path + "." + v, ""), (o, n) -> n, TreeMap::new)),
@@ -51,10 +52,11 @@ public class Config {
         .setWriter(JYML::setItem);
 
     public static final JOption<Set<String>> ENCHANTMENTS_DISABLED = JOption.create("Enchantments.Disabled",
-        Set.of("enchant_name", "other_enchant"),
-        "A list of enchantments, that will be disabled and removed from the game (server).",
-        "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
-        "Example: To disable 'Explosive Arrows' you need to add 'explosive_arrows' here.");
+            Set.of("enchant_name", "other_enchant"),
+            "A list of enchantments, that will be disabled and removed from the game (server).",
+            "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
+            "Example: To disable 'Explosive Arrows' you need to add 'explosive_arrows' here.")
+        .mapReader(set -> set.stream().map(String::toLowerCase).collect(Collectors.toSet()));
 
     public static final JOption<Map<String, Set<String>>> ENCHANTMENTS_DISABLED_IN_WORLDS = new JOption<Map<String, Set<String>>>("Enchantments.Disabled_In_Worlds",
         (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> k, worldName -> cfg.getStringSet(path + "." + worldName))),

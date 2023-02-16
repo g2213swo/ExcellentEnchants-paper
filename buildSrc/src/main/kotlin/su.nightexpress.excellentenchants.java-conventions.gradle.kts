@@ -43,12 +43,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly("su.nexmedia:NexEngine:2.2.8")
+    compileOnly("su.nexmedia:NexEngine:2.2.9")
     compileOnly("org.jetbrains:annotations:24.0.0")
 }
 
 group = "su.nightexpress.excellentenchants"
-version = "3.3.0.2"
+version = "3.3.1"
 
 java {
     toolchain {

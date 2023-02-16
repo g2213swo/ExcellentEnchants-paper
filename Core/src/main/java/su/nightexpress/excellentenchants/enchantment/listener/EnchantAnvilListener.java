@@ -19,6 +19,7 @@ import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -59,7 +60,8 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         @NotNull ItemStack second,
         @NotNull ItemStack result
     ) {
-        if (!second.getType().isAir()) return false;
+        if (!second.getType().isAir() && (second.getType() == first.getType() || second.getType() == Material.ENCHANTED_BOOK))
+            return false;
         if (result.getType() != first.getType()) return false;
 
         ItemStack resultCopy = result.clone();
@@ -78,16 +80,22 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
     ) {
         if (second.getType().isAir()) return false;
 
-        Set<ExcellentEnchant> chargeable = EnchantManager.getExcellentEnchantments(first).keySet().stream()
+        Set<ExcellentEnchant> chargeables = EnchantManager.getExcellentEnchantments(first).keySet().stream()
             .filter(en -> en.isChargesEnabled() && en.isChargesFuel(second) && !en.isFullOfCharges(first))
             .collect(Collectors.toSet());
-        if (chargeable.isEmpty()) return false;
+        if (chargeables.isEmpty()) return false;
 
         ItemStack result2 = first.clone();
-        chargeable.forEach(enchant -> EnchantManager.rechargeEnchantmentCharges(result2, enchant));
-        PDCUtil.setData(result2, RECHARGED, true);
+
+        int count = 0;
+        while (count < second.getAmount() && !chargeables.stream().allMatch(en -> en.isFullOfCharges(result2))) {
+            chargeables.forEach(enchant -> EnchantManager.rechargeEnchantmentCharges(result2, enchant));
+            count++;
+        }
+
+        PDCUtil.setData(result2, RECHARGED, count);
         e.setResult(result2);
-        this.plugin.runTask(c -> e.getInventory().setRepairCost(chargeable.size()), false);
+        this.plugin.runTask(c -> e.getInventory().setRepairCost(chargeables.size()), false);
         return true;
     }
 
@@ -103,12 +111,14 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
 
         ItemStack copy = result.getType().isAir() ? first.clone() : result.clone();
         Map<ExcellentEnchant, Integer> enchantments = EnchantManager.getExcellentEnchantments(first);
+        Map<ExcellentEnchant, Integer> charges = new HashMap<>(enchantments.keySet().stream().collect(Collectors.toMap(k -> k, v -> v.getCharges(first))));
         AtomicInteger repairCost = new AtomicInteger(e.getInventory().getRepairCost());
 
         // Merge only if it's Item + Item, Item + Enchanted book or Enchanted Book + Enchanted Book
         if (second.getType() == Material.ENCHANTED_BOOK || second.getType() == first.getType()) {
             EnchantManager.getExcellentEnchantments(second).forEach((enchant, level) -> {
                 enchantments.merge(enchant, level, (oldLvl, newLvl) -> (oldLvl.equals(newLvl)) ? (Math.min(enchant.getMaxLevel(), oldLvl + 1)) : (Math.max(oldLvl, newLvl)));
+                charges.merge(enchant, enchant.getCharges(second), Integer::sum);
             });
         }
 
@@ -116,6 +126,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         enchantments.forEach((enchant, level) -> {
             if (EnchantManager.addEnchantment(copy, enchant, level, false)) {
                 repairCost.addAndGet(enchant.getAnvilMergeCost(level));
+                EnchantManager.setEnchantmentCharges(copy, enchant, charges.getOrDefault(enchant, 0));
             }
         });
 
@@ -134,7 +145,10 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         if (e.getRawSlot() != 2) return;
 
         ItemStack item = e.getCurrentItem();
-        if (item == null || !PDCUtil.getBooleanData(item, RECHARGED)) return;
+        if (item == null) return;
+
+        int count = PDCUtil.getIntData(item, RECHARGED);
+        if (count == 0) return;
 
         Player player = (Player) e.getWhoClicked();
         if (player.getLevel() < inventory.getRepairCost()) return;
@@ -148,7 +162,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
 
         ItemStack second = inventory.getSecondItem();
         if (second != null && !second.getType().isAir()) {
-            second.setAmount(second.getAmount() - 1);
+            second.setAmount(second.getAmount() - count);
         }
         inventory.setFirstItem(null);
         inventory.setResult(null);

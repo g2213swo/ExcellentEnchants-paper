@@ -115,8 +115,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         // Класс для исключения неудачных попыток.
         EnchantPopulator populator = new EnchantPopulator(obtainType, item);
 
-        // Херачим до талого, пока нужное количество не будет добавлено
-        // или не закончатся чары и/или тиры.
+        // Добавляем сколько можем, пока нужное количество не будет добавлено или не закончатся чары и/или тиры.
         while (!populator.isEmpty() && enchRoll > 0) {
             // Достигнут максимум чар (любых) для итема, заканчиваем.
             if (enchantsToAdd.size() >= enchMax) break;
@@ -196,11 +195,12 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     @NotNull
     public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
-        if (meta == null || !meta.hasEnchants()) return Collections.emptyMap();
+        return meta == null ? Collections.emptyMap() : getEnchantments(meta);
+    }
 
-        return (meta instanceof EnchantmentStorageMeta storageMeta)
-            ? storageMeta.getStoredEnchants()
-            : meta.getEnchants();
+    @NotNull
+    public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemMeta meta) {
+        return (meta instanceof EnchantmentStorageMeta meta2) ? meta2.getStoredEnchants() : meta.getEnchants();
     }
 
     public static int getEnchantmentsAmount(@NotNull ItemStack item) {
@@ -216,7 +216,11 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     }
 
     public static int getEnchantmentCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        return PDCUtil.getIntData(item, enchant.getChargesKey());
+        return enchant.isChargesEnabled() ? PDCUtil.getIntData(item, enchant.getChargesKey()) : -1;
+    }
+
+    public static int getEnchantmentCharges(@NotNull ItemMeta meta, @NotNull ExcellentEnchant enchant) {
+        return enchant.isChargesEnabled() ? PDCUtil.getIntData(meta, enchant.getChargesKey()) : -1;
     }
 
     public static boolean isEnchantmentOutOfCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
@@ -271,13 +275,23 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
     @NotNull
     public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemStack item) {
-        return EnchantManager.getEnchantments(item).entrySet().stream()
+        return getExcellentEnchantments(EnchantManager.getEnchantments(item));
+    }
+
+    @NotNull
+    public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemMeta meta) {
+        return getExcellentEnchantments(EnchantManager.getEnchantments(meta));
+    }
+
+    @NotNull
+    private static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull Map<Enchantment, Integer> enchants) {
+        return enchants.entrySet().stream()
             .map(entry -> {
                 ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
                 return enchant == null ? null : Pair.of(enchant, entry.getValue());
             })
             .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
+            //.sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
             .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
     }
 
@@ -298,7 +312,8 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     @Nullable
     public static ExcellentEnchant getEnchantmentByEffect(@NotNull LivingEntity entity, @NotNull PotionEffect effect) {
         Enchantment enchantment = ExcellentEnchantsAPI.PLUGIN.getEnchantNMS().getEnchantmentByEffect(entity, effect);
-        if (enchantment instanceof ExcellentEnchant enchant) return enchant;
+        if (enchantment instanceof ExcellentEnchant enchant)
+            return enchant;
         return null;
     }
 

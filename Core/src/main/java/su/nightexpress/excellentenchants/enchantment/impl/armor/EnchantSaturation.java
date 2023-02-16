@@ -35,24 +35,28 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
 
     public EnchantSaturation(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-
-        this.task = new Task(plugin);
-        this.task.start();
     }
 
     @Override
     public void loadConfig() {
         super.loadConfig();
         this.saturationInterval = JOption.create("Settings.Saturation.Interval", 100,
-            "How often (in seconds) enchantment will have effect?").read(cfg);
+            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
         this.saturationAmount = EnchantScaler.read(this, "Settings.Saturation.Amount", Placeholders.ENCHANTMENT_LEVEL,
             "Amount of food points to restore.");
         this.saturationMaxFoodLevel = EnchantScaler.read(this, "Settings.Saturation.Max_Food_Level", "20",
             "Maximal player's food level for the enchantment to stop feeding them.");
+
+        this.task = new Task(plugin);
+        this.task.start();
     }
 
     @Override
     public void clear() {
+        this.stopTask();
+    }
+
+    private void stopTask() {
         if (this.task != null) {
             this.task.stop();
             this.task = null;
@@ -110,7 +114,12 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
         public void action() {
             for (LivingEntity entity : this.getEntities()) {
                 EnchantManager.getEquippedEnchants(entity, EnchantSaturation.class).forEach((item, enchants) -> {
-                    enchants.forEach((enchant, level) -> enchant.onTrigger(entity, item, level));
+                    enchants.forEach((enchant, level) -> {
+                        if (enchant.isOutOfCharges(item)) return;
+                        if (enchant.onTrigger(entity, item, level)) {
+                            enchant.consumeCharges(item);
+                        }
+                    });
                 });
             }
         }

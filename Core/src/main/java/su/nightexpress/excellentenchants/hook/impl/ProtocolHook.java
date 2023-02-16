@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -102,7 +103,7 @@ public class ProtocolHook {
 
         if (!item.hasItemMeta()) return item; // if this is simple item
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
+        if (meta == null || meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return item;
 
         Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
         if (enchants.isEmpty()) return item; // if no enchants on this item

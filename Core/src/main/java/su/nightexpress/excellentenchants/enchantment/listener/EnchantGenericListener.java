@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.AbstractListener;
+import su.nexmedia.engine.hooks.Hooks;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
@@ -178,6 +179,8 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
 
         LivingEntity entity = e.getEntity();
+        if (Hooks.isMythicMob(entity)) return;
+
         EntityEquipment equipment = entity.getEquipment();
         if (equipment == null) return;
 
@@ -185,8 +188,10 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             ItemStack item = equipment.getItem(slot);
             if (EnchantManager.isEnchantable(item)) {
                 EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
+                EnchantManager.getExcellentEnchantments(item).keySet().forEach(enchant -> EnchantManager.restoreEnchantmentCharges(item, enchant));
                 equipment.setItem(slot, item);
             }
         }
     }
+
 }
