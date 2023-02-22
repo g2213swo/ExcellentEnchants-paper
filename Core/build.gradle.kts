@@ -13,14 +13,12 @@ plugins {
 
 dependencies {
     // The server API
-    // compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
     compileOnly("org.purpurmc.purpur:purpur-api:1.19.3-R0.1-SNAPSHOT")
 
     // NMS modules
     api(project(":NMS"))
     implementation(project(":V1_17_R1", configuration = "reobf"))
     implementation(project(":V1_18_R2", configuration = "reobf"))
-    implementation(project(":V1_19_R1", configuration = "reobf"))
     implementation(project(":V1_19_R2", configuration = "reobf"))
 
     // 3rd party plugins
@@ -104,11 +102,18 @@ tasks {
     shadowJar {
         minimize {
             exclude(dependency("su.nightexpress.excellentenchants:.*:.*"))
-            // exclude(dependency("su.nexmedia.playerblocktracker:.*:.*"))
         }
         archiveFileName.set("ExcellentEnchants-${project.version}.jar")
         archiveClassifier.set("")
         destinationDirectory.set(file("$rootDir"))
+    }
+    processResources {
+        filesMatching("**/paper-plugin.yml") {
+            expand(mapOf(
+                "version" to "${project.version}",
+                "description" to project.description
+            ))
+        }
     }
     register("deployJar") {
         doLast {

@@ -1,0 +1,60 @@
+name: ExcellentEnchants
+main: su.nightexpress.excellentenchants.ExcellentEnchants
+version: ${version}
+api-version: 1.19
+authors: [ NightExpress, Nailm ]
+description: ${description}
+load-before: # These plugins might read the EnchantmentRegistry, so we load before them
+  - name: HuskSync
+    bootstrap: false
+  - name: MMOItems
+    bootstrap: false
+  - name: ItemsAdder
+    bootstrap: false
+  - name: WanderingTraders
+    bootstrap: false
+  - name: BetterGUI
+    bootstrap: false
+load-after:
+  - name: NexEngine
+    bootstrap: false
+dependencies:
+  - name: NexEngine
+    required: true
+    bootstrap: false
+  - name: ProtocolLib
+    required: false
+    bootstrap: false
+  - name: NoCheatPlus
+    required: false
+    bootstrap: false
+permissions:
+  excellentenchants.admin:
+    description: Grants access to all plugin functions.
+    default: op
+    children:
+      excellentenchants.user: true
+      excellentenchants.command: true
+  excellentenchants.user:
+    description: Grants access to basic player plugin functions.
+    default: op
+  excellentenchants.command:
+    description: Grants access to all the plugin commands.
+    default: op
+    children:
+      excellentenchants.command.book: true
+      excellentenchants.command.enchant: true
+      excellentenchants.command.list: true
+      excellentenchants.command.tierbook: true
+  excellentenchants.command.book:
+    description: Grants access to /eenchants book command.
+    default: op
+  excellentenchants.command.enchant:
+    description: Grants access to /eenchants enchant command.
+    default: op
+  excellentenchants.command.list:
+    description: Grants access to /eenchants list command.
+    default: op
+  excellentenchants.command.tierbook:
+    description: Grants access to /eenchants tierbook command.
+    default: op
