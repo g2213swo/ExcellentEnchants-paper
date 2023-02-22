@@ -19,7 +19,6 @@ import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.v1_17_R1.V1_17_R1;
 import su.nightexpress.excellentenchants.nms.v1_18_R2.V1_18_R2;
-import su.nightexpress.excellentenchants.nms.v1_19_R1.V1_19_R1;
 import su.nightexpress.excellentenchants.nms.v1_19_R2.V1_19_R2;
 import su.nightexpress.excellentenchants.tier.TierManager;
 
@@ -68,7 +67,6 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         this.enchantNMS = switch (Version.CURRENT) {
             case V1_17_R1 -> new V1_17_R1();
             case V1_18_R2 -> new V1_18_R2();
-            case V1_19_R1 -> new V1_19_R1();
             case V1_19_R2 -> new V1_19_R2();
         };
         return true;
