@@ -7,13 +7,13 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 plugins {
     id("su.nightexpress.excellentenchants.java-conventions")
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
     id("net.kyori.indra.git") version "2.1.1"
 }
 
 dependencies {
     // The server API
-    compileOnly("org.purpurmc.purpur:purpur-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("org.purpurmc.purpur:purpur-api:1.19.4-R0.1-SNAPSHOT")
 
     // NMS modules
     api(project(":NMS"))
