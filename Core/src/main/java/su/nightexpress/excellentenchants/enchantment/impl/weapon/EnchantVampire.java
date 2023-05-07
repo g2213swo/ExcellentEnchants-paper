@@ -44,13 +44,12 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
         this.healAmount = EnchantScaler.read(this, "Settings.Heal.Amount", "0.25 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Amount of health to be restored for attacker.");
         this.healMultiplier = JOption.create("Settings.Heal.As_Multiplier", false,
-            "When 'true', the option above will work as a multiplier of the inflicted damage.").read(cfg);
+            "When 'true', the option above will work as a multiplier of the inflicted damage.").read(this.cfg);
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public double getHealAmount(int level) {
@@ -58,18 +57,16 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
     }
 
     public boolean isHealMultiplier() {
-        return healMultiplier;
+        return this.healMultiplier;
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         double healAmount = this.getHealAmount(level);
 
         return str -> str
@@ -92,7 +89,7 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
         double healFinal = this.isHealMultiplier() ? e.getDamage() * healAmount : healAmount;
 
         EntityRegainHealthEvent healthEvent = new EntityRegainHealthEvent(damager, healFinal, EntityRegainHealthEvent.RegainReason.CUSTOM);
-        plugin.getPluginManager().callEvent(healthEvent);
+        this.plugin.getPluginManager().callEvent(healthEvent);
         if (healthEvent.isCancelled()) return false;
 
         damager.setHealth(Math.min(healthMax, healthHas + healthEvent.getAmount()));

@@ -15,8 +15,7 @@ public enum FitItemType {
     SWORD, TRIDENT, AXE, BOW, CROSSBOW,
     HOE, PICKAXE, SHOVEL, FISHING_ROD;
 
-    @Nullable
-    public static FitItemType getByEnchantmentTarget(@NotNull EnchantmentTarget target) {
+    public static @Nullable FitItemType getByEnchantmentTarget(@NotNull EnchantmentTarget target) {
         return switch (target) {
             case ARMOR -> ARMOR;
             case ARMOR_FEET -> BOOTS;

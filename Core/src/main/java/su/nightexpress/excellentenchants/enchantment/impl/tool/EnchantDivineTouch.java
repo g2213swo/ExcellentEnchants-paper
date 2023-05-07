@@ -50,29 +50,25 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         this.chanceImplementation = ChanceImplementation.create(this);
         this.spawnerName = JOption.create("Settings.Spawner_Item.Name", "<green>Mob Spawner <gray>(" + Placeholders.GENERIC_TYPE + ")",
             "Spawner item display name.",
-            "Placeholder '" + Placeholders.GENERIC_TYPE + "' for the mob type.").read(cfg);
-    }
-
-    @NotNull
-    @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+            "Placeholder '" + Placeholders.GENERIC_TYPE + "' for the mob type.").read(this.cfg);
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
+    }
+
+    @Override
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE};
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 
-    @NotNull
-    private ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
+    private @NotNull ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
         ItemStack itemSpawner = new ItemStack(Material.SPAWNER);
         BlockStateMeta stateItem = (BlockStateMeta) itemSpawner.getItemMeta();
         if (stateItem == null) return itemSpawner;
@@ -81,7 +77,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         spawnerItem.setSpawnedType(spawnerBlock.getSpawnedType());
         spawnerItem.update(true);
         stateItem.setBlockState(spawnerItem);
-        stateItem.displayName(ComponentUtil.asComponent(this.spawnerName.replace(Placeholders.GENERIC_TYPE, plugin.getLangManager().getEnum(spawnerBlock.getSpawnedType()))));
+        stateItem.displayName(ComponentUtil.asComponent(this.spawnerName.replace(Placeholders.GENERIC_TYPE, this.plugin.getLangManager().getEnum(spawnerBlock.getSpawnedType()))));
         itemSpawner.setItemMeta(stateItem);
 
         return itemSpawner;
@@ -107,12 +103,9 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         Block block = e.getBlock();
-        if (!this.isAvailableToUse(player))
-            return false;
-        if (!(block.getState() instanceof CreatureSpawner spawnerBlock))
-            return false;
-        if (!this.checkTriggerChance(level))
-            return false;
+        if (!this.isAvailableToUse(player)) return false;
+        if (!(block.getState() instanceof CreatureSpawner spawnerBlock)) return false;
+        if (!this.checkTriggerChance(level)) return false;
 
         e.setExpToDrop(0);
         e.setDropItems(true);
@@ -124,8 +117,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawnerPlace(BlockPlaceEvent e) {
         Block block = e.getBlock();
-        if (block.getType() != Material.SPAWNER)
-            return;
+        if (block.getType() != Material.SPAWNER) return;
 
         Player player = e.getPlayer();
         ItemStack spawner = player.getInventory().getItem(e.getHand());

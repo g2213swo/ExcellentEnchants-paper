@@ -4,6 +4,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -45,21 +46,18 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
         this.chanceImplementation = ChanceImplementation.create(this);
     }
 
-    @NotNull
     @Override
-    public ArrowImplementation getArrowImplementation() {
-        return arrowImplementation;
+    public @NotNull ArrowImplementation getArrowImplementation() {
+        return this.arrowImplementation;
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.BOW;
     }
 
@@ -76,7 +74,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
         if (e.getHitEntity() != null || e.getHitBlock() == null) return false;
 
         Block block = e.getHitBlock();
-        block.getWorld().strikeLightning(block.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
+        block.getWorld().strikeLightning(block.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(this.plugin, true));
         if (this.hasVisualEffects()) {
             EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.BLOCK_CRACK, block.getType().name(), 1D, 1D, 1D, 0.05, 150);
             EffectUtil.playEffect(LocationUtil.getCenter(block.getLocation()), Particle.FIREWORKS_SPARK, "", 1D, 1D, 1D, 0.05, 150);
@@ -88,10 +86,10 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     public boolean onDamage(@NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile, @NotNull LivingEntity shooter, @NotNull LivingEntity victim, @NotNull ItemStack weapon, int level) {
         if (!this.isOurProjectile(projectile)) return false;
 
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
             if (victim.isDead()) return;
             victim.setNoDamageTicks(0);
-            victim.getWorld().strikeLightning(victim.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
+            victim.getWorld().strikeLightning(victim.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(this.plugin, true));
         });
 
         return true;
@@ -100,9 +98,9 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onItemDamage(EntityDamageByEntityEvent e) {
         if (!e.getDamager().hasMetadata(META_NO_ITEM_DAMAGE)) return;
-        if (!(e.getEntity() instanceof Item item)) return;
-
-        e.setCancelled(true);
-        item.setFireTicks(0);
+        if (e.getEntity() instanceof Item || e.getEntity() instanceof ItemFrame) {
+            e.setCancelled(true);
+            e.getEntity().setFireTicks(0);
+        }
     }
 }

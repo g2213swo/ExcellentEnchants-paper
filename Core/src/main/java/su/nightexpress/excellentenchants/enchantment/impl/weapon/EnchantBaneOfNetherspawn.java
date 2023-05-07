@@ -44,7 +44,7 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
     public void loadConfig() {
         super.loadConfig();
         this.damageModifier = JOption.create("Settings.Damage.As_Modifier", false,
-            "When 'true' multiplies the damage. When 'false' sums plain values.").read(cfg);
+            "When 'true' multiplies the damage. When 'false' sums plain values.").read(this.cfg);
         this.damageFormula = EnchantScaler.read(this, "Settings.Damage.Amount", "0.5 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Amount of additional damage.");
     }
@@ -54,16 +54,14 @@ public class EnchantBaneOfNetherspawn extends ExcellentEnchant implements Combat
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_DAMAGE, NumberUtil.format(this.getDamageModifier(level)));
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 

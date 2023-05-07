@@ -2,10 +2,7 @@ package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
 import org.bukkit.World;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -55,39 +52,35 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
         this.arrowImplementation = ArrowImplementation.create(this);
         this.chanceImplementation = ChanceImplementation.create(this);
         this.explosionFireSpread = JOption.create("Settings.Explosion.Fire_Spread", true,
-            "When 'true' creates fire on nearby blocks.").read(cfg);
+            "When 'true' creates fire on nearby blocks.").read(this.cfg);
         this.explosionDamageItems = JOption.create("Settings.Explosion.Damage_Items", false,
-            "When 'true' inflicts damage to items on the ground.").read(cfg);
+            "When 'true' inflicts damage to items on the ground.").read(this.cfg);
         this.explosionDamageBlocks = JOption.create("Settings.Explosion.Damage_Blocks", false,
-            "When 'true' allows to break blocks by explosion.").read(cfg);
+            "When 'true' allows to break blocks by explosion.").read(this.cfg);
         this.explosionSize = EnchantScaler.read(this, "Settings.Explosion.Size", "2.0 + " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets the explosion size. The more size - the bigger explosion.");
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)))
             ;
     }
 
-    @NotNull
     @Override
-    public ArrowImplementation getArrowImplementation() {
-        return arrowImplementation;
+    public @NotNull ArrowImplementation getArrowImplementation() {
+        return this.arrowImplementation;
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.BOW;
     }
 
@@ -139,8 +132,9 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
         if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) return;
         if (this.explosionDamageItems) return;
         if (!e.getDamager().hasMetadata(META_EXPLOSION_SOURCE)) return;
-        if (!(e.getEntity() instanceof Item item)) return;
 
-        e.setCancelled(true);
+        if (e.getEntity() instanceof Item || e.getEntity() instanceof ItemFrame) {
+            e.setCancelled(true);
+        }
     }
 }

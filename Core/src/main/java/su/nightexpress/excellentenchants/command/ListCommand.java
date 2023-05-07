@@ -17,15 +17,13 @@ public class ListCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    @NotNull
-    public String getUsage() {
+    public @NotNull String getUsage() {
         return "";
     }
 
     @Override
-    @NotNull
-    public String getDescription() {
-        return plugin.getMessage(Lang.COMMAND_LIST_DESC).getLocalized();
+    public @NotNull String getDescription() {
+        return this.plugin.getMessage(Lang.COMMAND_LIST_DESC).getLocalized();
     }
 
     @Override
@@ -35,6 +33,6 @@ public class ListCommand extends AbstractCommand<ExcellentEnchants> {
 
     @Override
     protected void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Map<String, String> flags) {
-        plugin.getEnchantManager().getEnchantsListGUI().open((Player) sender, 1);
+        this.plugin.getEnchantManager().getEnchantsListGUI().open((Player) sender, 1);
     }
 }

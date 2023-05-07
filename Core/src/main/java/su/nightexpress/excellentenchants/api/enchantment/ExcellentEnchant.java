@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.IListener;
+import su.nexmedia.engine.api.placeholder.PlaceholderConstants;
 import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.*;
 import su.nexmedia.engine.utils.random.Rnd;
@@ -48,7 +49,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     private static final String NAMESPACE = "excellentenchants";
     private static final LoadingCache<ExcellentEnchant, Map<Integer, String>> STRING_NAME_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<>() {
-        @Override public @NotNull Map<Integer, String> load(final @NotNull ExcellentEnchant key) {
+        @Override
+        public @NotNull Map<Integer, String> load(final @NotNull ExcellentEnchant key) {
             int startLvl = key.getStartLevel();
             int maxLvl = key.getMaxLevel();
 
@@ -57,13 +59,14 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
             return new Int2ObjectArrayMap<>() {{
                 for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
-                    put(lvl, key.getDisplayName() + " " + NumberUtil.toRoman(lvl));
+                    this.put(lvl, key.getDisplayName() + " " + NumberUtil.toRoman(lvl));
                 }
             }};
         }
     });
     private static final LoadingCache<ExcellentEnchant, Map<Integer, Component>> COMPONENT_NAME_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<>() {
-        @Override public @NotNull Map<Integer, Component> load(final @NotNull ExcellentEnchant key) {
+        @Override
+        public @NotNull Map<Integer, Component> load(final @NotNull ExcellentEnchant key) {
             int startLvl = key.getStartLevel();
             int maxLvl = key.getMaxLevel();
 
@@ -78,7 +81,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
             return new Int2ObjectArrayMap<>() {{
                 for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
-                    put(lvl, displayName.appendSpace().append(Component.text(NumberUtil.toRoman(lvl))).style(displayStyle));
+                    this.put(lvl, displayName.appendSpace().append(Component.text(NumberUtil.toRoman(lvl))).style(displayStyle));
                 }
             }};
         }
@@ -125,30 +128,31 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         this.cfg.reload();
 
         this.displayName = JOption.create("Name", StringUtil.capitalizeFully(this.getId().replace("_", " ")),
-            "Enchantment display name. It will be shown in item lore.").read(cfg);
+            "Enchantment display name. It will be shown in item lore.").read(this.cfg);
 
-        this.tier = plugin.getTierManager().getTierById(JOption.create("Tier", Placeholders.DEFAULT,
-            "Enchantment tier. Must be a valid tier identifier from the 'tiers.yml'.").read(cfg));
+        this.tier = this.plugin.getTierManager().getTierById(JOption.create("Tier", PlaceholderConstants.DEFAULT,
+            "Enchantment tier. Must be a valid tier identifier from the 'tiers.yml'.").read(this.cfg));
         if (this.tier == null) {
             this.tier = Tier.DEFAULT;
         }
         this.tier.getEnchants().add(this);
 
         this.description = JOption.create("Description", new ArrayList<>(),
-            "Enchantment description. It will be shown in item lore under enchantment name.",
-            "You can use 'Enchantment' placeholders: " + Placeholders.URL_PLACEHOLDERS).read(cfg);
+                "Enchantment description. It will be shown in item lore under enchantment name.",
+                "You can use 'Enchantment' placeholders: " + Placeholders.URL_PLACEHOLDERS)
+            .mapReader(Colorizer::apply).read(this.cfg);
 
         this.isTreasure = JOption.create("Is_Treasure", false,
             "Sets whether this enchantment is a treasure enchantment.",
-            "Treasure enchantments can only be received via looting, trading, or fishing.").read(cfg);
+            "Treasure enchantments can only be received via looting, trading, or fishing.").read(this.cfg);
 
         this.levelMin = Math.max(1, JOption.create("Level.Min", 1,
-            "Sets the minimal (start) enchantment level. Can not be less than 1.").read(cfg));
+            "Sets the minimal (start) enchantment level. Can not be less than 1.").read(this.cfg));
 
         this.levelMax = JOption.create("Level.Max", 3,
             "Sets the maximal enchantment level. Can not be less than min. level.",
             "Note: While you can 'bypass' this value by enchant commands, all level-dependant enchantment",
-            "settings will have a limit up to this setting.").read(cfg);
+            "settings will have a limit up to this setting.").read(this.cfg);
 
         this.levelByEnchantCost = EnchantScaler.read(this, ObtainType.ENCHANTING.getPathName() + ".Level_By_Exp_Cost",
             (int) (30D / this.levelMax) + " * " + Placeholders.ENCHANTMENT_LEVEL,
@@ -162,33 +166,33 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         this.obtainLevelCap = new HashMap<>();
         for (ObtainType obtainType : ObtainType.values()) {
             double obtainChance = JOption.create(obtainType.getPathName() + ".Chance", 50D,
-                "Chance for this enchantment to be obtained via " + obtainType.getPathName()).read(cfg);
+                "Chance for this enchantment to be obtained via " + obtainType.getPathName()).read(this.cfg);
             this.obtainChance.put(obtainType, obtainChance);
 
             int levelMin = JOption.create(obtainType.getPathName() + ".Level.Min", -1,
                 "Minimal level when obtained via " + obtainType.getPathName(),
-                "Can not be less than enchantment min. level. Set -1 to use enchantment min. level.").read(cfg);
+                "Can not be less than enchantment min. level. Set -1 to use enchantment min. level.").read(this.cfg);
             int levelMax = JOption.create(obtainType.getPathName() + ".Level.Max", -1,
                 "Maximal level when obtained via " + obtainType.getPathName(),
-                "Can not be greater than enchantment max. level. Set -1 to use enchantment max. level.").read(cfg);
+                "Can not be greater than enchantment max. level. Set -1 to use enchantment max. level.").read(this.cfg);
             this.obtainLevelCap.put(obtainType, new int[]{levelMin, levelMax});
         }
 
 
         this.conflicts = JOption.create("Conflicts", new HashSet<>(),
             "A list of conflicting enchantment names.",
-            "Conflicting enchantments can not be combined on anvils and obtained together on the same item.").read(cfg);
+            "Conflicting enchantments can not be combined on anvils and obtained together on the same item.").read(this.cfg);
 
         this.hasVisualEffects = JOption.create("Settings.Visual_Effects", true,
-            "Enables/Disables enchantment visual effects, such as particles.").read(cfg);
+            "Enables/Disables enchantment visual effects, such as particles.").read(this.cfg);
 
 
         if (Config.ENCHANTMENTS_CHARGES_ENABLED.get()) {
             this.chargesEnabled = JOption.create("Settings.Charges.Enabled", false,
                 "When 'true' enables the Charges system for this enchantment.",
-                "When enchanted the first time on enchanting table, it will have maximum charges amount.").read(cfg);
+                "When enchanted the first time on enchanting table, it will have maximum charges amount.").read(this.cfg);
             this.chargesCustomFuel = JOption.create("Settings.Charges.Custom_Fuel", false,
-                "When 'true' uses different (non-default) fuel item (from the 'Fuel_Item' setting) to recharge.").read(cfg);
+                "When 'true' uses different (non-default) fuel item (from the 'Fuel_Item' setting) to recharge.").read(this.cfg);
             this.chargesMax = EnchantScaler.read(this, "Settings.Charges.Maximum", "100",
                 "Maximum amount of charges for the enchantment.");
             this.chargesConsumeAmount = EnchantScaler.read(this, "Settings.Charges.Consume_Amount", "1",
@@ -198,12 +202,11 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             this.chargesFuel = JOption.create("Settings.Charges.Fuel_Item", new ItemStack(Material.LAPIS_LAZULI),
                     "An item, that will be used to restore enchantment charges on anvils.",
                     "Item Options:" + Placeholders.URL_ENGINE_ITEMS)
-                .setWriter(JYML::setItem).read(cfg);
+                .setWriter(JYML::setItem).read(this.cfg);
         }
     }
 
-    @NotNull
-    public UnaryOperator<String> replaceAllPlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replaceAllPlaceholders(int level) {
         return str -> str.transform(this.replacePlaceholders(level))
             .replace(Placeholders.ENCHANTMENT_NAME, this.getDisplayName())
             .replace(Placeholders.ENCHANTMENT_NAME_FORMATTED, this.getNameFormatted(level))
@@ -211,7 +214,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             .replace(Placeholders.ENCHANTMENT_LEVEL_MIN, String.valueOf(this.getStartLevel()))
             .replace(Placeholders.ENCHANTMENT_LEVEL_MAX, String.valueOf(this.getMaxLevel()))
             .replace(Placeholders.ENCHANTMENT_TIER, this.getTier().getName())
-            .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
+            .replace(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> this.plugin.getLangManager().getEnum(type)).toList()))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
             .replace(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
@@ -224,8 +227,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             ;
     }
 
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> {
             str = str.replace(Placeholders.ENCHANTMENT_DESCRIPTION, String.join("\n", this.getDescription()));
 
@@ -244,55 +246,48 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     @Override
     public void registerListeners() {
-        this.plugin.getPluginManager().registerEvents(this, plugin);
+        this.plugin.getPluginManager().registerEvents(this, this.plugin);
     }
 
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         FitItemType itemType = FitItemType.getByEnchantmentTarget(this.getItemTarget());
         return itemType == null ? new FitItemType[0] : new FitItemType[]{itemType};
     }
 
     public boolean isDisabledInWorld(@NotNull World world) {
         Set<String> disabled = Config.ENCHANTMENTS_DISABLED_IN_WORLDS.get().getOrDefault(world.getName(), Collections.emptySet());
-        return disabled.contains(this.getKey().getKey()) || disabled.contains(Placeholders.WILDCARD);
+        return disabled.contains(this.getKey().getKey()) || disabled.contains(PlaceholderConstants.WILDCARD);
     }
 
     public boolean isAvailableToUse(@NotNull LivingEntity entity) {
         return !this.isDisabledInWorld(entity.getWorld());
     }
 
-    @NotNull
-    public JYML getConfig() {
+    public @NotNull JYML getConfig() {
         return this.cfg;
     }
 
-    @NotNull
-    public String getId() {
+    public @NotNull String getId() {
         return this.id;
     }
 
-    @NotNull
-    public EnchantPriority getPriority() {
-        return priority;
+    public @NotNull EnchantPriority getPriority() {
+        return this.priority;
     }
 
-    @NotNull
     @Override
-    public String getName() {
-        return getId().toUpperCase();
+    public @NotNull String getName() {
+        return this.getId().toUpperCase();
     }
 
-    @NotNull
-    public String getDisplayName() {
+    public @NotNull String getDisplayName() {
         return this.displayName;
     }
 
     /**
      * Only used in GUIs.
      */
-    @NotNull
-    public String getNameFormatted(int level) {
+    public @NotNull String getNameFormatted(int level) {
         // Shouldn't contain legacy color code here, only MiniMessage strings allowed
 
         return STRING_NAME_CACHE.getUnchecked(this).get(level);
@@ -301,23 +296,21 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     /**
      * Only used in GUIs.
      */
-    @NotNull
-    public String getNameFormatted(int level, int charges) {
+    public @NotNull String getNameFormatted(int level, int charges) {
         // Shouldn't contain legacy color code here, only MiniMessage strings allowed
 
         if (!this.isChargesEnabled() || charges < 0) return this.getNameFormatted(level);
 
         int chargesMax = this.getChargesMax(level);
-        double percent = (double) charges / (double) chargesMax * 100D;
-        Map.Entry<Double, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
+        int percent = (int) Math.ceil((double) charges / (double) chargesMax * 100D);
+        Map.Entry<Integer, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
         if (entry == null) return this.getNameFormatted(level);
 
         String format = entry.getValue().replace(Placeholders.GENERIC_AMOUNT, String.valueOf(charges));
         return this.getNameFormatted(level) + " " + format;
     }
 
-    @NotNull
-    public List<String> getDescription() {
+    public @NotNull List<String> getDescription() {
         return this.description;
     }
 
@@ -328,27 +321,23 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
      *
      * @return a copy of the enchantment description for the given level
      */
-    @NotNull
-    public List<String> getDescription(int level) {
+    public @NotNull List<String> getDescription(int level) {
         List<String> description = new ArrayList<>(this.description);
         description.replaceAll(this.replacePlaceholders(level));
         return description;
     }
 
-    @NotNull
-    public List<String> formatDescription(int level) {
+    public @NotNull List<String> formatDescription(int level) {
         return this.getDescription(level).stream()
             .map(line -> Config.ENCHANTMENTS_DESCRIPTION_FORMAT.get().replace(Placeholders.GENERIC_DESCRIPTION, line))
             .toList();
     }
 
-    @NotNull
-    public Set<String> getConflicts() {
-        return conflicts;
+    public @NotNull Set<String> getConflicts() {
+        return this.conflicts;
     }
 
-    @NotNull
-    public Tier getTier() {
+    public @NotNull Tier getTier() {
         return this.tier;
     }
 
@@ -449,7 +438,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     public boolean isChargesCustomFuel() {
-        return chargesCustomFuel;
+        return this.chargesCustomFuel;
     }
 
     public int getChargesMax(int level) {
@@ -464,8 +453,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return this.isChargesEnabled() ? (int) this.chargesRechargeAmount.getValue(level) : 0;
     }
 
-    @NotNull
-    public ItemStack getChargesFuel() {
+    public @NotNull ItemStack getChargesFuel() {
         ItemStack fuelHas = this.chargesFuel;
         if (!this.isChargesCustomFuel() || fuelHas == null || fuelHas.getType().isAir()) {
             return Config.ENCHANTMENTS_CHARGES_FUEL_ITEM.get();
@@ -477,9 +465,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return item.isSimilar(this.getChargesFuel());
     }
 
-    @NotNull
-    public NamespacedKey getChargesKey() {
-        return chargesKey;
+    public @NotNull NamespacedKey getChargesKey() {
+        return this.chargesKey;
     }
 
     @Override
@@ -509,8 +496,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         if (!this.isChargesEnabled()) return this.displayName(level);
 
         int chargesMax = this.getChargesMax(level);
-        double percent = (double) charges / (double) chargesMax * 100D;
-        Map.Entry<Double, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
+        int percent = (int) Math.floor((double) charges / chargesMax);
+        Map.Entry<Integer, String> entry = Config.ENCHANTMENTS_CHARGES_FORMAT.get().floorEntry(percent);
         if (entry == null) return this.displayName(level);
 
         String format = entry.getValue().replace(Placeholders.GENERIC_AMOUNT, String.valueOf(charges));
@@ -544,7 +531,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     @Override
-    public float getDamageIncrease(final int level, @NotNull final EntityCategory entityCategory) {
+    public float getDamageIncrease(final int level, final @NotNull EntityCategory entityCategory) {
         // Not compatible with this Paper API
         return 0.0F;
     }
@@ -558,7 +545,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     @Override
     public @NotNull String translationKey() {
         // Not compatible with this Paper API
-        return Key.key(NAMESPACE, id).asString();
+        return Key.key(NAMESPACE, this.id).asString();
     }
 
 }

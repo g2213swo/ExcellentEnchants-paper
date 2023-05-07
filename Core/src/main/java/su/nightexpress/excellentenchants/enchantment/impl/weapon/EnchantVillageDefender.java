@@ -39,7 +39,7 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
             "Amount of additional damage.");
 
         this.damageMultiplier = JOption.create("Settings.Damage.As_Modifier", false,
-            "When 'true' the 'Damage.Formula' will work as a multiplier to the original damage.").read(cfg);
+            "When 'true' the 'Damage.Formula' will work as a multiplier to the original damage.").read(this.cfg);
     }
 
     public double getDamageAddict(int level) {
@@ -47,12 +47,11 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
     }
 
     public boolean isDamageMultiplier() {
-        return damageMultiplier;
+        return this.damageMultiplier;
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAddict(level)))
@@ -60,8 +59,7 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 

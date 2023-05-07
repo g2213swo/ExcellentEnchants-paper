@@ -12,7 +12,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -33,16 +32,6 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
     public EnchantGenericListener(@NotNull EnchantManager enchantManager) {
         super(enchantManager.plugin());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onEnchantPotionEffectQuit(PlayerQuitEvent e) {
-        Player player = e.getPlayer();
-
-        player.getActivePotionEffects().stream()
-            .filter(effect -> EnchantManager.isEnchantmentEffect(player, effect)).forEach(effect -> {
-                player.removePotionEffect(effect.getType());
-            });
     }
 
     // ---------------------------------------------------------------
@@ -66,7 +55,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     }
 
     private void updateGrindstone(@NotNull Inventory inventory) {
-        this.plugin.getServer().getScheduler().runTask(plugin, () -> {
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
             ItemStack result = inventory.getItem(2);
             if (result == null || result.getType().isAir())
                 return;
@@ -80,9 +69,9 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
                 curses.putAll(EnchantManager.getExcellentEnchantments(source));
             }
             curses.entrySet().removeIf(entry -> !entry.getKey().isCursed());
-            curses.forEach((excellentEnchant, level) -> {
-                EnchantManager.addEnchantment(result, excellentEnchant, level, true);
-            });
+            curses.forEach((excellentEnchant, level) ->
+                EnchantManager.addEnchantment(result, excellentEnchant, level, true)
+            );
         });
     }
 
@@ -97,7 +86,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
         enchantsPrepared.putAll(enchantsToPopulate);
 
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
             ItemStack result = e.getInventory().getItem(0);
             if (result == null) return;
 
@@ -176,22 +165,25 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEnchantPopulateSpawn(CreatureSpawnEvent e) {
-        if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
-
+        //if (Config.getObtainSettings(ObtainType.MOB_SPAWNING).isEmpty()) return;
         LivingEntity entity = e.getEntity();
-        if (Hooks.isMythicMob(entity)) return;
+        if (entity.getType() == EntityType.ARMOR_STAND) return;
 
-        EntityEquipment equipment = entity.getEquipment();
-        if (equipment == null) return;
+        this.plugin.runTaskLater(task -> {
+            EntityEquipment equipment = entity.getEquipment();
+            if (equipment == null) return;
 
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack item = equipment.getItem(slot);
-            if (EnchantManager.isEnchantable(item)) {
-                EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
-                EnchantManager.getExcellentEnchantments(item).keySet().forEach(enchant -> EnchantManager.restoreEnchantmentCharges(item, enchant));
-                equipment.setItem(slot, item);
+            boolean isMythic = Hooks.isMythicMob(entity);
+            boolean doPopulation = Config.getObtainSettings(ObtainType.MOB_SPAWNING).isPresent() && !isMythic;
+
+            for (EquipmentSlot slot : EquipmentSlot.values()) {
+                ItemStack item = equipment.getItem(slot);
+                if (EnchantManager.isEnchantable(item)) {
+                    if (doPopulation) EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
+                    EnchantManager.getExcellentEnchantments(item).keySet().forEach(enchant -> EnchantManager.restoreEnchantmentCharges(item, enchant));
+                    equipment.setItem(slot, item);
+                }
             }
-        }
+        }, 40L);
     }
-
 }

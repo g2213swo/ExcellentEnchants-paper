@@ -29,8 +29,7 @@ public abstract class PotionEnchant extends ExcellentEnchant implements Potioned
     }
 
     @Override
-    @NotNull
-    public Potioned getPotionImplementation() {
+    public @NotNull Potioned getPotionImplementation() {
         return this.potionImplementation;
     }
 }

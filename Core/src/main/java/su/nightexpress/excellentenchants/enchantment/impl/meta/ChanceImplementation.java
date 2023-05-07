@@ -18,15 +18,13 @@ public final class ChanceImplementation implements Chanced {
         this.triggerChance = triggerChance;
     }
 
-    @NotNull
-    public static ChanceImplementation create(@NotNull ExcellentEnchant enchant) {
+    public static @NotNull ChanceImplementation create(@NotNull ExcellentEnchant enchant) {
         return new ChanceImplementation(enchant, EnchantScaler.read(enchant, "Settings.Trigger_Chance", "100",
             "A chance that this enchantment will be triggered."));
     }
 
     @Override
-    @NotNull
-    public Chanced getChanceImplementation() {
+    public @NotNull Chanced getChanceImplementation() {
         return this;
     }
 

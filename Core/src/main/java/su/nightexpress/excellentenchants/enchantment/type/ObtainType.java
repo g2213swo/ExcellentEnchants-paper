@@ -16,8 +16,7 @@ public enum ObtainType {
         this.pathName = pathName;
     }
 
-    @NotNull
-    public String getPathName() {
-        return pathName;
+    public @NotNull String getPathName() {
+        return this.pathName;
     }
 }

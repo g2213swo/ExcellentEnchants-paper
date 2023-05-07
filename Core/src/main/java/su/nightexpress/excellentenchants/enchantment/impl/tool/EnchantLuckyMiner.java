@@ -38,10 +38,9 @@ public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, Bloc
             "Exp modifier value. The original exp amount will be multiplied on this value.");
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public double getExpModifier(int level) {
@@ -49,22 +48,19 @@ public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, Bloc
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_EXP_MODIFIER, NumberUtil.format(this.getExpModifier(level) * 100D - 100D));
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE};
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 

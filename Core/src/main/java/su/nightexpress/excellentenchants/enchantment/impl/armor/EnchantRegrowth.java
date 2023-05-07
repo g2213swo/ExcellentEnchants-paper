@@ -13,15 +13,17 @@ import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTask;
 
 import java.util.function.UnaryOperator;
 
-public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant, ICleanable {
+public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, ICleanable {
 
     public static final String ID = "regrowth";
 
@@ -35,6 +37,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     private EnchantScaler healMaxHealth;
     private EnchantScaler healAmount;
 
+    private ChanceImplementation chanceImplementation;
     private Task task;
 
     public EnchantRegrowth(@NotNull ExcellentEnchants plugin) {
@@ -45,8 +48,9 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     @Override
     public void loadConfig() {
         super.loadConfig();
+        this.chanceImplementation = ChanceImplementation.create(this);
         this.healInterval = JOption.create("Settings.Heal.Interval", 100,
-            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
+            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(this.cfg);
         this.healMinHealth = EnchantScaler.read(this, "Settings.Heal.Min_Health", "0.5",
             "Minimal entity health for the enchantment to have effect.");
         this.healMaxHealth = EnchantScaler.read(this, "Settings.Heal.Max_Health", "20.0",
@@ -54,7 +58,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
         this.healAmount = EnchantScaler.read(this, "Settings.Heal.Amount", "0.25",
             "Amount of hearts to be restored.");
 
-        this.task = new Task(plugin);
+        this.task = new Task(this.plugin);
         this.task.start();
     }
 
@@ -71,8 +75,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_HEAL_AMOUNT, NumberUtil.format(this.getHealAmount(level)))
@@ -82,9 +85,13 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
             ;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
+    }
+
+    @Override
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_TORSO;
     }
 
@@ -107,6 +114,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
         if (!this.isAvailableToUse(entity)) return false;
+        if (!this.checkTriggerChance(level)) return false;
 
         double healthMax = EntityUtil.getAttribute(entity, Attribute.GENERIC_MAX_HEALTH);
         double healthHas = entity.getHealth();
@@ -125,7 +133,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements PassiveEnchant,
     class Task extends AbstractEnchantmentTask {
 
         public Task(@NotNull ExcellentEnchants plugin) {
-            super(plugin, healInterval, false);
+            super(plugin, EnchantRegrowth.this.healInterval, false);
         }
 
         @Override

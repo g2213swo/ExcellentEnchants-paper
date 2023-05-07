@@ -15,17 +15,20 @@ import su.nexmedia.engine.api.config.JOption;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 
-public class EnchantGhast extends ExcellentEnchant implements BowEnchant {
+public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chanced {
 
     public static final String ID = "ghast";
 
     private boolean fireSpread;
     private EnchantScaler yield;
+    private ChanceImplementation chanceImplementation;
 
     public EnchantGhast(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
@@ -34,14 +37,20 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant {
     @Override
     public void loadConfig() {
         super.loadConfig();
+        this.chanceImplementation = ChanceImplementation.create(this);
         this.fireSpread = JOption.create("Settings.Fire_Spread", true,
-            "When 'true' creates fire on nearby blocks.").read(cfg);
+            "When 'true' creates fire on nearby blocks.").read(this.cfg);
         this.yield = EnchantScaler.read(this, "Settings.Yield", "1.0 + " + Placeholders.ENCHANTMENT_LEVEL,
             "Fireball explosion size/radius. The more value = the bigger the explosion.");
     }
 
+    @Override
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
+    }
+
     public boolean isFireSpread() {
-        return fireSpread;
+        return this.fireSpread;
     }
 
     public float getYield(int level) {
@@ -49,17 +58,15 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant {
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.BOW;
     }
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter))
-            return false;
-        if (!(e.getProjectile() instanceof Projectile projectile))
-            return false;
+        if (!this.isAvailableToUse(shooter)) return false;
+        if (!this.checkTriggerChance(level)) return false;
+        if (!(e.getProjectile() instanceof Projectile projectile)) return false;
 
         Fireball fireball;
 
@@ -85,9 +92,11 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant {
     }
 
     @Override
-    public boolean onDamage(@NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile,
+    public boolean onDamage(
+        @NotNull EntityDamageByEntityEvent e, @NotNull Projectile projectile,
         @NotNull LivingEntity shooter, @NotNull LivingEntity victim,
-        @NotNull ItemStack weapon, int level) {
+        @NotNull ItemStack weapon, int level
+    ) {
         return false;
     }
 }

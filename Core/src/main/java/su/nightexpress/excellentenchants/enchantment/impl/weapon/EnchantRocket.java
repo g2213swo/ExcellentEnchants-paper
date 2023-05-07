@@ -38,10 +38,9 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
             "Firework power. The more power = the higher fly distance.");
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public final double getFireworkPower(int level) {
@@ -49,8 +48,7 @@ public class EnchantRocket extends ExcellentEnchant implements Chanced, CombatEn
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 

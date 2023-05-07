@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.api.placeholder.PlaceholderConstants;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
@@ -20,23 +21,34 @@ public class Config {
 
     public static final JOption<Long> TASKS_ARROW_TRAIL_TICKS_INTERVAL = JOption.create("Tasks.Arrow_Trail.Tick_Interval", 1L,
         "Sets how often (in ticks) arrow trail particle effects will be spawned behind the arrow.");
-    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval", 150L,
-        "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them.",
-        "This setting does NOT refreshes currently active effects, but only attempts to add them if absent."
+    public static final JOption<Long> TASKS_PASSIVE_POTION_EFFECTS_APPLY_INTERVAL = JOption.create("Tasks.Passive_Potion_Effects.Apply_Interval", 100L,
+        "Sets how often (in ticks) the plugin will apply permanent potion effects from enchanted items to an entity who wear them."
     );
 
     public static final JOption<Boolean> ENCHANTMENTS_CHARGES_ENABLED = JOption.create("Enchantments.Charges.Enabled", false,
         "Enables the enchantment Charges feature.",
         Placeholders.URL_WIKI + "Charges-System");
 
-    public static final JOption<TreeMap<Double, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Double, String>>("Enchantments.Charges.Format",
-        (cfg, path, def) -> cfg.getSection(path).stream().collect(Collectors.toMap(k -> StringUtil.getDouble(k, 0), v -> cfg.getString(path + "." + v, ""), (o, n) -> n, TreeMap::new)),
+    public static final JOption<TreeMap<Integer, String>> ENCHANTMENTS_CHARGES_FORMAT = new JOption<TreeMap<Integer, String>>("Enchantments.Charges.Format",
+        (cfg, path, def) -> {
+            TreeMap<Integer, String> map = new TreeMap<>();
+            for (String raw : cfg.getSection(path)) {
+                int percent = StringUtil.getInteger(raw, -1);
+                if (percent < 0) continue;
+
+                String format = cfg.getString(path + "." + raw, "");
+                if (format.isEmpty()) continue;
+
+                map.put(percent, format);
+            }
+            return map;
+        },
         () -> {
-            TreeMap<Double, String> map = new TreeMap<>();
-            map.put(0D, "<#ff9a9a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(25D, "<#ffc39a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(50D, "<#f6ff9a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
-            map.put(75D, "<#bcff9a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            TreeMap<Integer, String> map = new TreeMap<>();
+            map.put(0, "<#ff9a9a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(25, "<#ffc39a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(50, "<#f6ff9a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
+            map.put(75, "<#bcff9a>(" + Placeholders.GENERIC_AMOUNT + "⚡)");
             return map;
         },
         "Enchantment charges format depends on amount of charges left (in percent).",
@@ -63,7 +75,7 @@ public class Config {
         () -> Map.of("your_world_name", Set.of("enchantment_name", "ice_aspect")),
         "Here you can disable certain enchantments in certain worlds.",
         "Enchantment names are the same as enchantment file name in /enchants/ folder. ! Must be in lower_case !",
-        "To disable all enchantments for a world, use '" + Placeholders.WILDCARD + "' instead of enchantment names.")
+        "To disable all enchantments for a world, use '" + PlaceholderConstants.WILDCARD + "' instead of enchantment names.")
         .setWriter((cfg, path, map) -> map.forEach((world, enchants) -> cfg.set(path + "." + world, enchants)));
 
     public static final JOption<Boolean> ENCHANTMENTS_DESCRIPTION_ENABLED = JOption.create("Enchantments.Description.Enabled", true,
@@ -97,8 +109,7 @@ public class Config {
         "Settings for the different ways of obtaining enchantments.")
         .setWriter((cfg, path, map) -> map.forEach((type, settings) -> ObtainSettings.write(cfg, path + "." + type.getPathName(), settings)));
 
-    @NotNull
-    public static Optional<ObtainSettings> getObtainSettings(@NotNull ObtainType obtainType) {
+    public static @NotNull Optional<ObtainSettings> getObtainSettings(@NotNull ObtainType obtainType) {
         ObtainSettings settings = OBTAIN_SETTINGS.get().get(obtainType);
         return settings == null || !settings.isEnabled() ? Optional.empty() : Optional.of(settings);
     }

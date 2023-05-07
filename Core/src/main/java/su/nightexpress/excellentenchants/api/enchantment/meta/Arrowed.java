@@ -10,13 +10,11 @@ public interface Arrowed {
 
     @NotNull Arrowed getArrowImplementation();
 
-    @NotNull
-    default Optional<Particle> getTrailParticle() {
+    default @NotNull Optional<Particle> getTrailParticle() {
         return this.getArrowImplementation().getTrailParticle();
     }
 
-    @NotNull
-    default Optional<String> getTrailData() {
+    default @NotNull Optional<String> getTrailData() {
         return this.getArrowImplementation().getTrailData();
     }
 

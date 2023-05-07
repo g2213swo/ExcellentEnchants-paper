@@ -35,22 +35,20 @@ public class EnchantThunder extends ExcellentEnchant implements Chanced, CombatE
         super.loadConfig();
         this.chanceImplementation = ChanceImplementation.create(this);
         this.inThunderstormOnly = JOption.create("Settings.During_Thunderstorm_Only", false,
-            "When 'true' the enchantment will be triggered only if there is an active thunderstorm in the world.").read(cfg);
+            "When 'true' the enchantment will be triggered only if there is an active thunderstorm in the world.").read(this.cfg);
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public boolean isInThunderstormOnly() {
-        return inThunderstormOnly;
+        return this.inThunderstormOnly;
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 
@@ -61,10 +59,10 @@ public class EnchantThunder extends ExcellentEnchant implements Chanced, CombatE
         if (victim.getLocation().getBlock().getLightFromSky() != 15) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
             if (victim.isDead()) return;
             victim.setNoDamageTicks(0);
-            victim.getWorld().strikeLightning(victim.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(plugin, true));
+            victim.getWorld().strikeLightning(victim.getLocation()).setMetadata(META_NO_ITEM_DAMAGE, new FixedMetadataValue(this.plugin, true));
         });
 
         return true;

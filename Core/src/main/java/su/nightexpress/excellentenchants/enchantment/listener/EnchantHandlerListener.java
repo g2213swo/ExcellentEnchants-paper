@@ -38,16 +38,15 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
     }
 
     private void setSourceWeapon(@NotNull Projectile projectile, @NotNull ItemStack item) {
-        projectile.setMetadata(META_PROJECTILE_WEAPON, new FixedMetadataValue(plugin, item));
+        projectile.setMetadata(META_PROJECTILE_WEAPON, new FixedMetadataValue(this.plugin, item));
     }
 
-    @Nullable
-    private ItemStack getSourceWeapon(@NotNull Projectile projectile) {
+    private @Nullable ItemStack getSourceWeapon(@NotNull Projectile projectile) {
         return projectile.hasMetadata(META_PROJECTILE_WEAPON) ? (ItemStack) projectile.getMetadata(META_PROJECTILE_WEAPON).get(0).value() : null;
     }
 
     private void removeSourceWeapon(@NotNull Projectile projectile) {
-        projectile.removeMetadata(META_PROJECTILE_WEAPON, plugin);
+        projectile.removeMetadata(META_PROJECTILE_WEAPON, this.plugin);
     }
 
     // ---------------------------------------------------------------

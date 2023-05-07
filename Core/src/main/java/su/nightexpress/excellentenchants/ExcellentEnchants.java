@@ -15,11 +15,13 @@ import su.nightexpress.excellentenchants.config.Lang;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.impl.PlaceholderHook;
 import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.v1_17_R1.V1_17_R1;
 import su.nightexpress.excellentenchants.nms.v1_18_R2.V1_18_R2;
 import su.nightexpress.excellentenchants.nms.v1_19_R2.V1_19_R2;
+import su.nightexpress.excellentenchants.nms.v1_19_R3.V1_19_R3;
 import su.nightexpress.excellentenchants.tier.TierManager;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
@@ -31,8 +33,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
     private TierManager tierManager;
 
     @Override
-    @NotNull
-    protected ExcellentEnchants getSelf() {
+    protected @NotNull ExcellentEnchants getSelf() {
         return this;
     }
 
@@ -61,6 +62,7 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             this.tierManager.shutdown();
             this.tierManager = null;
         }
+        PlaceholderHook.shutdown();
     }
 
     private boolean setNMS() {
@@ -68,6 +70,8 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
             case V1_17_R1 -> new V1_17_R1();
             case V1_18_R2 -> new V1_18_R2();
             case V1_19_R2 -> new V1_19_R2();
+            case V1_19_R3 -> new V1_19_R3();
+            default -> throw new IllegalStateException("unsupported Minecraft version: " + Version.CURRENT);
         };
         return true;
     }
@@ -100,6 +104,9 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         } else {
             this.warn(HookId.PROTOCOL_LIB + " is not installed. Enchantments won't be displayed on items.");
         }
+        if (Hooks.hasPlaceholderAPI()) {
+            PlaceholderHook.setup();
+        }
     }
 
     @Override
@@ -107,18 +114,15 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
         this.registerPermissions(Perms.class);
     }
 
-    @NotNull
-    public TierManager getTierManager() {
-        return tierManager;
+    public @NotNull TierManager getTierManager() {
+        return this.tierManager;
     }
 
-    @NotNull
-    public EnchantManager getEnchantManager() {
+    public @NotNull EnchantManager getEnchantManager() {
         return this.enchantManager;
     }
 
-    @NotNull
-    public EnchantNMS getEnchantNMS() {
-        return enchantNMS;
+    public @NotNull EnchantNMS getEnchantNMS() {
+        return this.enchantNMS;
     }
 }

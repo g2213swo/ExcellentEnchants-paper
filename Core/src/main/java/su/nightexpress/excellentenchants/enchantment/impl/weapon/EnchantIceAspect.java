@@ -22,9 +22,8 @@ public class EnchantIceAspect extends PotionEnchant implements CombatEnchant {
         super(plugin, ID, EnchantPriority.MEDIUM, PotionEffectType.SLOW, false);
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 

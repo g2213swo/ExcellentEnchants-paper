@@ -47,35 +47,29 @@ public class EnchantPopulator {
         this.getEnchants().keySet().removeIf(this::isEmpty);
     }
 
-    @NotNull
-    public ObtainType getObtainType() {
-        return obtainType;
+    public @NotNull ObtainType getObtainType() {
+        return this.obtainType;
     }
 
-    @NotNull
-    public ItemStack getItem() {
-        return item;
+    public @NotNull ItemStack getItem() {
+        return this.item;
     }
 
-    @NotNull
-    public Map<Tier, Set<ExcellentEnchant>> getEnchants() {
+    public @NotNull Map<Tier, Set<ExcellentEnchant>> getEnchants() {
         return this.enchants;
     }
 
-    @NotNull
-    public Set<ExcellentEnchant> getEnchants(@NotNull Tier tier) {
+    public @NotNull Set<ExcellentEnchant> getEnchants(@NotNull Tier tier) {
         return this.getEnchants().getOrDefault(tier, new HashSet<>());
     }
 
-    @Nullable
-    public Tier getTierByChance() {
+    public @Nullable Tier getTierByChance() {
         Map<Tier, Double> map = this.getEnchants().keySet().stream()
             .collect(Collectors.toMap(k -> k, v -> v.getChance(this.getObtainType())));
         return Rnd.get(map);
     }
 
-    @Nullable
-    public ExcellentEnchant getEnchantByChance(@NotNull Tier tier) {
+    public @Nullable ExcellentEnchant getEnchantByChance(@NotNull Tier tier) {
         Map<ExcellentEnchant, Double> map = this.getEnchants(tier).stream()
             .collect(Collectors.toMap(k -> k, v -> v.getObtainChance(this.getObtainType())));
         return map.isEmpty() ? null : Rnd.get(map);

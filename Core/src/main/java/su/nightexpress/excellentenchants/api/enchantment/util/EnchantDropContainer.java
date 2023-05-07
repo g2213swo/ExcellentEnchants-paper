@@ -17,13 +17,11 @@ public class EnchantDropContainer {
         this.drops = new ArrayList<>();
     }
 
-    @NotNull
-    public BlockDropItemEvent getParent() {
-        return parent;
+    public @NotNull BlockDropItemEvent getParent() {
+        return this.parent;
     }
 
-    @NotNull
-    public List<ItemStack> getDrops() {
-        return drops;
+    public @NotNull List<ItemStack> getDrops() {
+        return this.drops;
     }
 }

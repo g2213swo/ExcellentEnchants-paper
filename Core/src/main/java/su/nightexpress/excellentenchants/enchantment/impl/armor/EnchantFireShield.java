@@ -30,8 +30,7 @@ public class EnchantFireShield extends ExcellentEnchant implements Chanced, Comb
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level)))
@@ -49,15 +48,13 @@ public class EnchantFireShield extends ExcellentEnchant implements Chanced, Comb
             "If entity's current fire ticks amount is greater than this value, it won't be changed.");
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR;
     }
 

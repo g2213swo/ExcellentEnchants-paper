@@ -39,28 +39,28 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
         this.chanceImplementation = ChanceImplementation.create(this);
         this.loot = new HashMap<>();
 
-        for (String eId : cfg.getSection("Settings.Treasures")) {
+        for (String eId : this.cfg.getSection("Settings.Treasures")) {
             EntityType eType = CollectionsUtil.getEnum(eId, EntityType.class);
             if (eType == null || !eType.isAlive()) {
-                plugin.error("[Scavenger] Invalid entity type '" + eId + "' !");
+                this.plugin.error("[Scavenger] Invalid entity type '" + eId + "' !");
                 continue;
             }
 
             Map<Material, Pair<int[], Double>> items = new HashMap<>();
-            for (String sFromArray : cfg.getSection("Settings.Treasures." + eId)) {
+            for (String sFromArray : this.cfg.getSection("Settings.Treasures." + eId)) {
                 Material material = Material.getMaterial(sFromArray.toUpperCase());
                 if (material == null) {
-                    plugin.error("[Scavenger] Invalid item material '" + sFromArray + "' !");
+                    this.plugin.error("[Scavenger] Invalid item material '" + sFromArray + "' !");
                     continue;
                 }
 
                 String path = "Settings.Treasures." + eId + "." + sFromArray + ".";
-                String[] amountSplit = cfg.getString(path + "Amount", "1:1").split(":");
+                String[] amountSplit = this.cfg.getString(path + "Amount", "1:1").split(":");
                 int amountMin = StringUtil.getInteger(amountSplit[0], 1);
                 int amountMax = StringUtil.getInteger(amountSplit[1], 1);
                 int[] amount = new int[]{amountMin, amountMax};
 
-                double chance = cfg.getDouble(path + "Chance");
+                double chance = this.cfg.getDouble(path + "Chance");
                 if (chance <= 0) continue;
 
                 Pair<int[], Double> item = Pair.of(amount, chance);
@@ -70,15 +70,13 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
         }
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 

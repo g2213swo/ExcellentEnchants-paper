@@ -32,8 +32,7 @@ public final class ArrowImplementation implements Arrowed {
         this.trailData = trailData;
     }
 
-    @NotNull
-    public static ArrowImplementation create(@NotNull ExcellentEnchant enchant) {
+    public static @NotNull ArrowImplementation create(@NotNull ExcellentEnchant enchant) {
         JYML cfg = enchant.getConfig();
         Particle trailParticle = JOption.create("Settings.Arrow.Trail_Effect.Name", Particle.class, Particle.REDSTONE,
             "Particle name for the arrow trail effect.",
@@ -46,8 +45,7 @@ public final class ArrowImplementation implements Arrowed {
     }
 
     @Override
-    @NotNull
-    public Arrowed getArrowImplementation() {
+    public @NotNull Arrowed getArrowImplementation() {
         return this;
     }
 
@@ -62,31 +60,28 @@ public final class ArrowImplementation implements Arrowed {
         ArrowTrailsTask.add(projectile, particle, data);
     }
 
-    @NotNull
     @Override
-    public Optional<Particle> getTrailParticle() {
-        return trailParticle == null ? Optional.empty() : Optional.of(trailParticle);
+    public @NotNull Optional<Particle> getTrailParticle() {
+        return this.trailParticle == null ? Optional.empty() : Optional.of(this.trailParticle);
     }
 
-    @NotNull
     @Override
-    public Optional<String> getTrailData() {
-        return trailData == null ? Optional.empty() : Optional.of(trailData);
+    public @NotNull Optional<String> getTrailData() {
+        return this.trailData == null ? Optional.empty() : Optional.of(this.trailData);
     }
 
-    @NotNull
-    public NamespacedKey getProjectileKey() {
-        return projectileKey;
+    public @NotNull NamespacedKey getProjectileKey() {
+        return this.projectileKey;
     }
 
     @Override
     public void addData(@NotNull Projectile projectile) {
-        PDCUtil.setData(projectile, this.getProjectileKey(), this.enchant.getId());
+        PDCUtil.set(projectile, this.getProjectileKey(), this.enchant.getId());
     }
 
     @Override
     public boolean isOurProjectile(@NotNull Projectile projectile) {
-        String enchantId = PDCUtil.getStringData(projectile, this.getProjectileKey());
+        String enchantId = PDCUtil.getString(projectile, this.getProjectileKey()).orElse(null);
         return this.enchant.getId().equalsIgnoreCase(enchantId);
     }
 }

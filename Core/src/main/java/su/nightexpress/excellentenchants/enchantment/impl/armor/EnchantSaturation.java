@@ -41,13 +41,13 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
     public void loadConfig() {
         super.loadConfig();
         this.saturationInterval = JOption.create("Settings.Saturation.Interval", 100,
-            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
+            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(this.cfg);
         this.saturationAmount = EnchantScaler.read(this, "Settings.Saturation.Amount", Placeholders.ENCHANTMENT_LEVEL,
             "Amount of food points to restore.");
         this.saturationMaxFoodLevel = EnchantScaler.read(this, "Settings.Saturation.Max_Food_Level", "20",
             "Maximal player's food level for the enchantment to stop feeding them.");
 
-        this.task = new Task(plugin);
+        this.task = new Task(this.plugin);
         this.task.start();
     }
 
@@ -64,8 +64,7 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_SATURATION_AMOUNT, NumberUtil.format(this.getSaturationAmount(level)))
@@ -75,8 +74,7 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_HEAD;
     }
 
@@ -89,7 +87,7 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
     }
 
     public long getSaturationInterval() {
-        return saturationInterval;
+        return this.saturationInterval;
     }
 
     @Override
@@ -107,7 +105,7 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
     class Task extends AbstractEnchantmentTask {
 
         public Task(@NotNull ExcellentEnchants plugin) {
-            super(plugin, saturationInterval, false);
+            super(plugin, EnchantSaturation.this.saturationInterval, false);
         }
 
         @Override

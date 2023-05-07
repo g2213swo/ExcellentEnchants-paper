@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.IPlaceholder;
+import su.nexmedia.engine.api.placeholder.PlaceholderConstants;
 import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
@@ -20,7 +21,7 @@ import java.util.stream.Stream;
 
 public class Tier implements IPlaceholder {
 
-    public static final Tier DEFAULT = new Tier(Placeholders.DEFAULT, 100, "Default", NamedTextColor.WHITE, new HashMap<>());
+    public static final Tier DEFAULT = new Tier(PlaceholderConstants.DEFAULT, 100, "Default", NamedTextColor.WHITE, new HashMap<>());
 
     static {
         Stream.of(ObtainType.values()).forEach(type -> DEFAULT.getChance().put(type, 100D));
@@ -50,35 +51,30 @@ public class Tier implements IPlaceholder {
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders() {
+    public @NotNull UnaryOperator<String> replacePlaceholders() {
         return str -> str
             .replace(Placeholders.TIER_ID, this.getId())
             .replace(Placeholders.TIER_NAME, this.getName())
             ;
     }
 
-    @NotNull
-    public String getId() {
+    public @NotNull String getId() {
         return this.id;
     }
 
     public int getPriority() {
-        return priority;
+        return this.priority;
     }
 
-    @NotNull
-    public String getName() {
+    public @NotNull String getName() {
         return this.name;
     }
 
-    @NotNull
-    public TextColor getColor() {
+    public @NotNull TextColor getColor() {
         return this.color;
     }
 
-    @NotNull
-    public Map<ObtainType, Double> getChance() {
+    public @NotNull Map<ObtainType, Double> getChance() {
         return this.chance;
     }
 
@@ -86,20 +82,16 @@ public class Tier implements IPlaceholder {
         return this.getChance().getOrDefault(obtainType, 0D);
     }
 
-    @NotNull
-    public Set<ExcellentEnchant> getEnchants() {
+    public @NotNull Set<ExcellentEnchant> getEnchants() {
         return this.enchants;
     }
 
-    @NotNull
-    public Set<ExcellentEnchant> getEnchants(@NotNull ObtainType obtainType) {
+    public @NotNull Set<ExcellentEnchant> getEnchants(@NotNull ObtainType obtainType) {
         return this.getEnchants(obtainType, null);
     }
 
-    @NotNull
-    public Set<ExcellentEnchant> getEnchants(@NotNull ObtainType obtainType, @Nullable ItemStack item) {
-        Set<ExcellentEnchant> set = this.getEnchants()
-            .stream()
+    public @NotNull Set<ExcellentEnchant> getEnchants(@NotNull ObtainType obtainType, @Nullable ItemStack item) {
+        Set<ExcellentEnchant> set = this.getEnchants().stream()
             .filter(enchant -> enchant.getObtainChance(obtainType) > 0)
             .filter(enchant -> item == null || enchant.canEnchantItem(item))
             .collect(Collectors.toCollection(HashSet::new));

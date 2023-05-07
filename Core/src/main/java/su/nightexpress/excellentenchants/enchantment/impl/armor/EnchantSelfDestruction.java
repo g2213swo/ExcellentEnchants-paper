@@ -45,23 +45,20 @@ public class EnchantSelfDestruction extends ExcellentEnchant implements Chanced,
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionSize(level)))
             ;
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_TORSO;
     }
 
@@ -75,9 +72,9 @@ public class EnchantSelfDestruction extends ExcellentEnchant implements Chanced,
         if (!this.checkTriggerChance(level)) return false;
 
         float size = (float) this.getExplosionSize(level);
-        entity.setMetadata(META_EXPLOSION_SOURCE, new FixedMetadataValue(plugin, true));
+        entity.setMetadata(META_EXPLOSION_SOURCE, new FixedMetadataValue(this.plugin, true));
         boolean exploded = entity.getWorld().createExplosion(entity.getLocation(), size, false, false, entity);
-        entity.removeMetadata(META_EXPLOSION_SOURCE, plugin);
+        entity.removeMetadata(META_EXPLOSION_SOURCE, this.plugin);
         return exploded;
     }
 

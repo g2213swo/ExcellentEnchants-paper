@@ -213,13 +213,11 @@ public class EnchantRegister {
         PLUGIN.info("All enchants are unregistered.");
     }
 
-    @Nullable
-    public static ExcellentEnchant get(@NotNull NamespacedKey key) {
+    public static @Nullable ExcellentEnchant get(@NotNull NamespacedKey key) {
         return ENCHANT_REGISTRY.get(key);
     }
 
-    @Nullable
-    private static <T extends ExcellentEnchant> T init(@NotNull Class<T> clazz, @NotNull String id) {
+    private static @Nullable <T extends ExcellentEnchant> T init(@NotNull Class<T> clazz, @NotNull String id) {
         if (Config.ENCHANTMENTS_DISABLED.get().contains(id)) return null;
 
         try {

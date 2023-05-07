@@ -29,15 +29,13 @@ public class EnchantHardened extends PotionEnchant implements Chanced, CombatEnc
         this.chanceImplementation = ChanceImplementation.create(this);
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_TORSO;
     }
 

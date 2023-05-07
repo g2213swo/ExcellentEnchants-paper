@@ -44,10 +44,9 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
         return true;
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public int getDurabilityAmount(int level) {
@@ -55,16 +54,14 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_DURABILITY_AMOUNT, NumberUtil.format(this.getDurabilityAmount(level)));
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.BREAKABLE;
     }
 

@@ -46,19 +46,19 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
 
         this.sound = JOption.create("Settings.Sound", Sound.class, Sound.BLOCK_LAVA_EXTINGUISH,
             "Sound to play on smelting.",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html").read(cfg);
+            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html").read(this.cfg);
 
         this.smeltingTable = new HashMap<>();
-        for (String sFrom : cfg.getSection("Settings.Smelting_Table")) {
+        for (String sFrom : this.cfg.getSection("Settings.Smelting_Table")) {
             Material mFrom = Material.getMaterial(sFrom.toUpperCase());
             if (mFrom == null) {
-                plugin.error("[Smelter] Invalid source material '" + sFrom + "' !");
+                this.plugin.error("[Smelter] Invalid source material '" + sFrom + "' !");
                 continue;
             }
-            String sTo = cfg.getString("Settings.Smelting_Table." + sFrom, "");
+            String sTo = this.cfg.getString("Settings.Smelting_Table." + sFrom, "");
             Material mTo = Material.getMaterial(sTo.toUpperCase());
             if (mTo == null) {
-                plugin.error("[Smelter] Invalid result material '" + sTo + "' !");
+                this.plugin.error("[Smelter] Invalid result material '" + sTo + "' !");
                 continue;
             }
             this.smeltingTable.put(mFrom, mTo);
@@ -70,21 +70,18 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
             "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE, FitItemType.AXE, FitItemType.SHOVEL};
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 

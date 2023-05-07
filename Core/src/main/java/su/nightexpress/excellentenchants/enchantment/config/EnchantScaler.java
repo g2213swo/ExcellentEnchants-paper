@@ -16,8 +16,7 @@ public class EnchantScaler extends Scaler {
         super(enchant.getConfig(), path, Placeholders.ENCHANTMENT_LEVEL, enchant.getStartLevel(), enchant.getMaxLevel());
     }
 
-    @NotNull
-    public static EnchantScaler read(@NotNull ExcellentEnchant enchant, @NotNull String path, @NotNull String def, @Nullable String... comments) {
+    public static @NotNull EnchantScaler read(@NotNull ExcellentEnchant enchant, @NotNull String path, @NotNull String def, @Nullable String... comments) {
         enchant.getConfig().addMissing(path, def);
         if (comments != null) {
             List<String> list = new ArrayList<>(Arrays.asList(comments));

@@ -56,12 +56,11 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
 
         this.blocksAffected = JOption.create("Settings.Blocks.Affected", new HashSet<>(),
                 "List of blocks, that will be affected by this enchantment.",
-                "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html").read(cfg).stream()
+                "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html").read(this.cfg).stream()
             .map(type -> Material.getMaterial(type.toUpperCase())).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    @NotNull
-    public Set<Material> getBlocksAffected() {
+    public @NotNull Set<Material> getBlocksAffected() {
         return this.blocksAffected;
     }
 
@@ -70,27 +69,23 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_BLOCK_LIMIT, String.valueOf(this.getBlocksLimit(level)));
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE};
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 
-    @NotNull
-    private Set<Block> getNearby(@NotNull Block block) {
+    private @NotNull Set<Block> getNearby(@NotNull Block block) {
         return Stream.of(AREA)
             .map(block::getRelative)
             .filter(blockAdded -> blockAdded.getType() == block.getType())
@@ -116,9 +111,10 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
             // Play block break particles before the block broken.
             EffectUtil.playEffect(LocationUtil.getCenter(ore.getLocation()), Particle.BLOCK_CRACK.name(), ore.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
 
-            ore.setMetadata(META_BLOCK_VEINED, new FixedMetadataValue(plugin, true));
-            plugin.getNMS().breakBlock(player, ore);
-            ore.removeMetadata(META_BLOCK_VEINED, plugin);
+            ore.setMetadata(META_BLOCK_VEINED, new FixedMetadataValue(this.plugin, true));
+            //plugin.getNMS().breakBlock(player, ore);
+            player.breakBlock(ore);
+            ore.removeMetadata(META_BLOCK_VEINED, this.plugin);
         });
     }
 

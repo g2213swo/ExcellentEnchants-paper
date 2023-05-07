@@ -45,7 +45,8 @@ public class ProtocolHook {
 
         manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, ListenerPriority.LOWEST, PacketType.Play.Client.SET_CREATIVE_SLOT) {
             // modifying the items received from creative players
-            @Override public void onPacketReceiving(final PacketEvent event) {
+            @Override
+            public void onPacketReceiving(final PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
                 ItemStack item = packet.getItemModifier().read(0);
@@ -56,7 +57,8 @@ public class ProtocolHook {
 
         manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, ListenerPriority.NORMAL, PacketType.Play.Server.SET_SLOT) {
             // write lore when the server sets an item in a slot
-            @Override public void onPacketSending(PacketEvent event) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
                 ItemStack item = packet.getItemModifier().read(0);
@@ -67,7 +69,8 @@ public class ProtocolHook {
 
         manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, ListenerPriority.NORMAL, PacketType.Play.Server.WINDOW_ITEMS) {
             // write lore when the server sets a window of items
-            @Override public void onPacketSending(PacketEvent event) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
 
                 List<ItemStack> items = packet.getItemListModifier().readSafely(0);
@@ -126,7 +129,7 @@ public class ProtocolHook {
             int charges = EnchantManager.getEnchantmentCharges(item, enchant);
             lore.add(0, enchant.displayName(level, charges));
         });
-        PDCUtil.setData(meta, DESCRIPTION_SIZE, descSize.get());
+        PDCUtil.set(meta, DESCRIPTION_SIZE, descSize.get());
 
         meta.lore(lore);
         item.setItemMeta(meta);
@@ -143,7 +146,7 @@ public class ProtocolHook {
         List<Component> lore = Objects.requireNonNull(meta.lore());
         int size = EnchantManager.getExcellentEnchantments(item).size();
         if (size == 0) return item; // if no custom enchantment on this item
-        size += PDCUtil.getIntData(meta, DESCRIPTION_SIZE);
+        size += PDCUtil.getInt(meta, DESCRIPTION_SIZE).orElse(0);
         List<Component> reverted = lore.subList(size, lore.size()); // gets the part without any enchantment lore
         meta.lore(reverted.isEmpty() ? null : reverted);
 

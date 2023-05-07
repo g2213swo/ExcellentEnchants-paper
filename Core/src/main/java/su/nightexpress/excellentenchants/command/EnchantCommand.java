@@ -25,15 +25,13 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    @NotNull
-    public String getDescription() {
-        return plugin.getMessage(Lang.COMMAND_ENCHANT_DESC).getLocalized();
+    public @NotNull String getDescription() {
+        return this.plugin.getMessage(Lang.COMMAND_ENCHANT_DESC).getLocalized();
     }
 
     @Override
-    @NotNull
-    public String getUsage() {
-        return plugin.getMessage(Lang.COMMAND_ENCHANT_USAGE).getLocalized();
+    public @NotNull String getUsage() {
+        return this.plugin.getMessage(Lang.COMMAND_ENCHANT_USAGE).getLocalized();
     }
 
     @Override
@@ -42,8 +40,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    @NotNull
-    public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
+    public @NotNull List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
         if (arg == 1) return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();
         if (arg == 2) return Arrays.asList("-1", "1", "5", "10");
         return super.getTab(player, arg, args);
@@ -65,7 +62,7 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
 
         Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(args[1].toLowerCase()));
         if (enchantment == null) {
-            plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
+            this.plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
@@ -80,6 +77,6 @@ public class EnchantCommand extends AbstractCommand<ExcellentEnchants> {
             EnchantManager.removeEnchantment(item, enchantment);
         }
 
-        plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
+        this.plugin.getMessage(Lang.COMMAND_ENCHANT_DONE).send(sender);
     }
 }

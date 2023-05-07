@@ -32,15 +32,13 @@ public class EnchantIceShield extends PotionEnchant implements Chanced, CombatEn
         this.chanceImplementation = ChanceImplementation.create(this);
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_TORSO;
     }
 
     @Override
-    @NotNull
-    public Chanced getChanceImplementation() {
+    public @NotNull Chanced getChanceImplementation() {
         return this.chanceImplementation;
     }
 

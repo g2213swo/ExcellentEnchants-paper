@@ -35,9 +35,8 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         super(plugin, ID, EnchantPriority.MEDIUM);
 
         PlayerBlockTracker.initialize(plugin);
-        PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = (block) -> {
-            return !this.getTreasures(block.getType()).isEmpty();
-        });
+        PlayerBlockTracker.BLOCK_FILTERS.add(this.blockTracker = block ->
+            !this.getTreasures(block.getType()).isEmpty());
     }
 
     @Override
@@ -46,23 +45,23 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         this.chanceImplementation = ChanceImplementation.create(this);
 
         this.treasures = new HashMap<>();
-        for (String sFromArray : cfg.getSection("Settings.Treasures")) {
+        for (String sFromArray : this.cfg.getSection("Settings.Treasures")) {
             for (String sFrom : sFromArray.split(",")) {
                 Material mFrom = Material.getMaterial(sFrom.toUpperCase());
                 if (mFrom == null) {
-                    plugin.error("[Treasures] Invalid source material '" + sFrom + "' !");
+                    this.plugin.error("[Treasures] Invalid source material '" + sFrom + "' !");
                     continue;
                 }
                 Map<Material, Double> treasuresList = new HashMap<>();
 
-                for (String sTo : cfg.getSection("Settings.Treasures." + sFromArray)) {
+                for (String sTo : this.cfg.getSection("Settings.Treasures." + sFromArray)) {
                     Material mTo = Material.getMaterial(sTo.toUpperCase());
                     if (mTo == null) {
-                        plugin.error("[Treasures] Invalid result material '" + sTo + "' for '" + sFromArray + "' !");
+                        this.plugin.error("[Treasures] Invalid result material '" + sTo + "' for '" + sFromArray + "' !");
                         continue;
                     }
 
-                    double tChance = cfg.getDouble("Settings.Treasures." + sFromArray + "." + sTo);
+                    double tChance = this.cfg.getDouble("Settings.Treasures." + sFromArray + "." + sTo);
                     treasuresList.put(mTo, tChance);
                 }
                 this.treasures.put(mFrom, treasuresList);
@@ -79,21 +78,18 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         PlayerBlockTracker.BLOCK_FILTERS.remove(this.blockTracker);
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE, FitItemType.AXE, FitItemType.SHOVEL};
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 
@@ -108,8 +104,7 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
         return true;
     }
 
-    @NotNull
-    public final List<ItemStack> getTreasures(@NotNull Material type) {
+    public final @NotNull List<ItemStack> getTreasures(@NotNull Material type) {
         List<ItemStack> list = new ArrayList<>();
         Map<Material, Double> treasures = this.treasures.getOrDefault(type, Collections.emptyMap());
         treasures.forEach((mat, chance) -> {

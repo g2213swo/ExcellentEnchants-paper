@@ -56,8 +56,7 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAmount(level) * 100D))
@@ -66,9 +65,8 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
             ;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 

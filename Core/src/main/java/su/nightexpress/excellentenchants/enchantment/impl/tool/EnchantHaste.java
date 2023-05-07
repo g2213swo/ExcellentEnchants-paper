@@ -19,14 +19,13 @@ public class EnchantHaste extends PotionEnchant implements PassiveEnchant {
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 
     @Override
     public boolean onTrigger(@NotNull LivingEntity entity, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(entity) || this.hasEffect(entity)) return false;
+        if (!this.isAvailableToUse(entity)) return false;
 
         return this.addEffect(entity, level);
     }

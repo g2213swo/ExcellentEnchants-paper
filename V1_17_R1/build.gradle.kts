@@ -9,7 +9,7 @@ plugins {
 
 dependencies {
     compileOnly(project(":NMS"))
-    paperDevBundle("1.17.1-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.17.1-R0.1-SNAPSHOT")
 }
 
 description = "V1_17_R1"

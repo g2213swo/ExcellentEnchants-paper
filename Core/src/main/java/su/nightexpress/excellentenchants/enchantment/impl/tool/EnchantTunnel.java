@@ -48,18 +48,16 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
     public void loadConfig() {
         super.loadConfig();
         this.disableOnSneak = JOption.create("Settings.Ignore_When_Sneaking", true,
-            "When 'true' the enchantment won't be triggered when sneaking.").read(cfg);
+            "When 'true' the enchantment won't be triggered when sneaking.").read(this.cfg);
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE, FitItemType.SHOVEL};
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 
@@ -128,9 +126,10 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
             EffectUtil.playEffect(LocationUtil.getCenter(blockAdd.getLocation()), Particle.BLOCK_CRACK.name(), blockAdd.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
 
             // Add metadata to prevent enchantment triggering in a loop.
-            blockAdd.setMetadata(META_BLOCK_TUNNEL, new FixedMetadataValue(plugin, true));
-            plugin.getNMS().breakBlock(player, blockAdd);
-            blockAdd.removeMetadata(META_BLOCK_TUNNEL, plugin);
+            blockAdd.setMetadata(META_BLOCK_TUNNEL, new FixedMetadataValue(this.plugin, true));
+            //plugin.getNMS().breakBlock(player, blockAdd);
+            player.breakBlock(blockAdd);
+            blockAdd.removeMetadata(META_BLOCK_TUNNEL, this.plugin);
         }
 
         NoCheatPlusHook.unexemptBlocks(player);

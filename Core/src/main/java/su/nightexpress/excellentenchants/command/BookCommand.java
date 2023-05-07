@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
 import su.nexmedia.engine.lang.LangManager;
+import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.PlayerUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
@@ -29,15 +30,13 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    @NotNull
-    public String getDescription() {
-        return plugin.getMessage(Lang.COMMAND_BOOK_DESC).getLocalized();
+    public @NotNull String getDescription() {
+        return this.plugin.getMessage(Lang.COMMAND_BOOK_DESC).getLocalized();
     }
 
     @Override
-    @NotNull
-    public String getUsage() {
-        return plugin.getMessage(Lang.COMMAND_BOOK_USAGE).getLocalized();
+    public @NotNull String getUsage() {
+        return this.plugin.getMessage(Lang.COMMAND_BOOK_USAGE).getLocalized();
     }
 
     @Override
@@ -46,9 +45,8 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    @NotNull
-    public List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
-        if (arg == 1) return PlayerUtil.getPlayerNames();
+    public @NotNull List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
+        if (arg == 1) return CollectionsUtil.playerNames(player);
         if (arg == 2) return Arrays.stream(Enchantment.values()).map(e -> e.getKey().getKey()).toList();
         if (arg == 3) return Arrays.asList("-1", "1", "5", "10");
         return super.getTab(player, arg, args);
@@ -61,7 +59,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
             return;
         }
 
-        Player player = plugin.getServer().getPlayer(args[1]);
+        Player player = this.plugin.getServer().getPlayer(args[1]);
         if (player == null) {
             this.errorPlayer(sender);
             return;
@@ -69,7 +67,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
 
         Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(args[2].toLowerCase()));
         if (enchantment == null) {
-            plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
+            this.plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
@@ -82,7 +80,7 @@ public class BookCommand extends AbstractCommand<ExcellentEnchants> {
         EnchantManager.addEnchantment(item, enchantment, level, true);
         PlayerUtil.addItem(player, item);
 
-        plugin.getMessage(Lang.COMMAND_BOOK_DONE)
+        this.plugin.getMessage(Lang.COMMAND_BOOK_DONE)
             .replace(Placeholders.GENERIC_ENCHANT, LangManager.getEnchantment(enchantment))
             .replace(Placeholders.Player.replacer(player))
             .send(sender);

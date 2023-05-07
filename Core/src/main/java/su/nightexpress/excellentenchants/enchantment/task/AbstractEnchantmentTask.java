@@ -16,12 +16,11 @@ public abstract class AbstractEnchantmentTask extends AbstractTask<ExcellentEnch
         super(plugin, interval, async);
     }
 
-    @NotNull
-    protected Collection<@NotNull ? extends LivingEntity> getEntities() {
-        Set<LivingEntity> list = new HashSet<>(plugin.getServer().getOnlinePlayers());
+    protected @NotNull Collection<? extends LivingEntity> getEntities() {
+        Set<LivingEntity> list = new HashSet<>(this.plugin.getServer().getOnlinePlayers());
 
         if (Config.ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS.get()) {
-            plugin.getServer().getWorlds().stream().filter(world -> !world.getPlayers().isEmpty()).forEach(world -> {
+            this.plugin.getServer().getWorlds().stream().filter(world -> !world.getPlayers().isEmpty()).forEach(world -> {
                 list.addAll(world.getEntitiesByClass(LivingEntity.class));
             });
         }

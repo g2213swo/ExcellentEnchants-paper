@@ -24,9 +24,8 @@ public class EnchantCurseOfFragility extends ExcellentEnchant {
         super(plugin, ID, EnchantPriority.MEDIUM);
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.BREAKABLE;
     }
 
@@ -61,7 +60,7 @@ public class EnchantCurseOfFragility extends ExcellentEnchant {
     }
 
     private void stopGrindstone(@NotNull Inventory inventory) {
-        plugin.getScheduler().runTask(plugin, () -> {
+        this.plugin.getScheduler().runTask(this.plugin, () -> {
             ItemStack first = inventory.getItem(0);
             ItemStack second = inventory.getItem(1);
 

@@ -1,14 +1,7 @@
-/.idea
-
-/target
-/Core/target
-/NMS/target
-/V1_17_R1/target
-/V1_18_R2/target
-/V1_19_R1/target
-/V1_19_R2/target
+.idea
 
 .gradle
 build
+target
 
 ExcellentEnchants*.jar

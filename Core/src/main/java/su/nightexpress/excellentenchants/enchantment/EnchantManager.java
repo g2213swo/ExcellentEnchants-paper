@@ -8,17 +8,14 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.manager.AbstractManager;
+import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
-import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
@@ -36,7 +33,6 @@ import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EnchantManager extends AbstractManager<ExcellentEnchants> {
@@ -83,9 +79,8 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         EnchantRegister.shutdown();
     }
 
-    @NotNull
-    public EnchantmentsListMenu getEnchantsListGUI() {
-        return enchantmentsListMenu;
+    public @NotNull EnchantmentsListMenu getEnchantsListGUI() {
+        return this.enchantmentsListMenu;
     }
 
     public static boolean isEnchantable(@NotNull ItemStack item) {
@@ -192,14 +187,12 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         item.setItemMeta(meta);
     }
 
-    @NotNull
-    public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemStack item) {
+    public static @NotNull Map<Enchantment, Integer> getEnchantments(@NotNull ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         return meta == null ? Collections.emptyMap() : getEnchantments(meta);
     }
 
-    @NotNull
-    public static Map<Enchantment, Integer> getEnchantments(@NotNull ItemMeta meta) {
+    public static @NotNull Map<Enchantment, Integer> getEnchantments(@NotNull ItemMeta meta) {
         return (meta instanceof EnchantmentStorageMeta meta2) ? meta2.getStoredEnchants() : meta.getEnchants();
     }
 
@@ -216,11 +209,11 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
     }
 
     public static int getEnchantmentCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
-        return enchant.isChargesEnabled() ? PDCUtil.getIntData(item, enchant.getChargesKey()) : -1;
+        return enchant.isChargesEnabled() ? PDCUtil.getInt(item, enchant.getChargesKey()).orElse(-0) : -1;
     }
 
     public static int getEnchantmentCharges(@NotNull ItemMeta meta, @NotNull ExcellentEnchant enchant) {
-        return enchant.isChargesEnabled() ? PDCUtil.getIntData(meta, enchant.getChargesKey()) : -1;
+        return enchant.isChargesEnabled() ? PDCUtil.getInt(meta, enchant.getChargesKey()).orElse(0) : -1;
     }
 
     public static boolean isEnchantmentOutOfCharges(@NotNull ItemStack item, @NotNull ExcellentEnchant enchant) {
@@ -266,67 +259,44 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
 
         int level = getEnchantmentLevel(item, enchant);
         int max = enchant.getChargesMax(level);
-        PDCUtil.setData(item, enchant.getChargesKey(), Math.max(0, Math.min(charges, max)));
+        PDCUtil.set(item, enchant.getChargesKey(), Math.max(0, Math.min(charges, max)));
     }
 
     public static int getExcellentEnchantmentsAmount(@NotNull ItemStack item) {
         return EnchantManager.getExcellentEnchantments(item).size();
     }
 
-    @NotNull
-    public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemStack item) {
+    public static @NotNull Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemStack item) {
         return getExcellentEnchantments(EnchantManager.getEnchantments(item));
     }
 
-    @NotNull
-    public static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemMeta meta) {
+    public static @NotNull Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull ItemMeta meta) {
         return getExcellentEnchantments(EnchantManager.getEnchantments(meta));
     }
 
-    @NotNull
-    private static Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull Map<Enchantment, Integer> enchants) {
-        return enchants.entrySet().stream()
-            .map(entry -> {
-                ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
-                return enchant == null ? null : Pair.of(enchant, entry.getValue());
-            })
-            .filter(Objects::nonNull)
-            //.sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
-            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
+    private static @NotNull Map<ExcellentEnchant, Integer> getExcellentEnchantments(@NotNull Map<Enchantment, Integer> enchants) {
+        Map<ExcellentEnchant, Integer> map = new HashMap<>();
+        enchants.forEach((enchantment, level) -> {
+            ExcellentEnchant excellent = EnchantRegister.get(enchantment.getKey());
+            if (excellent != null) {
+                map.put(excellent, level);
+            }
+        });
+        return map;
     }
 
-    @SuppressWarnings("unchecked")
-    @NotNull
-    public static <T extends IEnchantment> Map<T, Integer> getExcellentEnchantments(@NotNull ItemStack item, @NotNull Class<T> clazz) {
-        return EnchantManager.getEnchantments(item).entrySet().stream()
-            .map(entry -> {
-                ExcellentEnchant enchant = EnchantRegister.get(entry.getKey().getKey());
-                if (enchant == null || !clazz.isAssignableFrom(enchant.getClass())) return null;
-                return Pair.of((T) enchant, entry.getValue());
-            })
-            .filter(Objects::nonNull)
-            .sorted(Comparator.comparing(p -> p.getFirst().getPriority(), Comparator.reverseOrder()))
-            .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (old, nev) -> nev, LinkedHashMap::new));
+    public static @NotNull <T extends IEnchantment> Map<T, Integer> getExcellentEnchantments(@NotNull ItemStack item, @NotNull Class<T> clazz) {
+        Map<T, Integer> map = new HashMap<>();
+        EnchantManager.getEnchantments(item).forEach((enchantment, level) -> {
+            ExcellentEnchant excellent = EnchantRegister.get(enchantment.getKey());
+            if (excellent == null || !clazz.isAssignableFrom(excellent.getClass())) return;
+
+            map.put(clazz.cast(excellent), level);
+        });
+        return CollectionsUtil.sort(map, Comparator.comparing(p -> p.getKey().getPriority(), Comparator.reverseOrder()));
     }
 
-    @Nullable
-    public static ExcellentEnchant getEnchantmentByEffect(@NotNull LivingEntity entity, @NotNull PotionEffect effect) {
-        Enchantment enchantment = ExcellentEnchantsAPI.PLUGIN.getEnchantNMS().getEnchantmentByEffect(entity, effect);
-        if (enchantment instanceof ExcellentEnchant enchant)
-            return enchant;
-        return null;
-    }
-
-    public static boolean isEnchantmentEffect(@NotNull LivingEntity entity, @NotNull PotionEffect effect) {
-        return getEnchantmentByEffect(entity, effect) != null;
-    }
-
-    public static boolean hasEnchantmentEffect(@NotNull LivingEntity entity, @NotNull ExcellentEnchant enchant) {
-        return entity.getActivePotionEffects().stream().anyMatch(effect -> enchant.equals(getEnchantmentByEffect(entity, effect)));
-    }
-
-    @NotNull
-    public static Map<EquipmentSlot, ItemStack> getEquipmentEnchanted(@NotNull LivingEntity entity) {
+    public static @NotNull Map<EquipmentSlot, ItemStack> getEquipmentEnchanted(@NotNull LivingEntity entity) {
         Map<EquipmentSlot, ItemStack> equipment = EntityUtil.getEquippedItems(entity);
         equipment.entrySet().removeIf(entry -> {
             ItemStack item = entry.getValue();
@@ -338,8 +308,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         return equipment;
     }
 
-    @NotNull
-    public static Map<ItemStack, Map<ExcellentEnchant, Integer>> getEquippedEnchants(@NotNull LivingEntity entity) {
+    public static @NotNull Map<ItemStack, Map<ExcellentEnchant, Integer>> getEquippedEnchants(@NotNull LivingEntity entity) {
         Map<ItemStack, Map<ExcellentEnchant, Integer>> map = new HashMap<>();
         EnchantManager.getEquipmentEnchanted(entity).values().forEach(item -> {
             map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(EnchantManager.getExcellentEnchantments(item));
@@ -347,8 +316,7 @@ public class EnchantManager extends AbstractManager<ExcellentEnchants> {
         return map;
     }
 
-    @NotNull
-    public static <T extends IEnchantment> Map<ItemStack, Map<T, Integer>> getEquippedEnchants(@NotNull LivingEntity entity, @NotNull Class<T> clazz) {
+    public static @NotNull <T extends IEnchantment> Map<ItemStack, Map<T, Integer>> getEquippedEnchants(@NotNull LivingEntity entity, @NotNull Class<T> clazz) {
         Map<ItemStack, Map<T, Integer>> map = new HashMap<>();
         EnchantManager.getEquipmentEnchanted(entity).values().forEach(item -> {
             map.computeIfAbsent(item, k -> new LinkedHashMap<>()).putAll(EnchantManager.getExcellentEnchantments(item, clazz));

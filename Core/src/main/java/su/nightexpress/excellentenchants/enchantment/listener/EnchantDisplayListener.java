@@ -7,7 +7,7 @@ import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 
 public class EnchantDisplayListener extends AbstractListener<ExcellentEnchants> {
 
-    public EnchantDisplayListener(@NotNull final EnchantManager enchantManager) {
+    public EnchantDisplayListener(final @NotNull EnchantManager enchantManager) {
         super(enchantManager.plugin());
     }
 

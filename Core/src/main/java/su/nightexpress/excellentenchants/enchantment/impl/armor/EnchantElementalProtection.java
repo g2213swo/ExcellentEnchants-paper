@@ -39,8 +39,7 @@ public class EnchantElementalProtection extends ExcellentEnchant {
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_PROTECTION_AMOUNT, NumberUtil.format(this.getProtectionAmount(level)))
@@ -54,15 +53,14 @@ public class EnchantElementalProtection extends ExcellentEnchant {
         this.protectionAmount = EnchantScaler.read(this, "Settings.Protection.Amount", "0.05 * " + Placeholders.ENCHANTMENT_LEVEL,
             "How protection the enchantment will have?");
         this.protectionCapacity = JOption.create("Settings.Protection.Capacity", 1D,
-            "Maximal possible protection value from all armor pieces together.").read(cfg);
+            "Maximal possible protection value from all armor pieces together.").read(this.cfg);
         this.protectionAsModifier = JOption.create("Settings.Protection.As_Modifier", false,
             "When 'true' damage will be reduced by a percent of protection value.",
-            "When 'false' damage will be reduced by a plain protection value.").read(cfg);
+            "When 'false' damage will be reduced by a plain protection value.").read(this.cfg);
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR;
     }
 

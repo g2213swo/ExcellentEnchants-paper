@@ -47,11 +47,11 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
         this.keyLevel = new NamespacedKey(plugin, "list_display_level");
         this.iconCache = new HashMap<>();
 
-        this.enchantIcon = cfg.getItem("Enchantments.Icon");
-        this.enchantLoreConflicts = cfg.getStringList("Enchantments.Lore.Conflicts");
-        this.enchantLoreCharges = cfg.getStringList("Enchantments.Lore.Charges");
-        this.enchantLoreObtaining = cfg.getStringList("Enchantments.Lore.Obtaining");
-        this.enchantSlots = cfg.getIntArray("Enchantments.Slots");
+        this.enchantIcon = this.cfg.getItem("Enchantments.Icon");
+        this.enchantLoreConflicts = this.cfg.getStringList("Enchantments.Lore.Conflicts");
+        this.enchantLoreCharges = this.cfg.getStringList("Enchantments.Lore.Charges");
+        this.enchantLoreObtaining = this.cfg.getStringList("Enchantments.Lore.Obtaining");
+        this.enchantSlots = this.cfg.getIntArray("Enchantments.Slots");
 
         MenuClick click = (player, type, e) -> {
             if (type instanceof MenuItemType type2) {
@@ -59,8 +59,8 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
             }
         };
 
-        for (String sId : cfg.getSection("Content")) {
-            MenuItem menuItem = cfg.getMenuItem("Content." + sId);
+        for (String sId : this.cfg.getSection("Content")) {
+            MenuItem menuItem = this.cfg.getMenuItem("Content." + sId);
             if (menuItem.getType() != null) {
                 menuItem.setClickHandler(click);
             }
@@ -80,36 +80,32 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
     }
 
     @Override
-    @NotNull
-    protected List<ExcellentEnchant> getObjects(@NotNull Player player) {
-        return new ArrayList<>(EnchantRegister.ENCHANT_REGISTRY.values()
-            .stream()
+    protected @NotNull List<ExcellentEnchant> getObjects(@NotNull Player player) {
+        return new ArrayList<>(EnchantRegister.ENCHANT_REGISTRY.values().stream()
             .sorted(Comparator.comparing(ExcellentEnchant::getName))
             .toList()
         );
     }
 
     @Override
-    @NotNull
-    protected ItemStack getObjectStack(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
+    protected @NotNull ItemStack getObjectStack(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
         return this.getEnchantIcon(enchant, 1);
     }
 
     @Override
-    @NotNull
-    protected MenuClick getObjectClick(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
+    protected @NotNull MenuClick getObjectClick(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
         return (player1, type, e) -> {
             if (!e.isLeftClick()) return;
 
             ItemStack itemClick = e.getCurrentItem();
             if (itemClick == null) return;
 
-            int levelHas = PDCUtil.getIntData(itemClick, this.keyLevel);
+            int levelHas = PDCUtil.getInt(itemClick, this.keyLevel).orElse(0);
             if (levelHas == 0) levelHas = enchant.getStartLevel();
 
             if (++levelHas > enchant.getMaxLevel()) levelHas = enchant.getStartLevel();
             itemClick = this.getEnchantIcon(enchant, levelHas);
-            PDCUtil.setData(itemClick, this.keyLevel, levelHas);
+            PDCUtil.set(itemClick, this.keyLevel, levelHas);
 
             e.setCurrentItem(itemClick);
         };
@@ -121,8 +117,7 @@ public class EnchantmentsListMenu extends AbstractMenuAuto<ExcellentEnchants, Ex
             .computeIfAbsent(level, k -> this.buildEnchantIcon(enchant, level));
     }
 
-    @NotNull
-    private ItemStack buildEnchantIcon(@NotNull ExcellentEnchant enchant, int level) {
+    private @NotNull ItemStack buildEnchantIcon(@NotNull ExcellentEnchant enchant, int level) {
         ItemStack icon = new ItemStack(this.enchantIcon);
         ItemMeta meta = icon.getItemMeta();
         if (meta == null) return icon;

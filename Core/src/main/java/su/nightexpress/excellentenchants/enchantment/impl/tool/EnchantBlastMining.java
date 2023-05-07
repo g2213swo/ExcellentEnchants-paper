@@ -59,10 +59,9 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
             "For example, a Stone has 3.0 strength.");
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public double getExplosionPower(int level) {
@@ -70,31 +69,28 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     }
 
     public float getMinBlockStrength(int level) {
-        return (float) minBlockStrength.getValue(level);
+        return (float) this.minBlockStrength.getValue(level);
     }
 
     private boolean isBlockHardEnough(@NotNull Block block, int level) {
-        float strength = plugin.getNMS().getBlockStrength(block);
+        float strength = block.getType().getHardness();//plugin.getNMS().getBlockStrength(block);
         return (strength >= this.getMinBlockStrength(level));
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_EXPLOSION_POWER, NumberUtil.format(this.getExplosionPower(level)));
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.PICKAXE};
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TOOL;
     }
 
@@ -119,11 +115,11 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
 
         float power = (float) this.getExplosionPower(level);
 
-        player.setMetadata(META_EXPLOSION_SOURCE, new FixedMetadataValue(plugin, level));
+        player.setMetadata(META_EXPLOSION_SOURCE, new FixedMetadataValue(this.plugin, level));
         NoCheatPlusHook.exemptBlocks(player);
         boolean exploded = block.getWorld().createExplosion(block.getLocation(), power, false, true, player);
         NoCheatPlusHook.unexemptBlocks(player);
-        player.removeMetadata(META_EXPLOSION_SOURCE, plugin);
+        player.removeMetadata(META_EXPLOSION_SOURCE, this.plugin);
         return exploded;
     }
 
@@ -144,9 +140,10 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
 
         // Break all 'exploded' blocks by a player, adding metadata to them to prevent trigger enchantment in a loop.
         blockList.forEach(block -> {
-            block.setMetadata(META_EXPLOSION_MINED, new FixedMetadataValue(plugin, true));
-            plugin.getNMS().breakBlock(player, block);
-            block.removeMetadata(META_EXPLOSION_MINED, plugin);
+            block.setMetadata(META_EXPLOSION_MINED, new FixedMetadataValue(this.plugin, true));
+            //plugin.getNMS().breakBlock(player, block);
+            player.breakBlock(block);
+            block.removeMetadata(META_EXPLOSION_MINED, this.plugin);
         });
 
         // Clear list of 'exploded' blocks so the event won't affect them, as they are already mined by a player.

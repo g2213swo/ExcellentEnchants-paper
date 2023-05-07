@@ -62,7 +62,8 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
     ) {
         if (!second.getType().isAir() && (second.getType() == first.getType() || second.getType() == Material.ENCHANTED_BOOK))
             return false;
-        if (result.getType() != first.getType()) return false;
+        if (result.getType() != first.getType())
+            return false;
 
         ItemStack resultCopy = result.clone();
         EnchantManager.getExcellentEnchantments(first).forEach((hasEnch, hasLevel) -> {
@@ -93,7 +94,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
             count++;
         }
 
-        PDCUtil.setData(result2, RECHARGED, count);
+        PDCUtil.set(result2, RECHARGED, count);
         e.setResult(result2);
         this.plugin.runTask(c -> e.getInventory().setRepairCost(chargeables.size()), false);
         return true;
@@ -147,14 +148,14 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
         ItemStack item = e.getCurrentItem();
         if (item == null) return;
 
-        int count = PDCUtil.getIntData(item, RECHARGED);
+        int count = PDCUtil.getInt(item, RECHARGED).orElse(0);
         if (count == 0) return;
 
         Player player = (Player) e.getWhoClicked();
         if (player.getLevel() < inventory.getRepairCost()) return;
 
         player.setLevel(player.getLevel() - inventory.getRepairCost());
-        PDCUtil.removeData(item, RECHARGED);
+        PDCUtil.remove(item, RECHARGED);
         e.getView().setCursor(item);
         e.setCancelled(false);
 

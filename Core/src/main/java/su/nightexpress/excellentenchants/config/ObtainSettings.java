@@ -25,8 +25,7 @@ public class ObtainSettings {
         this.enchantsCustomMax = enchantsCustomMax;
     }
 
-    @NotNull
-    public static ObtainSettings read(@NotNull JYML cfg, @NotNull String path) {
+    public static @NotNull ObtainSettings read(@NotNull JYML cfg, @NotNull String path) {
         boolean isEnabled = cfg.getBoolean(path + ".Enabled");
         int enchantsTotalMax = cfg.getInt(path + ".Enchantments.Total_Maximum", 4);
         double enchantsCustomGenerationChance = cfg.getDouble(path + ".Enchantments.Custom_Generation_Chance", 50D);
@@ -45,27 +44,27 @@ public class ObtainSettings {
     }
 
     public boolean isEnabled() {
-        return isEnabled;
+        return this.isEnabled;
     }
 
     public int getEnchantsTotalMax() {
-        return enchantsTotalMax;
+        return this.enchantsTotalMax;
     }
 
     public double getEnchantsCustomGenerationChance() {
-        return enchantsCustomGenerationChance;
+        return this.enchantsCustomGenerationChance;
     }
 
     public int getEnchantsCustomMin() {
-        return enchantsCustomMin;
+        return this.enchantsCustomMin;
     }
 
     public int getEnchantsCustomMax() {
-        return enchantsCustomMax;
+        return this.enchantsCustomMax;
     }
 
     @Override
     public String toString() {
-        return "ObtainSettings{" + "enchantsTotalMax=" + enchantsTotalMax + ", enchantsCustomGenerationChance=" + enchantsCustomGenerationChance + ", enchantsCustomMin=" + enchantsCustomMin + ", enchantsCustomMax=" + enchantsCustomMax + '}';
+        return "ObtainSettings{" + "enchantsTotalMax=" + this.enchantsTotalMax + ", enchantsCustomGenerationChance=" + this.enchantsCustomGenerationChance + ", enchantsCustomMin=" + this.enchantsCustomMin + ", enchantsCustomMax=" + this.enchantsCustomMax + '}';
     }
 }

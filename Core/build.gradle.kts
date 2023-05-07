@@ -20,11 +20,12 @@ dependencies {
     implementation(project(":V1_17_R1", configuration = "reobf"))
     implementation(project(":V1_18_R2", configuration = "reobf"))
     implementation(project(":V1_19_R2", configuration = "reobf"))
+    implementation(project(":V1_19_R3", configuration = "reobf"))
 
     // 3rd party plugins
+    compileOnly("me.clip:placeholderapi:2.11.2")
     compileOnly("fr.neatmonster:nocheatplus:3.16.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT")
-    compileOnly("fr.neatmonster:nocheatplus:3.16.1-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6") {
         exclude("org.bukkit")
     }
@@ -61,11 +62,11 @@ bukkit {
         }
         register("excellentenchants.user") {
             description = "Grants access to basic player plugin functions."
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
+            default = BukkitPluginDescription.Permission.Default.OP
         }
         register("excellentenchants.command") {
             description = "Grants access to all the plugin commands."
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
+            default = BukkitPluginDescription.Permission.Default.OP
             children = listOf(
                 "excellentenchants.command.book",
                 "excellentenchants.command.enchant",
@@ -75,19 +76,19 @@ bukkit {
         }
         register("excellentenchants.command.book") {
             description = "Grants access to /eenchants book command."
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
+            default = BukkitPluginDescription.Permission.Default.OP
         }
         register("excellentenchants.command.enchant") {
             description = "Grants access to /eenchants enchant command."
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
+            default = BukkitPluginDescription.Permission.Default.OP
         }
         register("excellentenchants.command.list") {
             description = "Grants access to /eenchants list command."
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
+            default = BukkitPluginDescription.Permission.Default.OP
         }
         register("excellentenchants.command.tierbook") {
             description = "Grants access to /eenchants tierbook command."
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
+            default = BukkitPluginDescription.Permission.Default.OP
         }
     }
 }

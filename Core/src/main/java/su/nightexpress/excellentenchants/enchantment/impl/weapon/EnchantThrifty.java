@@ -50,7 +50,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
                 Set.of(EntityType.WITHER.name(), EntityType.ENDER_DRAGON.name()),
                 "List of entity types, that will not drop spawn eggs.",
                 "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html")
-            .read(cfg).stream().map(e -> CollectionsUtil.getEnum(e, EntityType.class))
+            .read(this.cfg).stream().map(e -> CollectionsUtil.getEnum(e, EntityType.class))
             .filter(Objects::nonNull).collect(Collectors.toSet());
 
         this.ignoredSpawnReasons = JOption.create("Settings.Ignored_Spawn_Reasons",
@@ -59,19 +59,17 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
                     CreatureSpawnEvent.SpawnReason.DISPENSE_EGG.name()),
                 "Entities will not drop spawn eggs if they were spawned by one of the reasons below.",
                 "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html")
-            .read(cfg).stream().map(e -> CollectionsUtil.getEnum(e, CreatureSpawnEvent.SpawnReason.class))
+            .read(this.cfg).stream().map(e -> CollectionsUtil.getEnum(e, CreatureSpawnEvent.SpawnReason.class))
             .filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 
@@ -80,7 +78,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
         if (!this.isAvailableToUse(entity)) return false;
 
         if (this.ignoredEntityTypes.contains(entity.getType())) return false;
-        if (PDCUtil.getBooleanData(entity, this.keyEntityIgnored)) return false;
+        if (PDCUtil.getBoolean(entity, this.keyEntityIgnored).orElse(false)) return false;
         if (!this.checkTriggerChance(level)) return false;
 
         Material material = Material.getMaterial(entity.getType().name() + "_SPAWN_EGG");
@@ -104,6 +102,6 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
     public void onCreatureSpawn(CreatureSpawnEvent e) {
         if (!this.ignoredSpawnReasons.contains(e.getSpawnReason())) return;
 
-        PDCUtil.setData(e.getEntity(), this.keyEntityIgnored, true);
+        PDCUtil.set(e.getEntity(), this.keyEntityIgnored, true);
     }
 }

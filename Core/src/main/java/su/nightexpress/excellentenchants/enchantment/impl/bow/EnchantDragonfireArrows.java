@@ -59,8 +59,7 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level) / 20D))
@@ -68,21 +67,18 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
             ;
     }
 
-    @NotNull
     @Override
-    public ArrowImplementation getArrowImplementation() {
-        return arrowImplementation;
+    public @NotNull ArrowImplementation getArrowImplementation() {
+        return this.arrowImplementation;
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.BOW;
     }
 

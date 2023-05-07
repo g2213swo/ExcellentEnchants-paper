@@ -69,8 +69,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.ARMOR_FEET;
     }
 
@@ -104,7 +103,7 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
         if (!hasLava)
             return;
 
-        plugin.getEnchantNMS().handleFlameWalker(player, player.getLocation(), level).forEach(block -> {
+        this.plugin.getEnchantNMS().handleFlameWalker(player, player.getLocation(), level).forEach(block -> {
             addBlock(block, Rnd.getDouble(this.getBlockDecayTime(level)) + 1);
         });
     }

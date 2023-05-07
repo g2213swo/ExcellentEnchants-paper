@@ -33,28 +33,25 @@ public class EnchantCurseOfMisfortune extends ExcellentEnchant implements Chance
         super.loadConfig();
         this.chanceImplementation = ChanceImplementation.create(this);
         this.dropExp = JOption.create("Settings.Drop_Exp", false,
-            "When 'true' allows to drop exp from mobs/blocks.").read(cfg);
+            "When 'true' allows to drop exp from mobs/blocks.").read(this.cfg);
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public boolean isDropExp() {
-        return dropExp;
+        return this.dropExp;
     }
 
     @Override
-    @NotNull
-    public FitItemType[] getFitItemTypes() {
+    public @NotNull FitItemType[] getFitItemTypes() {
         return new FitItemType[]{FitItemType.WEAPON, FitItemType.TOOL};
     }
 
-    @NotNull
     @Override
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.BREAKABLE;
     }
 

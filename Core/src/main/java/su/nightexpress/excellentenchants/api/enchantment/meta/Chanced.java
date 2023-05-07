@@ -16,6 +16,6 @@ public interface Chanced {
     }
 
     default boolean checkTriggerChance(int level) {
-        return getChanceImplementation().checkTriggerChance(level);
+        return this.getChanceImplementation().checkTriggerChance(level);
     }
 }

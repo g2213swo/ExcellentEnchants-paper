@@ -28,6 +28,9 @@ dependencies:
   - name: NoCheatPlus
     required: false
     bootstrap: false
+  - name: PlaceholderAPI
+    required: false
+    bootstrap: false
 permissions:
   excellentenchants.admin:
     description: Grants access to all plugin functions.

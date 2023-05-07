@@ -46,10 +46,9 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
             "Amount (in percent) of how much item durability will be reduced.");
     }
 
-    @NotNull
     @Override
-    public ChanceImplementation getChanceImplementation() {
-        return chanceImplementation;
+    public @NotNull ChanceImplementation getChanceImplementation() {
+        return this.chanceImplementation;
     }
 
     public final double getDurabilityReduction(int level) {
@@ -57,16 +56,14 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_DURABILITY_DAMAGE, NumberUtil.format(this.getDurabilityReduction(level) * 100D));
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.WEAPON;
     }
 

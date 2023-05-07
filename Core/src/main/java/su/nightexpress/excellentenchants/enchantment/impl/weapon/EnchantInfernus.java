@@ -43,16 +43,14 @@ public class EnchantInfernus extends ExcellentEnchant {
     }
 
     @Override
-    @NotNull
-    public UnaryOperator<String> replacePlaceholders(int level) {
+    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
         return str -> str
             .transform(super.replacePlaceholders(level))
             .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format((double) this.getFireTicks(level) / 20D));
     }
 
     @Override
-    @NotNull
-    public EnchantmentTarget getItemTarget() {
+    public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.TRIDENT;
     }
 

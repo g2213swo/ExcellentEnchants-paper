@@ -31,16 +31,16 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
             return;
         }*/
 
-        this.config = JYML.loadOrExtract(plugin, "tiers.yml");
+        this.config = JYML.loadOrExtract(this.plugin, "tiers.yml");
 
-        for (String sId : config.getSection("")) {
+        for (String sId : this.config.getSection("")) {
             String path = sId + ".";
 
-            int priority = config.getInt(path + "Priority");
-            String name = config.getString(path + "Name", sId);
+            int priority = this.config.getInt(path + "Priority");
+            String name = this.config.getString(path + "Name", sId);
 
             TextColor color = Optional
-                .ofNullable(config.getString(path + "Color"))
+                .ofNullable(this.config.getString(path + "Color"))
                 .map(v -> {
                     TextColor value = NamedTextColor.NAMES.value(v);
                     if (value == null) value = TextColor.fromHexString(v);
@@ -50,9 +50,9 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
             Map<ObtainType, Double> chance = new HashMap<>();
             for (ObtainType obtainType : ObtainType.values()) {
-                config.addMissing(path + "Obtain_Chance." + obtainType.name(), 50D);
+                this.config.addMissing(path + "Obtain_Chance." + obtainType.name(), 50D);
 
-                double chanceType = config.getDouble(path + "Obtain_Chance." + obtainType.name());
+                double chanceType = this.config.getDouble(path + "Obtain_Chance." + obtainType.name());
                 chance.put(obtainType, chanceType);
             }
 
@@ -72,28 +72,23 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
         this.tiers.clear();
     }
 
-    @NotNull
-    public JYML getConfig() {
-        return config;
+    public @NotNull JYML getConfig() {
+        return this.config;
     }
 
-    @Nullable
-    public Tier getTierById(@NotNull String id) {
+    public @Nullable Tier getTierById(@NotNull String id) {
         return this.tiers.get(id.toLowerCase());
     }
 
-    @NotNull
-    public Collection<Tier> getTiers() {
+    public @NotNull Collection<Tier> getTiers() {
         return this.tiers.values();
     }
 
-    @NotNull
-    public List<String> getTierIds() {
+    public @NotNull List<String> getTierIds() {
         return new ArrayList<>(this.tiers.keySet());
     }
 
-    @Nullable
-    public Tier getTierByChance(@NotNull ObtainType obtainType) {
+    public @Nullable Tier getTierByChance(@NotNull ObtainType obtainType) {
         Map<Tier, Double> map = this.getTiers().stream().collect(Collectors.toMap(k -> k, v -> v.getChance(obtainType)));
         return Rnd.get(map);
     }

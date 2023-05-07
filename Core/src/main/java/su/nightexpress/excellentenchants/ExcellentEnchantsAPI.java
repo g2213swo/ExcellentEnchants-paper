@@ -8,13 +8,11 @@ public class ExcellentEnchantsAPI {
 
     public static final ExcellentEnchants PLUGIN = ExcellentEnchants.getPlugin(ExcellentEnchants.class);
 
-    @NotNull
-    public static EnchantManager getEnchantManager() {
+    public static @NotNull EnchantManager getEnchantManager() {
         return PLUGIN.getEnchantManager();
     }
 
-    @NotNull
-    public static TierManager getTierManager() {
+    public static @NotNull TierManager getTierManager() {
         return PLUGIN.getTierManager();
     }
 }
