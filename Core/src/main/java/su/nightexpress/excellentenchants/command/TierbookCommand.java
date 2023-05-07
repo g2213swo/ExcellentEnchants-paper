@@ -19,8 +19,10 @@ import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.tier.Tier;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
@@ -46,7 +48,28 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
     @Override
     public @NotNull List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
         if (arg == 1) return CollectionsUtil.playerNames(player);
-        if (arg == 2) return this.plugin.getTierManager().getTierIds();
+        //region Kinda smart completions of multiple tiers
+        if (arg == 2) {
+            String in = args[2];
+            if (in.endsWith(":")) {
+                return Stream.of("1", "5", "10", "20")
+                    .map(str -> in + str)
+                    .toList();
+            } else if (in.endsWith(",")) {
+                return this.plugin.getTierManager().getTierIds().stream()
+                    .filter(str -> !in.contains(str))
+                    .map(str -> in + str)
+                    .toList();
+            } else if (!in.isEmpty() && !Character.isDigit(in.charAt(in.length() - 1))) {
+                return this.plugin.getTierManager().getTierIds().stream()
+                    .filter(str -> !in.contains(str))
+                    .map(str -> in + "," + str)
+                    .toList();
+            } else {
+                return this.plugin.getTierManager().getTierIds();
+            }
+        }
+        //endregion
         if (arg == 3) return Arrays.asList("-1", "1", "5", "10");
         return super.getTab(player, arg, args);
     }
@@ -64,12 +87,22 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
             return;
         }
 
-        Tier tier = this.plugin.getTierManager().getTierById(args[2].toLowerCase());
-        if (tier == null) {
+        //region Construct a weight map of tiers
+        Map<Tier, Double> weightMap = new HashMap<>();
+        Arrays.stream(args[2].toLowerCase().split(","))
+            .forEach(t -> {
+                String[] kv = t.split(":");
+                Tier tier = this.plugin.getTierManager().getTierById(kv[0]);
+                double weight = (kv.length < 2) ? 1 : Double.parseDouble(kv[1]);
+                weightMap.put(tier, weight);
+            });
+        if (weightMap.isEmpty()) {
             this.plugin.getMessage(Lang.COMMAND_TIER_BOOK_ERROR).send(sender);
             return;
         }
+        //endregion
 
+        Tier tier = Rnd.getByWeight(weightMap);
         ExcellentEnchant enchant = Rnd.get(tier.getEnchants());
         if (enchant == null) {
             this.plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);

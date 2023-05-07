@@ -16,7 +16,7 @@ public class Lang extends EngineLang {
     public static final LangKey COMMAND_BOOK_DESC = new LangKey("Command.Book.Desc", "Gives custom enchanted book.");
     public static final LangKey COMMAND_BOOK_DONE = new LangKey("Command.Book.Done", "Given <gold>" + Placeholders.GENERIC_ENCHANT + "</gold> enchanted book to <gold>" + Placeholders.Player.DISPLAY_NAME + "</gold>.");
 
-    public static final LangKey COMMAND_TIER_BOOK_USAGE = new LangKey("Command.TierBook.Usage", "<player> <tier> <level>");
+    public static final LangKey COMMAND_TIER_BOOK_USAGE = new LangKey("Command.TierBook.Usage", "<player> <tier1:x>[,<tier2:y>,...] <level>");
     public static final LangKey COMMAND_TIER_BOOK_DESC = new LangKey("Command.TierBook.Desc", "Gives an enchanted book.");
     public static final LangKey COMMAND_TIER_BOOK_ERROR = new LangKey("Command.TierBook.Error", "<red>Invalid tier!");
     public static final LangKey COMMAND_TIER_BOOK_DONE = new LangKey("Command.TierBook.Done", "Given <gold>" + Placeholders.TIER_NAME + "</gold> enchanted book to <gold>" + Placeholders.Player.DISPLAY_NAME + "</gold>.");
