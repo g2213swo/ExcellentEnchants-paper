@@ -14,7 +14,7 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/") {
         content {
             includeGroup("io.papermc.paper")
-            includeGroup("net.md-5")
+            includeGroup("net.md-5") // bungeecord-chat-1.16-R0.4-deprecated is required by paper-api
         }
     }
     maven("https://maven.enginehub.org/repo/") {
