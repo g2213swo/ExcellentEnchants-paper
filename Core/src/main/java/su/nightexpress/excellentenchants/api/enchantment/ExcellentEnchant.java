@@ -351,6 +351,13 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return this.levelMin;
     }
 
+    public int clampLevel(final int level) {
+        int maxLevel = this.getMaxLevel();
+        int minLevel = this.getStartLevel();
+        if (level > maxLevel) return maxLevel;
+        return Math.max(level, minLevel);
+    }
+
     public int getLevelByEnchantCost(int expLevel) {
         int get = this.levelByEnchantCost.getValues().entrySet().stream()
             .filter(en -> expLevel >= en.getValue().intValue())

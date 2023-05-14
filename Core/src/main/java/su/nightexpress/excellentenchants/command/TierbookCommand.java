@@ -112,6 +112,8 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
         int level = StringUtil.getInteger(args[3], -1, true);
         if (level < 1) {
             level = Rnd.get(enchant.getStartLevel(), enchant.getMaxLevel());
+        } else {
+            level = enchant.clampLevel(level);
         }
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
