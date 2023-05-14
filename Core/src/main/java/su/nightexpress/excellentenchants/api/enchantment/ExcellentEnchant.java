@@ -509,7 +509,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
      */
     @Override
     public @NotNull Component displayName(final int level) {
-        return COMPONENT_NAME_CACHE.getUnchecked(this).get(level);
+        return COMPONENT_NAME_CACHE.getUnchecked(this).get(Math.min(level, this.getMaxLevel()));
     }
 
     @Override
