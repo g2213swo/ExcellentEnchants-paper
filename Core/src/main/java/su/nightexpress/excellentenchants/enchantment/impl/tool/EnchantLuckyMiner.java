@@ -8,15 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, BlockBreakEnchant {
 
@@ -28,30 +26,30 @@ public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, Bloc
 
     public EnchantLuckyMiner(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to gain " + PLACEHOLDER_EXP_MODIFIER + "% more exp from ores.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.expModifier = EnchantScaler.read(this, "Settings.Exp_Modifier", "1.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.5",
+    public void loadSettings() {
+        super.loadSettings();
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "30.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 7.0");
+        this.expModifier = EnchantScaler.read(this, "Settings.Exp_Modifier",
+            "1.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 0.5",
             "Exp modifier value. The original exp amount will be multiplied on this value.");
+
+        this.addPlaceholder(PLACEHOLDER_EXP_MODIFIER, level -> NumberUtil.format(this.getExpModifier(level) * 100D - 100D));
     }
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     public double getExpModifier(int level) {
         return this.expModifier.getValue(level);
-    }
-
-    @Override
-    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> str
-            .transform(super.replacePlaceholders(level))
-            .replace(PLACEHOLDER_EXP_MODIFIER, NumberUtil.format(this.getExpModifier(level) * 100D - 100D));
     }
 
     @Override
@@ -66,10 +64,8 @@ public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, Bloc
 
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
-        if (!this.isAvailableToUse(player))
-            return false;
-        if (!this.checkTriggerChance(level))
-            return false;
+        if (!this.isAvailableToUse(player)) return false;
+        if (!this.checkTriggerChance(level)) return false;
 
         double expMod = this.getExpModifier(level);
         e.setExpToDrop((int) ((double) e.getExpToDrop() * expMod));

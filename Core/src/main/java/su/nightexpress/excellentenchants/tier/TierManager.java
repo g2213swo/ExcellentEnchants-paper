@@ -15,13 +15,14 @@ import java.util.stream.Collectors;
 
 public class TierManager extends AbstractManager<ExcellentEnchants> {
 
+    public static final String FILE_NAME = "tiers.yml";
+
     private JYML config;
     private final Map<String, Tier> tiers;
 
     public TierManager(@NotNull ExcellentEnchants plugin) {
         super(plugin);
         this.tiers = new HashMap<>();
-
     }
 
     @Override
@@ -31,7 +32,7 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
             return;
         }*/
 
-        this.config = JYML.loadOrExtract(this.plugin, "tiers.yml");
+        this.config = JYML.loadOrExtract(plugin, FILE_NAME);
 
         for (String sId : this.config.getSection("")) {
             String path = sId + ".";
@@ -60,10 +61,6 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
             this.tiers.put(tier.getId(), tier);
         }
 
-        if (this.tiers.isEmpty()) {
-            this.tiers.put(Tier.DEFAULT.getId(), Tier.DEFAULT);
-        }
-
         this.plugin.info("Tiers Loaded: " + this.tiers.size());
     }
 
@@ -90,6 +87,21 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
     public @Nullable Tier getTierByChance(@NotNull ObtainType obtainType) {
         Map<Tier, Double> map = this.getTiers().stream().collect(Collectors.toMap(k -> k, v -> v.getChance(obtainType)));
-        return Rnd.get(map);
+        return Rnd.getByWeight(map);
+    }
+
+    public @NotNull Tier getMostCommon() {
+        return this.getTiers().stream().min(Comparator.comparingInt(Tier::getPriority)).orElseThrow();
+    }
+
+    public @NotNull Tier getByRarityModifier(double point) {
+        int minPriority = this.getTiers().stream().mapToInt(Tier::getPriority).min().orElse(0);
+        int maxPriority = this.getTiers().stream().mapToInt(Tier::getPriority).max().orElse(0);
+
+        int threshold = (int) Math.ceil(minPriority + (maxPriority - minPriority) * point);
+
+        return this.getTiers().stream().filter(tier -> tier.getPriority() <= threshold)
+            .max(Comparator.comparingInt(tier -> tier.getPriority() - threshold))
+            .orElse(this.getMostCommon());
     }
 }

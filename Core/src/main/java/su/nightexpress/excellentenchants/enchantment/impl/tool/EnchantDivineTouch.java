@@ -18,19 +18,22 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.ComponentUtil;
-import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantDropContainer;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 
 public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, BlockBreakEnchant, BlockDropEnchant {
 
@@ -42,20 +45,27 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
 
     public EnchantDivineTouch(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to mine spawner.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(1.0);
+        this.getDefaults().setConflicts(EnchantSmelter.ID);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.spawnerName = JOption.create("Settings.Spawner_Item.Name", "<green>Mob Spawner <gray>(" + Placeholders.GENERIC_TYPE + ")",
-            "Spawner item display name.",
-            "Placeholder '" + Placeholders.GENERIC_TYPE + "' for the mob type.").read(this.cfg);
+    public void loadSettings() {
+        super.loadSettings();
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "15.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.spawnerName = JOption.create("Settings.Spawner_Item.Name",
+                "<green>Mob Spawner <gray>(" + Placeholders.GENERIC_TYPE + ")", // adventure
+                "Spawner item display name.",
+                "Placeholder '" + Placeholders.GENERIC_TYPE + "' for the mob type.")
+            .read(cfg); // adventure
     }
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     @Override
@@ -68,7 +78,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         return EnchantmentTarget.TOOL;
     }
 
-    private @NotNull ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
+    public @NotNull ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
         ItemStack itemSpawner = new ItemStack(Material.SPAWNER);
         BlockStateMeta stateItem = (BlockStateMeta) itemSpawner.getItemMeta();
         if (stateItem == null) return itemSpawner;
@@ -77,7 +87,11 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         spawnerItem.setSpawnedType(spawnerBlock.getSpawnedType());
         spawnerItem.update(true);
         stateItem.setBlockState(spawnerItem);
-        stateItem.displayName(ComponentUtil.asComponent(this.spawnerName.replace(Placeholders.GENERIC_TYPE, this.plugin.getLangManager().getEnum(spawnerBlock.getSpawnedType()))));
+        stateItem.displayName(ComponentUtil.replace(
+            text(this.spawnerName),
+            Placeholders.GENERIC_TYPE,
+            translatable(spawnerBlock.getSpawnedType())
+        )); // adventure
         itemSpawner.setItemMeta(stateItem);
 
         return itemSpawner;
@@ -90,11 +104,11 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
         if (!block.hasMetadata(META_HANDLE)) return false;
         if (!(state instanceof CreatureSpawner spawnerBlock)) return false;
 
-        dropContainer.getDrops().add(this.getSpawner(spawnerBlock));
+        dropContainer.getDrops().add(this.getSpawner(spawnerBlock)); // akiranya
 
         Location location = LocationUtil.getCenter(block.getLocation());
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(location, Particle.VILLAGER_HAPPY, "", 0.3f, 0.3f, 0.3f, 0.15f, 30);
+            SimpleParticle.of(Particle.VILLAGER_HAPPY).play(location, 0.3, 0.15, 30);
         }
         block.removeMetadata(META_HANDLE, this.plugin);
         return true;
@@ -121,7 +135,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
 
         Player player = e.getPlayer();
         ItemStack spawner = player.getInventory().getItem(e.getHand());
-        if (spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta))
+        if (spawner == null || spawner.getType() != Material.SPAWNER || !(spawner.getItemMeta() instanceof BlockStateMeta meta))
             return;
 
         CreatureSpawner spawnerItem = (CreatureSpawner) meta.getBlockState();

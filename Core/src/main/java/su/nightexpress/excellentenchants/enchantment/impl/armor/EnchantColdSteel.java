@@ -7,31 +7,49 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.template.PotionEnchant;
+import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.impl.meta.PotionImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantColdSteel extends PotionEnchant implements Chanced, CombatEnchant {
+public class EnchantColdSteel extends ExcellentEnchant implements Chanced, Potioned, CombatEnchant {
 
     public static final String ID = "cold_steel";
 
     private ChanceImplementation chanceImplementation;
+    private PotionImplementation potionImplementation;
 
     public EnchantColdSteel(@NotNull ExcellentEnchants plugin) {
-        super(plugin, ID, EnchantPriority.MEDIUM, PotionEffectType.SLOW_DIGGING, false);
+        super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to apply " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on attacker.");
+        this.getDefaults().setTier(0.3);
+        this.getDefaults().setLevelMax(3);
+
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+    public void loadSettings() {
+        super.loadSettings();
+
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "60 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
+        this.potionImplementation = PotionImplementation.create(this, PotionEffectType.SLOW_DIGGING, false,
+            "4 + " + Placeholders.ENCHANTMENT_LEVEL,
+            Placeholders.ENCHANTMENT_LEVEL);
     }
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
         return this.chanceImplementation;
+    }
+
+    @Override
+    public @NotNull PotionImplementation getPotionImplementation() {
+        return potionImplementation;
     }
 
     @Override

@@ -25,11 +25,11 @@ import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantDropContainer;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,10 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
+        this.getDefaults().setDescription("Drop chests and saves all its content.");
+        this.getDefaults().setLevelMax(1);
+        this.getDefaults().setTier(0.5);
+
         this.keyChest = new NamespacedKey(plugin, ID + ".item");
         this.keyItems = new TreeMap<>();
         for (int pos = 0; pos < 27; pos++) {
@@ -56,19 +60,19 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chestName = JOption.create("Settings.Chest_Item.Name", "Chest <gray>(" + Placeholders.GENERIC_AMOUNT + " items)",
+    public void loadSettings() {
+        super.loadSettings();
+        this.chestName = JOption.create("Settings.Chest_Item.Name", "Chest <gray>(" + Placeholders.GENERIC_AMOUNT + " items)", // adventure
             "Chest item display name.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(this.cfg);
+            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg); // adventure
         this.chestLore = JOption.create("Settings.Chest_Item.Lore", new ArrayList<>(),
             "Chest item lore.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(this.cfg);
+            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg); // adventure
     }
 
     @Deprecated
     private NamespacedKey getItemKey(int pos) {
-        return this.keyItems.computeIfAbsent(pos, key -> new NamespacedKey(this.plugin, "silkchest_item_" + pos));
+        return this.keyItems.computeIfAbsent(pos, key -> new NamespacedKey(plugin, "silkchest_item_" + pos));
     }
 
     @Override
@@ -97,13 +101,12 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
 
         int amount = (int) Stream.of(chestItem.getBlockInventory().getContents()).filter(i -> i != null && !i.getType().isAir()).count();
 
-        chestStack.editMeta(BlockStateMeta.class, meta -> {
-            meta.setBlockState(chestItem);
-            meta.displayName(ComponentUtil.asComponent(this.chestName));
-            meta.lore(ComponentUtil.asComponent(this.chestLore));
-            ItemUtil.replaceNameAndLore(meta, str -> str.replace(Placeholders.GENERIC_AMOUNT, String.valueOf(amount)));
-        });
+        stateMeta.setBlockState(chestItem);
+        stateMeta.displayName(ComponentUtil.asComponent(this.chestName));
+        stateMeta.lore(ComponentUtil.asComponent(this.chestLore));
+        chestStack.setItemMeta(stateMeta);
 
+        ItemUtil.replaceNameAndLore(chestStack, str -> str.replace(Placeholders.GENERIC_AMOUNT, String.valueOf(amount)));
         PDCUtil.set(chestStack, this.keyChest, true);
         return chestStack;
 
@@ -136,14 +139,9 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     }
 
     @Override
-    public boolean onDrop(
-        @NotNull BlockDropItemEvent e,
-        @NotNull EnchantDropContainer dropContainer,
-        @NotNull Player player,
-        @NotNull ItemStack item,
-        int level
-    ) {
+    public boolean onDrop(@NotNull BlockDropItemEvent e, @NotNull EnchantDropContainer dropContainer, @NotNull Player player, @NotNull ItemStack item, int level) {
         BlockState state = e.getBlockState();
+        Block block = state.getBlock();
 
         if (!this.isAvailableToUse(player)) return false;
         if (!(state instanceof Chest chest)) return false;
@@ -153,7 +151,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         chest.getBlockInventory().addItem(e.getItems().stream().map(Item::getItemStack).toList().toArray(new ItemStack[0]));
 
         // Добавляем кастомный сундук в кастомный дроп лист.
-        dropContainer.getDrops().add(this.getSilkChest(chest));
+        dropContainer.getDrops().add(this.getSilkChest(chest)); // akiranya
 
         // Очищаем инвентарь сундука и дефолтный дроп лист.
         chest.getBlockInventory().clear();
@@ -171,7 +169,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         BlockState state = block.getState();
         if (!(state instanceof Chest chest)) return;
 
-        chest.customName(null);
+        chest.customName(null); // adventure
         chest.update(true);
 
         Inventory inventory = chest.getBlockInventory();
@@ -193,9 +191,7 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         ItemStack item;
         if (e.getHotbarButton() >= 0) {
             item = player.getInventory().getItem(e.getHotbarButton());
-        } else {
-            item = e.getCurrentItem();
-        }
+        } else item = e.getCurrentItem();
 
         if (item == null || item.getType().isAir() || !this.isSilkChest(item)) return;
 

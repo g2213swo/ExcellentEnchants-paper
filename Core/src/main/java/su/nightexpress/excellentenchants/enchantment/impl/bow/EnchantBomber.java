@@ -1,5 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.bow;
 
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -12,14 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BowEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEnchant {
 
@@ -31,26 +30,35 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
 
     public EnchantBomber(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch TNT that explodes in " + PLACEHOLDER_FUSE_TICKS + "s.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.7);
+        this.getDefaults().setConflicts(
+            EnchantEnderBow.ID, EnchantGhast.ID,
+            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
+            EnchantHover.ID,
+            Enchantment.ARROW_FIRE.getKey().getKey(),
+            Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
+            Enchantment.ARROW_DAMAGE.getKey().getKey()
+        );
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.fuseTicks = EnchantScaler.read(this, "Settings.Fuse_Ticks", "100 - " + Placeholders.ENCHANTMENT_LEVEL + " * 10",
+    public void loadSettings() {
+        super.loadSettings();
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "5.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.fuseTicks = EnchantScaler.read(this, "Settings.Fuse_Ticks",
+            "100 - " + Placeholders.ENCHANTMENT_LEVEL + " * 10",
             "Sets fuse ticks (before it will explode) for the launched TNT.");
-    }
 
-    @Override
-    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> str
-            .transform(super.replacePlaceholders(level))
-            .replace(PLACEHOLDER_FUSE_TICKS, NumberUtil.format((double) this.getFuseTicks(level) / 20D));
+        this.addPlaceholder(PLACEHOLDER_FUSE_TICKS, level -> NumberUtil.format((double) this.getFuseTicks(level) / 20D));
     }
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     public int getFuseTicks(int level) {
@@ -64,12 +72,9 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
 
     @Override
     public boolean onShoot(@NotNull EntityShootBowEvent e, @NotNull LivingEntity shooter, @NotNull ItemStack bow, int level) {
-        if (!this.isAvailableToUse(shooter))
-            return false;
-        if (!this.checkTriggerChance(level))
-            return false;
-        if (!(e.getProjectile() instanceof Projectile projectile))
-            return false;
+        if (!this.isAvailableToUse(shooter)) return false;
+        if (!this.checkTriggerChance(level)) return false;
+        if (!(e.getProjectile() instanceof Projectile projectile)) return false;
 
         TNTPrimed primed = projectile.getWorld().spawn(projectile.getLocation(), TNTPrimed.class);
         primed.setVelocity(projectile.getVelocity().multiply(e.getForce() * 1.25));

@@ -10,14 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced {
 
@@ -29,14 +27,21 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
 
     public EnchantCurseOfBreaking(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to consume extra " + PLACEHOLDER_DURABILITY_AMOUNT + " durability points.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0D);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.durabilityAmount = EnchantScaler.read(this, "Settings.Durability_Amount", Placeholders.ENCHANTMENT_LEVEL,
+    public void loadSettings() {
+        super.loadSettings();
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+        this.durabilityAmount = EnchantScaler.read(this, "Settings.Durability_Amount",
+            Placeholders.ENCHANTMENT_LEVEL,
             "Amount of durability points to be taken from the item.");
+
+        this.addPlaceholder(PLACEHOLDER_DURABILITY_AMOUNT, level -> NumberUtil.format(this.getDurabilityAmount(level)));
     }
 
     @Override
@@ -46,18 +51,11 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     public int getDurabilityAmount(int level) {
         return (int) this.durabilityAmount.getValue(level);
-    }
-
-    @Override
-    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> str
-            .transform(super.replacePlaceholders(level))
-            .replace(PLACEHOLDER_DURABILITY_AMOUNT, NumberUtil.format(this.getDurabilityAmount(level)));
     }
 
     @Override
@@ -68,20 +66,16 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onItemDurability(PlayerItemDamageEvent e) {
         Player player = e.getPlayer();
-        if (!this.isAvailableToUse(player))
-            return;
+        if (!this.isAvailableToUse(player)) return;
 
         ItemStack item = e.getItem();
-        int level = EnchantManager.getEnchantmentLevel(item, this);
+        int level = EnchantUtils.getLevel(item, this);
 
-        if (level < 1)
-            return;
-        if (!this.checkTriggerChance(level))
-            return;
+        if (level < 1) return;
+        if (!this.checkTriggerChance(level)) return;
 
         int durabilityAmount = this.getDurabilityAmount(level);
-        if (durabilityAmount <= 0)
-            return;
+        if (durabilityAmount <= 0) return;
 
         e.setDamage(e.getDamage() + durabilityAmount);
     }

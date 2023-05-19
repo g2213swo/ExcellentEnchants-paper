@@ -1,4 +1,2 @@
 Plugin:
-  Command_Aliases: 'excellentenchants,eenchants,exenchants'
-  Language: 'en'
-  Name: 'ExcellentEnchants'
+  Command_Aliases: 'excellentenchants,eenchants'

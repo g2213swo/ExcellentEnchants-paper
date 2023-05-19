@@ -20,9 +20,9 @@ import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class ProtocolHook {
 
-    private static final NamespacedKey DESCRIPTION_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "description.size");
+    private static final NamespacedKey DESCRIPTION_SIZE = new NamespacedKey(ExcellentEnchantsAPI.PLUGIN, "description_size");
     private static final Style FALLBACK_STYLE = Style.style(config -> {
         config.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
         config.colorIfAbsent(NamedTextColor.GRAY);
@@ -108,7 +108,7 @@ public class ProtocolHook {
         ItemMeta meta = item.getItemMeta();
         if (meta == null || meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return item;
 
-        Map<ExcellentEnchant, Integer> enchants = EnchantManager.getExcellentEnchantments(item);
+        Map<ExcellentEnchant, Integer> enchants = EnchantUtils.getExcellents(meta);
         if (enchants.isEmpty()) return item; // if no enchants on this item
         List<Component> lore = Optional.ofNullable(meta.lore()).orElseGet(ArrayList::new);
 
@@ -126,7 +126,7 @@ public class ProtocolHook {
                 descSize.addAndGet(desc.size());
             }
             // Add vanilla-like enchantment lore
-            int charges = EnchantManager.getEnchantmentCharges(item, enchant);
+            int charges = EnchantUtils.getCharges(meta, enchant);
             lore.add(0, enchant.displayName(level, charges));
         });
         PDCUtil.set(meta, DESCRIPTION_SIZE, descSize.get());
@@ -144,7 +144,7 @@ public class ProtocolHook {
         if (meta == null || !meta.hasLore()) return item; // if no lore on this item
 
         List<Component> lore = Objects.requireNonNull(meta.lore());
-        int size = EnchantManager.getExcellentEnchantments(item).size();
+        int size = EnchantUtils.getExcellents(meta).size();
         if (size == 0) return item; // if no custom enchantment on this item
         size += PDCUtil.getInt(meta, DESCRIPTION_SIZE).orElse(0);
         List<Component> reverted = lore.subList(size, lore.size()); // gets the part without any enchantment lore

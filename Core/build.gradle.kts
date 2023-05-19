@@ -1,5 +1,3 @@
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-
 plugins {
     id("su.nightexpress.excellentenchants.java-conventions")
     id("com.github.johnrengelman.shadow") version "8.1.1"
@@ -9,7 +7,7 @@ plugins {
 
 dependencies {
     // The server API
-    compileOnly("org.purpurmc.purpur:purpur-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
 
     // NMS modules
     api(project(":NMS"))
@@ -18,76 +16,25 @@ dependencies {
     implementation(project(":V1_19_R2", configuration = "reobf"))
     implementation(project(":V1_19_R3", configuration = "reobf"))
 
+    compileOnly("cc.mewcraft", "mewcore", "5.16.1")
+
     // 3rd party plugins
-    compileOnly("me.clip:placeholderapi:2.11.2")
-    compileOnly("fr.neatmonster:nocheatplus:3.16.1-SNAPSHOT")
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0-SNAPSHOT")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.6") {
+    compileOnly("me.clip", "placeholderapi", "2.11.2")
+    compileOnly("fr.neatmonster", "nocheatplus", "3.16.1-SNAPSHOT")
+    compileOnly("com.comphenix.protocol", "ProtocolLib", "5.0.0")
+    compileOnly("com.sk89q.worldguard", "worldguard-bukkit", "7.0.6") {
         exclude("org.bukkit")
+    }
+    compileOnly("io.lumine", "Mythic-Dist", "5.2.6") {
+        isTransitive = false
     }
 }
 
-description = "Core"
+description = "Vanilla-like enchants for your server."
 version = "$version".decorateVersion()
 
 fun lastCommitHash(): String = indraGit.commit()?.name?.substring(0, 7) ?: error("Could not determine commit hash")
 fun String.decorateVersion(): String = if (endsWith("-SNAPSHOT")) "$this-${lastCommitHash()}" else this
-
-bukkit {
-    main = "su.nightexpress.excellentenchants.ExcellentEnchants"
-    name = "ExcellentEnchants"
-    description = "Vanilla-like enchants for your server."
-    version = "${project.version}"
-    apiVersion = "1.17"
-    authors = listOf("NightExpress")
-    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-    loadBefore = listOf("HuskSync")
-    depend = listOf("NexEngine")
-    softDepend = listOf(
-        "ProtocolLib",
-        "NoCheatPlus"
-    )
-    permissions {
-        register("excellentenchants.admin") {
-            description = "Grants access to all plugin functions."
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
-            childrenMap = mapOf(
-                "excellentenchants.user" to true,
-                "excellentenchants.command" to true
-            )
-        }
-        register("excellentenchants.user") {
-            description = "Grants access to basic player plugin functions."
-            default = BukkitPluginDescription.Permission.Default.OP
-        }
-        register("excellentenchants.command") {
-            description = "Grants access to all the plugin commands."
-            default = BukkitPluginDescription.Permission.Default.OP
-            children = listOf(
-                "excellentenchants.command.book",
-                "excellentenchants.command.enchant",
-                "excellentenchants.command.list",
-                "excellentenchants.command.tierbook"
-            )
-        }
-        register("excellentenchants.command.book") {
-            description = "Grants access to /eenchants book command."
-            default = BukkitPluginDescription.Permission.Default.OP
-        }
-        register("excellentenchants.command.enchant") {
-            description = "Grants access to /eenchants enchant command."
-            default = BukkitPluginDescription.Permission.Default.OP
-        }
-        register("excellentenchants.command.list") {
-            description = "Grants access to /eenchants list command."
-            default = BukkitPluginDescription.Permission.Default.OP
-        }
-        register("excellentenchants.command.tierbook") {
-            description = "Grants access to /eenchants tierbook command."
-            default = BukkitPluginDescription.Permission.Default.OP
-        }
-    }
-}
 
 tasks {
     jar {
@@ -106,10 +53,12 @@ tasks {
     }
     processResources {
         filesMatching("**/paper-plugin.yml") {
-            expand(mapOf(
-                "version" to "${project.version}",
-                "description" to project.description
-            ))
+            expand(
+                mapOf(
+                    "version" to "${project.version}",
+                    "description" to project.description
+                )
+            )
         }
     }
     register("deployJar") {

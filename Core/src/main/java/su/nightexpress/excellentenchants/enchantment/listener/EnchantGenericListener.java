@@ -20,10 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.manager.AbstractListener;
 import su.nexmedia.engine.hooks.Hooks;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
+import su.nightexpress.excellentenchants.hook.HookId;
+import su.nightexpress.excellentenchants.hook.impl.MythicMobsHook;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,20 +60,18 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     private void updateGrindstone(@NotNull Inventory inventory) {
         this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
             ItemStack result = inventory.getItem(2);
-            if (result == null || result.getType().isAir())
-                return;
+            if (result == null || result.getType().isAir()) return;
 
             Map<ExcellentEnchant, Integer> curses = new HashMap<>();
             for (int slot = 0; slot < 2; slot++) {
                 ItemStack source = inventory.getItem(slot);
-                if (source == null || source.getType().isAir())
-                    continue;
+                if (source == null || source.getType().isAir()) continue;
 
-                curses.putAll(EnchantManager.getExcellentEnchantments(source));
+                curses.putAll(EnchantUtils.getExcellents(source));
             }
             curses.entrySet().removeIf(entry -> !entry.getKey().isCursed());
             curses.forEach((excellentEnchant, level) ->
-                EnchantManager.addEnchantment(result, excellentEnchant, level, true)
+                EnchantUtils.add(result, excellentEnchant, level, true)
             );
         });
     }
@@ -82,7 +83,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
     public void onEnchantPopulateEnchantingTable(final EnchantItemEvent e) {
         ItemStack target = e.getItem();
         Map<Enchantment, Integer> enchantsPrepared = e.getEnchantsToAdd();
-        Map<Enchantment, Integer> enchantsToPopulate = EnchantManager.getEnchantsToPopulate(target, ObtainType.ENCHANTING, enchantsPrepared, enchant -> enchant.getLevelByEnchantCost(e.getExpLevelCost()));
+        Map<Enchantment, Integer> enchantsToPopulate = EnchantUtils.getPopulationCandidates(target, ObtainType.ENCHANTING, enchantsPrepared, enchant -> enchant.getLevelByEnchantCost(e.getExpLevelCost()));
 
         enchantsPrepared.putAll(enchantsToPopulate);
 
@@ -91,7 +92,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             if (result == null) return;
 
             // Fix enchantments for Enchant Books.
-            // Enchants are not added on book because they do not exists in NMS.
+            // Enchants are not added on book because they do not exist in NMS.
             // Server gets enchants from NMS to apply it on Book NBT tags.
             ItemMeta meta = result.getItemMeta();
             if (meta instanceof EnchantmentStorageMeta storageMeta) {
@@ -105,7 +106,7 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
             e.getEnchantsToAdd().forEach((enchantment, level) -> {
                 if (enchantment instanceof ExcellentEnchant enchant && enchant.isChargesEnabled()) {
-                    EnchantManager.restoreEnchantmentCharges(result, enchant);
+                    EnchantUtils.restoreCharges(result, enchant);
                 }
             });
 
@@ -121,16 +122,18 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         MerchantRecipe recipe = e.getRecipe();
         ItemStack result = recipe.getResult();
 
-        if (!EnchantManager.isEnchantable(result)) return;
-        if (!EnchantManager.populateEnchantments(result, ObtainType.VILLAGER)) return;
+        if (!EnchantUtils.isEnchantable(result)) return;
+        if (!EnchantUtils.populate(result, ObtainType.VILLAGER)) return;
 
         int uses = recipe.getUses();
         int maxUses = recipe.getMaxUses();
         boolean expReward = recipe.hasExperienceReward();
         int villagerExperience = recipe.getVillagerExperience();
         float priceMultiplier = recipe.getPriceMultiplier();
+        int demand = recipe.getDemand();
+        int specialPrice = recipe.getSpecialPrice();
 
-        MerchantRecipe recipe2 = new MerchantRecipe(result, uses, maxUses, expReward, villagerExperience, priceMultiplier);
+        MerchantRecipe recipe2 = new MerchantRecipe(result, uses, maxUses, expReward, villagerExperience, priceMultiplier, demand, specialPrice);
         recipe2.setIngredients(recipe.getIngredients());
         e.setRecipe(recipe2);
     }
@@ -144,8 +147,8 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
 
         if (entity instanceof Minecart || holder instanceof Chest) {
             e.getLoot().forEach(item -> {
-                if (item != null && EnchantManager.isEnchantable(item)) {
-                    EnchantManager.populateEnchantments(item, ObtainType.LOOT_GENERATION);
+                if (item != null && EnchantUtils.isEnchantable(item)) {
+                    EnchantUtils.populate(item, ObtainType.LOOT_GENERATION);
                 }
             });
         }
@@ -158,8 +161,8 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
         if (!(e.getCaught() instanceof Item item)) return;
 
         ItemStack itemStack = item.getItemStack();
-        if (EnchantManager.isEnchantable(itemStack)) {
-            EnchantManager.populateEnchantments(itemStack, ObtainType.FISHING);
+        if (EnchantUtils.isEnchantable(itemStack)) {
+            EnchantUtils.populate(itemStack, ObtainType.FISHING);
         }
     }
 
@@ -173,14 +176,14 @@ public class EnchantGenericListener extends AbstractListener<ExcellentEnchants> 
             EntityEquipment equipment = entity.getEquipment();
             if (equipment == null) return;
 
-            boolean isMythic = Hooks.isMythicMob(entity);
+            boolean isMythic = Hooks.hasPlugin(HookId.MYTHIC_MOBS) && MythicMobsHook.isMythicMob(entity);
             boolean doPopulation = Config.getObtainSettings(ObtainType.MOB_SPAWNING).isPresent() && !isMythic;
 
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 ItemStack item = equipment.getItem(slot);
-                if (EnchantManager.isEnchantable(item)) {
-                    if (doPopulation) EnchantManager.populateEnchantments(item, ObtainType.MOB_SPAWNING);
-                    EnchantManager.getExcellentEnchantments(item).keySet().forEach(enchant -> EnchantManager.restoreEnchantmentCharges(item, enchant));
+                if (EnchantUtils.isEnchantable(item)) {
+                    if (doPopulation) EnchantUtils.populate(item, ObtainType.MOB_SPAWNING);
+                    EnchantUtils.getExcellents(item).keySet().forEach(enchant -> EnchantUtils.restoreCharges(item, enchant));
                     equipment.setItem(slot, item);
                 }
             }

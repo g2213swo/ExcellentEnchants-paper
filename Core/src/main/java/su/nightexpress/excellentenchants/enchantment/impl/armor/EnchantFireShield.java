@@ -8,14 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantFireShield extends ExcellentEnchant implements Chanced, CombatEnchant {
 
@@ -27,30 +25,29 @@ public class EnchantFireShield extends ExcellentEnchant implements Chanced, Comb
 
     public EnchantFireShield(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to ignite the attacker for " + PLACEHOLDER_FIRE_DURATION + "s.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.4);
     }
 
     @Override
-    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> str
-            .transform(super.replacePlaceholders(level))
-            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format(this.getFireDuration(level)))
-            ;
-    }
+    public void loadSettings() {
+        super.loadSettings();
 
-    @Override
-    public void loadConfig() {
-        super.loadConfig();
-
-        this.chanceImplementation = ChanceImplementation.create(this);
-        this.fireDuration = EnchantScaler.read(this, "Settings.Fire.Duration", "2.5 * " + Placeholders.ENCHANTMENT_LEVEL,
+        this.chanceImplementation = ChanceImplementation.create(this,
+            Placeholders.ENCHANTMENT_LEVEL + " * 15.0");
+        this.fireDuration = EnchantScaler.read(this, "Settings.Fire.Duration",
+            "2.5 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Sets the fire duration (in seconds).",
             "If entity's current fire ticks amount is less than this value, it will be set to this value.",
             "If entity's current fire ticks amount is greater than this value, it won't be changed.");
+
+        this.addPlaceholder(PLACEHOLDER_FIRE_DURATION, level -> NumberUtil.format(this.getFireDuration(level)));
     }
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     @Override

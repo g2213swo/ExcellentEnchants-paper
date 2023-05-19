@@ -8,16 +8,14 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.CombatEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 public class EnchantVillageDefender extends ExcellentEnchant implements CombatEnchant {
 
@@ -29,17 +27,23 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
 
     public EnchantVillageDefender(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE_AMOUNT + " more damage to all pillagers.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
 
-        this.damageAmount = EnchantScaler.read(this, "Settings.Damage.Formula", "0.5 * " + Placeholders.ENCHANTMENT_LEVEL,
+        this.damageAmount = EnchantScaler.read(this, "Settings.Damage.Formula",
+            "0.5 * " + Placeholders.ENCHANTMENT_LEVEL,
             "Amount of additional damage.");
 
         this.damageMultiplier = JOption.create("Settings.Damage.As_Modifier", false,
-            "When 'true' the 'Damage.Formula' will work as a multiplier to the original damage.").read(this.cfg);
+            "When 'true' the 'Damage.Formula' will work as a multiplier to the original damage.").read(cfg);
+
+        this.addPlaceholder(PLACEHOLDER_DAMAGE_AMOUNT, level -> NumberUtil.format(this.getDamageAddict(level)));
     }
 
     public double getDamageAddict(int level) {
@@ -47,15 +51,7 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
     }
 
     public boolean isDamageMultiplier() {
-        return this.damageMultiplier;
-    }
-
-    @Override
-    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> str
-            .transform(super.replacePlaceholders(level))
-            .replace(PLACEHOLDER_DAMAGE_AMOUNT, NumberUtil.format(this.getDamageAddict(level)))
-            ;
+        return damageMultiplier;
     }
 
     @Override
@@ -75,7 +71,7 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
         e.setDamage(damageFinal);
 
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(victim.getEyeLocation(), Particle.VILLAGER_ANGRY, "", 0.25, 0.25, 0.25, 0.1f, 30);
+            SimpleParticle.of(Particle.VILLAGER_ANGRY).play(victim.getEyeLocation(), 0.25, 0.1, 30);
         }
         return true;
     }

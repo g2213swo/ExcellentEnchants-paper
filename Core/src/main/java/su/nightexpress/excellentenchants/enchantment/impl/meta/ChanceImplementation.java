@@ -2,24 +2,26 @@ package su.nightexpress.excellentenchants.enchantment.impl.meta;
 
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.random.Rnd;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 
 public final class ChanceImplementation implements Chanced {
 
-    public static final String PLACEHOLDER_CHANCE = "%enchantment_trigger_chance%";
-
-    // private final ExcellentEnchant enchant;
+    //private final ExcellentEnchant enchant;
     private final EnchantScaler triggerChance;
 
     private ChanceImplementation(@NotNull ExcellentEnchant enchant, @NotNull EnchantScaler triggerChance) {
-        // this.enchant = enchant;
+        //this.enchant = enchant;
         this.triggerChance = triggerChance;
     }
 
     public static @NotNull ChanceImplementation create(@NotNull ExcellentEnchant enchant) {
-        return new ChanceImplementation(enchant, EnchantScaler.read(enchant, "Settings.Trigger_Chance", "100",
+        return create(enchant, "100");
+    }
+
+    public static @NotNull ChanceImplementation create(@NotNull ExcellentEnchant enchant, @NotNull String def) {
+        return new ChanceImplementation(enchant, EnchantScaler.read(enchant, "Settings.Trigger_Chance", def,
             "A chance that this enchantment will be triggered."));
     }
 

@@ -8,20 +8,19 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.manager.ICleanable;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.EntityUtil;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.PassiveEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTask;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, ICleanable {
 
@@ -42,15 +41,18 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
 
     public EnchantRegrowth(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-
+        this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every " + PLACEHOLDER_HEAL_INTERVAL + "s.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.7);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+    public void loadSettings() {
+        super.loadSettings();
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
         this.healInterval = JOption.create("Settings.Heal.Interval", 100,
-            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(this.cfg);
+            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
         this.healMinHealth = EnchantScaler.read(this, "Settings.Heal.Min_Health", "0.5",
             "Minimal entity health for the enchantment to have effect.");
         this.healMaxHealth = EnchantScaler.read(this, "Settings.Heal.Max_Health", "20.0",
@@ -58,7 +60,12 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
         this.healAmount = EnchantScaler.read(this, "Settings.Heal.Amount", "0.25",
             "Amount of hearts to be restored.");
 
-        this.task = new Task(this.plugin);
+        this.addPlaceholder(PLACEHOLDER_HEAL_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
+        this.addPlaceholder(PLACEHOLDER_HEAL_MIN_HEALTH, level -> NumberUtil.format(this.getHealMaxHealth(level)));
+        this.addPlaceholder(PLACEHOLDER_HEAL_MAX_HEALTH, level -> NumberUtil.format(this.getHealMaxHealth(level)));
+        this.addPlaceholder(PLACEHOLDER_HEAL_INTERVAL, level -> NumberUtil.format((double) this.healInterval / 20D));
+
+        this.task = new Task(plugin);
         this.task.start();
     }
 
@@ -75,19 +82,8 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
     }
 
     @Override
-    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> str
-            .transform(super.replacePlaceholders(level))
-            .replace(PLACEHOLDER_HEAL_AMOUNT, NumberUtil.format(this.getHealAmount(level)))
-            .replace(PLACEHOLDER_HEAL_MIN_HEALTH, NumberUtil.format(this.getHealMaxHealth(level)))
-            .replace(PLACEHOLDER_HEAL_MAX_HEALTH, NumberUtil.format(this.getHealMaxHealth(level)))
-            .replace(PLACEHOLDER_HEAL_INTERVAL, NumberUtil.format((double) this.healInterval / 20D))
-            ;
-    }
-
-    @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     @Override
@@ -125,7 +121,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
         entity.setHealth(amount);
 
         if (this.hasVisualEffects()) {
-            EffectUtil.playEffect(entity.getEyeLocation(), Particle.HEART, "", 0.3, 0.3, 0.3, 0.1, 5);
+            SimpleParticle.of(Particle.HEART).play(entity.getEyeLocation(), 0.25, 0.1, 5);
         }
         return true;
     }
@@ -133,13 +129,13 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
     class Task extends AbstractEnchantmentTask {
 
         public Task(@NotNull ExcellentEnchants plugin) {
-            super(plugin, EnchantRegrowth.this.healInterval, false);
+            super(plugin, healInterval, false);
         }
 
         @Override
         public void action() {
             for (LivingEntity entity : this.getEntities()) {
-                EnchantManager.getEquippedEnchants(entity, EnchantRegrowth.class).forEach((item, enchants) -> {
+                EnchantUtils.getEquipped(entity, EnchantRegrowth.class).forEach((item, enchants) -> {
                     enchants.forEach((enchant, level) -> {
                         if (enchant.isOutOfCharges(item)) return;
                         if (enchant.onTrigger(entity, item, level)) {

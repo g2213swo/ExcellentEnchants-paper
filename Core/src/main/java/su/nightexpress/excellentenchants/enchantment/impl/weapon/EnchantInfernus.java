@@ -13,12 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.utils.NumberUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
-
-import java.util.function.UnaryOperator;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
 public class EnchantInfernus extends ExcellentEnchant {
 
@@ -29,24 +27,23 @@ public class EnchantInfernus extends ExcellentEnchant {
 
     public EnchantInfernus(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription("Launched trident will ignite the enemy for " + PLACEHOLDER_FIRE_DURATION + "s. on hit.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.1);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.fireTicks = EnchantScaler.read(this, "Settings.Fire_Ticks", "60 + " + Placeholders.ENCHANTMENT_LEVEL + " * 20",
+    public void loadSettings() {
+        super.loadSettings();
+        this.fireTicks = EnchantScaler.read(this, "Settings.Fire_Ticks",
+            "60 + " + Placeholders.ENCHANTMENT_LEVEL + " * 20",
             "Sets for how long (in ticks) entity will be ignited on hit. 20 ticks = 1 second.");
+
+        this.addPlaceholder(PLACEHOLDER_FIRE_DURATION, level -> NumberUtil.format((double) this.getFireTicks(level) / 20D));
     }
 
     public int getFireTicks(int level) {
         return (int) this.fireTicks.getValue(level);
-    }
-
-    @Override
-    public @NotNull UnaryOperator<String> replacePlaceholders(int level) {
-        return str -> str
-            .transform(super.replacePlaceholders(level))
-            .replace(PLACEHOLDER_FIRE_DURATION, NumberUtil.format((double) this.getFireTicks(level) / 20D));
     }
 
     @Override
@@ -57,18 +54,14 @@ public class EnchantInfernus extends ExcellentEnchant {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onInfernusTridentLaunch(ProjectileLaunchEvent e) {
         Entity entity = e.getEntity();
-        if (!(entity instanceof Trident trident))
-            return;
-        if (!(trident.getShooter() instanceof LivingEntity shooter))
-            return;
-        if (!this.isAvailableToUse(shooter))
-            return;
+        if (!(entity instanceof Trident trident)) return;
+        if (!(trident.getShooter() instanceof LivingEntity shooter)) return;
+        if (!this.isAvailableToUse(shooter)) return;
 
         ItemStack item = trident.getItem();
 
-        int level = EnchantManager.getEnchantmentLevel(item, this);
-        if (level <= 0)
-            return;
+        int level = EnchantUtils.getLevel(item, this);
+        if (level <= 0) return;
 
         trident.setFireTicks(Integer.MAX_VALUE);
     }
@@ -76,14 +69,12 @@ public class EnchantInfernus extends ExcellentEnchant {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInfernusDamageApply(EntityDamageByEntityEvent e) {
         Entity entity = e.getDamager();
-        if (!(entity instanceof Trident trident))
-            return;
+        if (!(entity instanceof Trident trident)) return;
 
         ItemStack item = trident.getItem();
 
-        int level = EnchantManager.getEnchantmentLevel(item, this);
-        if (level <= 0 || trident.getFireTicks() <= 0)
-            return;
+        int level = EnchantUtils.getLevel(item, this);
+        if (level <= 0 || trident.getFireTicks() <= 0) return;
 
         int ticks = this.getFireTicks(level);
         e.getEntity().setFireTicks(ticks);

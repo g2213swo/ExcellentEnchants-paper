@@ -1,7 +1,6 @@
 package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -11,15 +10,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.EffectUtil;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockBreakEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
-import su.nightexpress.excellentenchants.enchantment.EnchantRegister;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.hook.impl.NoCheatPlusHook;
 
 import java.util.HashSet;
@@ -42,13 +39,17 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
 
     public EnchantTunnel(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
+        this.getDefaults().setDescription("Mines multiple blocks at once in a certain shape.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(1.0);
+        this.getDefaults().setConflicts(EnchantVeinminer.ID, EnchantBlastMining.ID);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
+    public void loadSettings() {
+        super.loadSettings();
         this.disableOnSneak = JOption.create("Settings.Ignore_When_Sneaking", true,
-            "When 'true' the enchantment won't be triggered when sneaking.").read(this.cfg);
+            "When 'true' the enchantment won't be triggered when sneaking.").read(cfg);
     }
 
     @Override
@@ -64,20 +65,13 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
     @Override
     public boolean onBreak(@NotNull BlockBreakEvent e, @NotNull Player player, @NotNull ItemStack item, int level) {
         Block block = e.getBlock();
-        if (!this.isAvailableToUse(player))
-            return false;
-        if (this.disableOnSneak && player.isSneaking())
-            return false;
-        if (EnchantRegister.VEINMINER != null && EnchantManager.hasEnchantment(item, EnchantRegister.VEINMINER))
-            return false;
-        if (EnchantRegister.BLAST_MINING != null && EnchantManager.hasEnchantment(item, EnchantRegister.BLAST_MINING))
-            return false;
-        if (block.hasMetadata(META_BLOCK_TUNNEL))
-            return false;
-        if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType()))
-            return false;
-        if (block.getDrops(item).isEmpty())
-            return false;
+        if (!this.isAvailableToUse(player)) return false;
+        if (this.disableOnSneak && player.isSneaking()) return false;
+        if (EnchantUtils.contains(item, EnchantVeinminer.ID)) return false;
+        if (EnchantUtils.contains(item, EnchantBlastMining.ID)) return false;
+        if (block.hasMetadata(META_BLOCK_TUNNEL)) return false;
+        if (block.getType().isInteractable() && !INTERACTABLE_BLOCKS.contains(block.getType())) return false;
+        if (block.getDrops(item).isEmpty()) return false;
 
         BlockFace dir = LocationUtil.getDirection(player);
         boolean isY = dir != null && block.getRelative(dir.getOppositeFace()).isEmpty();
@@ -105,31 +99,30 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
             }
 
             // Skip blocks that should not be mined
-            if (blockAdd.equals(block))
-                continue;
-            if (blockAdd.getDrops(item).isEmpty())
-                continue;
-            if (blockAdd.isLiquid())
-                continue;
+            if (blockAdd.equals(block)) continue;
+            if (blockAdd.getDrops(item).isEmpty()) continue;
+            if (blockAdd.isLiquid()) continue;
 
             Material addType = blockAdd.getType();
 
             // Some extra block checks.
-            if (addType.isInteractable() && !INTERACTABLE_BLOCKS.contains(addType))
-                continue;
+            if (addType.isInteractable() && !INTERACTABLE_BLOCKS.contains(addType)) continue;
             if (addType == Material.BEDROCK || addType == Material.END_PORTAL || addType == Material.END_PORTAL_FRAME)
                 continue;
-            if (addType == Material.OBSIDIAN && addType != block.getType())
-                continue;
+            if (addType == Material.OBSIDIAN && addType != block.getType()) continue;
 
             // Play block break particles before it's broken.
+            /*SimpleParticle.of(Particle.BLOCK_CRACK, blockAdd.getType())
+                .play(damager.getEyeLocation(), 0.25, 0.1, 20);
             EffectUtil.playEffect(LocationUtil.getCenter(blockAdd.getLocation()), Particle.BLOCK_CRACK.name(), blockAdd.getType().name(), 0.2, 0.2, 0.2, 0.1, 20);
 
+             */
+
             // Add metadata to prevent enchantment triggering in a loop.
-            blockAdd.setMetadata(META_BLOCK_TUNNEL, new FixedMetadataValue(this.plugin, true));
+            blockAdd.setMetadata(META_BLOCK_TUNNEL, new FixedMetadataValue(plugin, true));
             //plugin.getNMS().breakBlock(player, blockAdd);
             player.breakBlock(blockAdd);
-            blockAdd.removeMetadata(META_BLOCK_TUNNEL, this.plugin);
+            blockAdd.removeMetadata(META_BLOCK_TUNNEL, plugin);
         }
 
         NoCheatPlusHook.unexemptBlocks(player);

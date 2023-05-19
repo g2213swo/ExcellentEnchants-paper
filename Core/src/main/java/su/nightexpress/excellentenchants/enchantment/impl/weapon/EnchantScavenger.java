@@ -8,16 +8,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.Pair;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.DeathEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,40 +27,56 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
     public static final String ID = "scavenger";
 
     private Map<EntityType, Map<Material, Pair<int[], Double>>> loot;
+
     private ChanceImplementation chanceImplementation;
 
     public EnchantScavenger(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain additional loot from mobs.");
+        this.getDefaults().setLevelMax(3);
+        this.getDefaults().setTier(0.3);
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+    public void loadSettings() {
+        super.loadSettings();
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "15.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
+
         this.loot = new HashMap<>();
 
-        for (String eId : this.cfg.getSection("Settings.Treasures")) {
-            EntityType eType = CollectionsUtil.getEnum(eId, EntityType.class);
+        if (!this.cfg.contains("Settings.Treasures")) {
+            cfg.addMissing("Settings.Treasures.VILLAGER.EMERALD.Amount", "1:1");
+            cfg.addMissing("Settings.Treasures.VILLAGER.EMERALD.Chance", "50");
+
+            cfg.addMissing("Settings.Treasures.SKELETON.BONE_MEAL.Amount", "1:2");
+            cfg.addMissing("Settings.Treasures.SKELETON.BONE_MEAL.Chance", "50");
+
+            cfg.saveChanges();
+        }
+
+        for (String eId : cfg.getSection("Settings.Treasures")) {
+            EntityType eType = StringUtil.getEnum(eId, EntityType.class).orElse(null);
             if (eType == null || !eType.isAlive()) {
-                this.plugin.error("[Scavenger] Invalid entity type '" + eId + "' !");
+                plugin.error("[Scavenger] Invalid entity type '" + eId + "' !");
                 continue;
             }
 
             Map<Material, Pair<int[], Double>> items = new HashMap<>();
-            for (String sFromArray : this.cfg.getSection("Settings.Treasures." + eId)) {
+            for (String sFromArray : cfg.getSection("Settings.Treasures." + eId)) {
                 Material material = Material.getMaterial(sFromArray.toUpperCase());
                 if (material == null) {
-                    this.plugin.error("[Scavenger] Invalid item material '" + sFromArray + "' !");
+                    plugin.error("[Scavenger] Invalid item material '" + sFromArray + "' !");
                     continue;
                 }
 
                 String path = "Settings.Treasures." + eId + "." + sFromArray + ".";
-                String[] amountSplit = this.cfg.getString(path + "Amount", "1:1").split(":");
+                String[] amountSplit = cfg.getString(path + "Amount", "1:1").split(":");
                 int amountMin = StringUtil.getInteger(amountSplit[0], 1);
                 int amountMax = StringUtil.getInteger(amountSplit[1], 1);
                 int[] amount = new int[]{amountMin, amountMax};
 
-                double chance = this.cfg.getDouble(path + "Chance");
+                double chance = cfg.getDouble(path + "Chance");
                 if (chance <= 0) continue;
 
                 Pair<int[], Double> item = Pair.of(amount, chance);
@@ -72,7 +88,7 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     @Override

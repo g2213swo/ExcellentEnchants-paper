@@ -6,48 +6,35 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.command.AbstractCommand;
+import su.nexmedia.engine.api.command.CommandResult;
 import su.nexmedia.engine.utils.CollectionsUtil;
 import su.nexmedia.engine.utils.Placeholders;
 import su.nexmedia.engine.utils.PlayerUtil;
-import su.nexmedia.engine.utils.StringUtil;
 import su.nexmedia.engine.utils.random.Rnd;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Perms;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
 import su.nightexpress.excellentenchants.config.Lang;
-import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 import su.nightexpress.excellentenchants.tier.Tier;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
     public TierbookCommand(@NotNull ExcellentEnchants plugin) {
         super(plugin, new String[]{"tierbook"}, Perms.COMMAND_TIERBOOK);
-    }
-
-    @Override
-    public @NotNull String getDescription() {
-        return this.plugin.getMessage(Lang.COMMAND_TIER_BOOK_DESC).getLocalized();
-    }
-
-    @Override
-    public @NotNull String getUsage() {
-        return this.plugin.getMessage(Lang.COMMAND_TIER_BOOK_USAGE).getLocalized();
-    }
-
-    @Override
-    public boolean isPlayerOnly() {
-        return false;
+        this.setDescription(plugin.getMessage(Lang.COMMAND_TIER_BOOK_DESC));
+        this.setUsage(plugin.getMessage(Lang.COMMAND_TIER_BOOK_USAGE));
     }
 
     @Override
     public @NotNull List<String> getTab(@NotNull Player player, int arg, @NotNull String[] args) {
-        if (arg == 1) return CollectionsUtil.playerNames(player);
+        if (arg == 1) {
+            return CollectionsUtil.playerNames(player);
+        }
         //region Kinda smart completions of multiple tiers
         if (arg == 2) {
             String in = args[2];
@@ -75,13 +62,13 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
     }
 
     @Override
-    public void onExecute(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Map<String, String> flags) {
-        if (args.length != 4) {
+    protected void onExecute(@NotNull CommandSender sender, @NotNull CommandResult result) {
+        if (result.length() < 4) {
             this.printUsage(sender);
             return;
         }
 
-        Player player = this.plugin.getServer().getPlayer(args[1]);
+        Player player = plugin.getServer().getPlayer(result.getArg(1));
         if (player == null) {
             this.errorPlayer(sender);
             return;
@@ -89,7 +76,7 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
 
         //region Construct a weight map of tiers
         Map<Tier, Double> weightMap = new HashMap<>();
-        Arrays.stream(args[2].toLowerCase().split(","))
+        Arrays.stream(result.getArg(2).toLowerCase().split(","))
             .forEach(t -> {
                 String[] kv = t.split(":");
                 Tier tier = this.plugin.getTierManager().getTierById(kv[0]);
@@ -97,30 +84,31 @@ public class TierbookCommand extends AbstractCommand<ExcellentEnchants> {
                 weightMap.put(tier, weight);
             });
         if (weightMap.isEmpty()) {
-            this.plugin.getMessage(Lang.COMMAND_TIER_BOOK_ERROR).send(sender);
+            plugin.getMessage(Lang.COMMAND_TIER_BOOK_ERROR).send(sender);
             return;
         }
         //endregion
 
         Tier tier = Rnd.getByWeight(weightMap);
-        ExcellentEnchant enchant = Rnd.get(tier.getEnchants());
+        Set<ExcellentEnchant> enchants = EnchantRegistry.getOfTier(tier);
+        ExcellentEnchant enchant = enchants.isEmpty() ? null : Rnd.get(enchants);
         if (enchant == null) {
-            this.plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
+            plugin.getMessage(Lang.ERROR_NO_ENCHANT).send(sender);
             return;
         }
 
-        int level = StringUtil.getInteger(args[3], -1, true);
+        int level = result.getInt(3, -1);
         if (level < 1) {
             level = Rnd.get(enchant.getStartLevel(), enchant.getMaxLevel());
         } else {
-            level = enchant.clampLevel(level);
+            level = EnchantUtils.clampLevel(level, enchant);
         }
 
         ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
-        EnchantManager.addEnchantment(item, enchant, level, true);
+        EnchantUtils.add(item, enchant, level, true);
         PlayerUtil.addItem(player, item);
 
-        this.plugin.getMessage(Lang.COMMAND_TIER_BOOK_DONE)
+        plugin.getMessage(Lang.COMMAND_TIER_BOOK_DONE)
             .replace(tier.replacePlaceholders())
             .replace(Placeholders.Player.replacer(player))
             .send(sender);

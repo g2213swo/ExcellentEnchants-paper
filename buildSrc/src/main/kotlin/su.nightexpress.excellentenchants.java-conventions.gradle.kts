@@ -6,11 +6,6 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://repo.purpurmc.org/snapshots") {
-        content {
-            includeGroup("org.purpurmc.purpur")
-        }
-    }
     maven("https://repo.papermc.io/repository/maven-public/") {
         content {
             includeGroup("io.papermc.paper")
@@ -36,6 +31,11 @@ repositories {
             includeGroup("fr.neatmonster")
         }
     }
+    maven("https://mvn.lumine.io/repository/maven-public/") {
+        content {
+            includeGroup("io.lumine")
+        }
+    }
 }
 
 dependencies {
@@ -44,7 +44,7 @@ dependencies {
 }
 
 group = "su.nightexpress.excellentenchants"
-version = "3.3.3"
+version = "3.4.0"
 
 java {
     toolchain {

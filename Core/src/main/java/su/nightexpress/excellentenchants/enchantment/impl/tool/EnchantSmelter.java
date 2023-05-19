@@ -6,25 +6,26 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.utils.EffectUtil;
+import su.nexmedia.engine.api.particle.SimpleParticle;
 import su.nexmedia.engine.utils.LocationUtil;
 import su.nexmedia.engine.utils.MessageUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
-import su.nightexpress.excellentenchants.api.enchantment.ExcellentEnchant;
+import su.nightexpress.excellentenchants.Placeholders;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.type.BlockDropEnchant;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantDropContainer;
-import su.nightexpress.excellentenchants.api.enchantment.util.EnchantPriority;
+import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantDropContainer;
+import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDropEnchant {
@@ -37,42 +38,42 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
 
     public EnchantSmelter(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
+        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to smelt a block/ore.");
+        this.getDefaults().setLevelMax(5);
+        this.getDefaults().setTier(0.3);
+        this.getDefaults().setConflicts(
+            EnchantDivineTouch.ID,
+            Enchantment.SILK_TOUCH.getKey().getKey()
+        );
     }
 
     @Override
-    public void loadConfig() {
-        super.loadConfig();
-        this.chanceImplementation = ChanceImplementation.create(this);
+    public void loadSettings() {
+        super.loadSettings();
+        this.chanceImplementation = ChanceImplementation.create(this,
+            "25.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 10");
 
         this.sound = JOption.create("Settings.Sound", Sound.class, Sound.BLOCK_LAVA_EXTINGUISH,
             "Sound to play on smelting.",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html").read(this.cfg);
+            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html").read(cfg);
 
-        this.smeltingTable = new HashMap<>();
-        for (String sFrom : this.cfg.getSection("Settings.Smelting_Table")) {
-            Material mFrom = Material.getMaterial(sFrom.toUpperCase());
-            if (mFrom == null) {
-                this.plugin.error("[Smelter] Invalid source material '" + sFrom + "' !");
-                continue;
-            }
-            String sTo = this.cfg.getString("Settings.Smelting_Table." + sFrom, "");
-            Material mTo = Material.getMaterial(sTo.toUpperCase());
-            if (mTo == null) {
-                this.plugin.error("[Smelter] Invalid result material '" + sTo + "' !");
-                continue;
-            }
-            this.smeltingTable.put(mFrom, mTo);
-        }
-        this.cfg.setComments("Settings.Smelting_Table",
+        this.smeltingTable = JOption.forMap("Settings.Smelting_Table",
+            key -> Material.getMaterial(key.toUpperCase()),
+            (cfg, path, key) -> Material.getMaterial(cfg.getString(path + "." + key, "").toUpperCase()),
+            Map.of(
+                Material.RAW_IRON, Material.IRON_INGOT,
+                Material.RAW_GOLD, Material.GOLD_INGOT
+            ),
             "Table of Original -> Smelted items.",
             "Syntax: 'Material Source : Material Result'.",
             "Note: Material source is material name of the dropped item, not the broken block!",
-            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
+            "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html"
+        ).setWriter((cfg, path, map) -> map.forEach((src, to) -> cfg.set(path + "." + src.name(), to.name()))).read(cfg);
     }
 
     @Override
     public @NotNull ChanceImplementation getChanceImplementation() {
-        return this.chanceImplementation;
+        return chanceImplementation;
     }
 
     @Override
@@ -100,8 +101,8 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
         Block block = e.getBlockState().getBlock();
         if (this.hasVisualEffects()) {
             Location location = LocationUtil.getCenter(block.getLocation(), true);
-            MessageUtil.playSound(location, this.sound);
-            EffectUtil.playEffect(location, Particle.FLAME, "", 0.2f, 0.2f, 0.2f, 0.05f, 30);
+            MessageUtil.playSound(location, this.sound); // akiranya
+            SimpleParticle.of(Particle.FLAME).play(location, 0.25, 0.05, 20);
         }
         return true;
     }
