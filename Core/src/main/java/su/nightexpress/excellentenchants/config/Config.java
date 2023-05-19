@@ -1,13 +1,14 @@
 package su.nightexpress.excellentenchants.config;
 
+import cc.mewcraft.mewcore.item.api.PluginItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nexmedia.engine.api.config.JOption;
-import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.placeholder.PlaceholderConstants;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantChargesFuel;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 
 import java.util.Map;
@@ -61,12 +62,21 @@ public class Config {
         "Use '" + Placeholders.GENERIC_AMOUNT + "' placeholder for amount of charges.")
         .setWriter((cfg, path, map) -> map.forEach((perc, str) -> cfg.set(path + "." + perc, str)));
 
-    public static final JOption<ItemStack> ENCHANTMENTS_CHARGES_FUEL_ITEM = JOption.create("Enchantments.Charges.Fuel_Item",
-            new ItemStack(Material.LAPIS_LAZULI),
-            "Default item used to recharge item's enchantments on anvils.",
-            "If you want different item for certain enchantments, you can do it in that enchantment configs.",
-            "Item Options: " + Placeholders.URL_ENGINE_SCALER)
-        .setWriter(JYML::setItem);
+    // Akiranya starts - custom item support
+    public static final JOption<EnchantChargesFuel> ENCHANTMENTS_CHARGES_FUEL_ITEM = new JOption<EnchantChargesFuel>("Enchantments.Charges.Fuel_Item",
+        (cfg, path, def) -> {
+            PluginItem<?> pluginItem = cfg.getPluginItem(path + ".External");
+            return pluginItem != null ? new EnchantChargesFuel(pluginItem) : new EnchantChargesFuel(cfg.getItem(path + ".General"));
+        },
+        () -> new EnchantChargesFuel(new ItemStack(Material.LAPIS_LAZULI)),
+        "Default item used to recharge item's enchantments on anvils.",
+        "If you want different item for certain enchantments, you can do it in that enchantment configs.",
+        "Item Options: " + Placeholders.URL_ENGINE_SCALER)
+        .setWriter((cfg, path, obj) -> {
+            obj.getPluginItem().ifPresent(item -> cfg.setPluginItem(path + ".External", item));
+            obj.getGeneralItem().ifPresent(item -> cfg.setItem(path + ".General", item));
+        });
+    // Akiranya ends
 
     public static final JOption<Set<String>> ENCHANTMENTS_DISABLED = JOption.create("Enchantments.Disabled",
             Set.of("enchant_name", "other_enchant"),

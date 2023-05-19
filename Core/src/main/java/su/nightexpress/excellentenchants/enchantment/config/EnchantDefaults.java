@@ -1,7 +1,5 @@
 package su.nightexpress.excellentenchants.enchantment.config;
 
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JOption;
@@ -39,7 +37,7 @@ public class EnchantDefaults {
     private EnchantScaler chargesMax;
     private EnchantScaler chargesConsumeAmount;
     private EnchantScaler chargesRechargeAmount;
-    private ItemStack chargesFuel;
+    private EnchantChargesFuel chargesFuel;
 
     public EnchantDefaults(@NotNull ExcellentEnchant enchant) {
         this.setDisplayName(StringUtil.capitalizeUnderscored(enchant.getId()));
@@ -126,10 +124,11 @@ public class EnchantDefaults {
                 "How many charges will be consumed when enchantment is triggered?"));
             this.setChargesRechargeAmount(EnchantScaler.read(enchant, "Settings.Charges.Recharge_Amount", "25",
                 "How many charges will be restored when using 'Fuel Item' in anvil?"));
-            this.setChargesFuel(JOption.create("Settings.Charges.Fuel_Item", new ItemStack(Material.LAPIS_LAZULI),
-                    "An item, that will be used to restore enchantment charges on anvils.",
-                    "Item Options:" + Placeholders.URL_ENGINE_ITEMS)
-                .setWriter(JYML::setItem).read(cfg));
+            // Akiranya starts - add plugin item support
+            this.setChargesFuel(EnchantChargesFuel.read(enchant, "Settings.Charges.Fuel_Item",
+                "An item, that will be used to restore enchantment charges on anvils.",
+                "Item Options:" + Placeholders.URL_ENGINE_ITEMS));
+            // Akiranya ends
         }
     }
 
@@ -257,11 +256,11 @@ public class EnchantDefaults {
         this.chargesMax = chargesMax;
     }
 
-    public @Nullable ItemStack getChargesFuel() { // TODO
+    public @Nullable EnchantChargesFuel getChargesFuel() {
         return chargesFuel;
     }
 
-    public void setChargesFuel(@Nullable ItemStack chargesFuel) { // TODO
+    public void setChargesFuel(@Nullable EnchantChargesFuel chargesFuel) {
         this.chargesFuel = chargesFuel;
     }
 

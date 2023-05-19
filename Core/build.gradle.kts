@@ -1,7 +1,6 @@
 plugins {
     id("su.nightexpress.excellentenchants.java-conventions")
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
     id("net.kyori.indra.git") version "2.1.1"
 }
 

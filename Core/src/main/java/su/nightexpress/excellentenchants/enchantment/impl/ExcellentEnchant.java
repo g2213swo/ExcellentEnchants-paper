@@ -35,6 +35,7 @@ import su.nightexpress.excellentenchants.api.enchantment.meta.Chanced;
 import su.nightexpress.excellentenchants.api.enchantment.meta.Potioned;
 import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.EnchantManager;
+import su.nightexpress.excellentenchants.enchantment.config.EnchantChargesFuel;
 import su.nightexpress.excellentenchants.enchantment.config.EnchantDefaults;
 import su.nightexpress.excellentenchants.enchantment.type.FitItemType;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
@@ -133,7 +134,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
                 .add(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, () -> NumberUtil.format(this.getChargesMax(level)))
                 .add(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, () -> NumberUtil.format(this.getChargesConsumeAmount(level)))
                 .add(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, () -> NumberUtil.format(this.getChargesRechargeAmount(level)))
-                .add(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, () -> ComponentUtil.asMiniMessage(ItemUtil.getName(this.getChargesFuel())));
+                .add(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, () -> ComponentUtil.asMiniMessage(ItemUtil.getName(this.getChargesFuel().getItem()))); // Akiranya - plugin item support
 
             if (this instanceof Chanced chanced) {
                 map.add(Placeholders.ENCHANTMENT_CHANCE, () -> NumberUtil.format(chanced.getTriggerChance(level)));
@@ -375,16 +376,18 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return this.isChargesEnabled() ? (int) this.getDefaults().getChargesRechargeAmount().getValue(level) : 0;
     }
 
-    public @NotNull ItemStack getChargesFuel() { // TODO
-        ItemStack fuelHas = this.getDefaults().getChargesFuel();
-        if (!this.isChargesCustomFuel() || fuelHas == null || fuelHas.getType().isAir()) {
+    // Akiranya - plugin item support
+    public @NotNull EnchantChargesFuel getChargesFuel() {
+        EnchantChargesFuel fuel = this.getDefaults().getChargesFuel();
+        if (!this.isChargesCustomFuel() || fuel == null || fuel.getItem().getType().isAir()) {
             return Config.ENCHANTMENTS_CHARGES_FUEL_ITEM.get();
         }
-        return fuelHas.clone();
+        return fuel;
     }
+    // Akiranya ends
 
-    public boolean isChargesFuel(@NotNull ItemStack item) { // TODO
-        return item.isSimilar(this.getChargesFuel());
+    public boolean isChargesFuel(@NotNull ItemStack item) {
+        return this.getChargesFuel().isFuel(item); // Akiranya - plugin item support
     }
 
     public @NotNull NamespacedKey getChargesKey() {
