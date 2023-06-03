@@ -34,7 +34,7 @@ public class EnchantAnvilListener extends AbstractListener<ExcellentEnchants> {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onAnvilRename(PrepareAnvilEvent e) {
+    public void onAnvilRename(PrepareAnvilEvent e) { // TODO itemsadder overwrites it?
         AnvilInventory inventory = e.getInventory();
 
         ItemStack first = inventory.getFirstItem();
