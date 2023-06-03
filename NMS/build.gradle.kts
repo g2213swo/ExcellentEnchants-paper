@@ -1,9 +1,12 @@
 plugins {
-    id("su.nightexpress.excellentenchants.java-conventions")
+    id("su.nightexpress.project-conventions")
+    alias(libs.plugins.indra)
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT")
 }
 
-description = "NMS"
+indra {
+    javaVersions().target(17)
+}

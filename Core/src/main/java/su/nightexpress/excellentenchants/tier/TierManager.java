@@ -11,6 +11,7 @@ import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class TierManager extends AbstractManager<ExcellentEnchants> {
@@ -22,7 +23,7 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
     public TierManager(@NotNull ExcellentEnchants plugin) {
         super(plugin);
-        this.tiers = new HashMap<>();
+        this.tiers = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -34,11 +35,11 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
         this.config = JYML.loadOrExtract(plugin, FILE_NAME);
 
-        for (String sId : this.config.getSection("")) {
+        for (String sId : config.getSection("")) {
             String path = sId + ".";
 
-            int priority = this.config.getInt(path + "Priority");
-            String name = this.config.getString(path + "Name", sId);
+            int priority = config.getInt(path + "Priority");
+            String name = config.getString(path + "Name", sId);
 
             TextColor color = Optional
                 .ofNullable(this.config.getString(path + "Color"))
@@ -51,9 +52,9 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
 
             Map<ObtainType, Double> chance = new HashMap<>();
             for (ObtainType obtainType : ObtainType.values()) {
-                this.config.addMissing(path + "Obtain_Chance." + obtainType.name(), 50D);
+                config.addMissing(path + "Obtain_Chance." + obtainType.name(), 50D);
 
-                double chanceType = this.config.getDouble(path + "Obtain_Chance." + obtainType.name());
+                double chanceType = config.getDouble(path + "Obtain_Chance." + obtainType.name());
                 chance.put(obtainType, chanceType);
             }
 
@@ -70,7 +71,7 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
     }
 
     public @NotNull JYML getConfig() {
-        return this.config;
+        return config;
     }
 
     public @Nullable Tier getTierById(@NotNull String id) {
@@ -86,7 +87,11 @@ public class TierManager extends AbstractManager<ExcellentEnchants> {
     }
 
     public @Nullable Tier getTierByChance(@NotNull ObtainType obtainType) {
-        Map<Tier, Double> map = this.getTiers().stream().collect(Collectors.toMap(k -> k, v -> v.getChance(obtainType)));
+        Map<Tier, Double> map = this.getTiers().stream()
+            .filter(tier -> tier.getChance(obtainType) > 0D)
+            .collect(Collectors.toMap(k -> k, v -> v.getChance(obtainType), (o, n) -> n, HashMap::new));
+        if (map.isEmpty()) return null;
+
         return Rnd.getByWeight(map);
     }
 

@@ -1,6 +1,7 @@
 plugins {
-    id("su.nightexpress.excellentenchants.java-conventions")
-    id("io.papermc.paperweight.userdev")
+    id("su.nightexpress.project-conventions")
+    alias(libs.plugins.paperweight.userdev)
+    alias(libs.plugins.indra)
 }
 
 dependencies {
@@ -8,10 +9,12 @@ dependencies {
     paperweight.paperDevBundle("1.18.2-R0.1-SNAPSHOT")
 }
 
-description = "V1_18_R2"
-
 tasks {
     assemble {
         dependsOn(reobfJar)
     }
+}
+
+indra {
+    javaVersions().target(17)
 }
