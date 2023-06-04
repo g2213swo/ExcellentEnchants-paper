@@ -12,7 +12,6 @@ dependencies {
     // NMS modules
     api(project(":NMS"))
     implementation(project(":V1_18_R2", configuration = "reobf"))
-    implementation(project(":V1_19_R2", configuration = "reobf"))
     implementation(project(":V1_19_R3", configuration = "reobf"))
 
     compileOnly(libs.mewcore)
