@@ -3,7 +3,7 @@ main: su.nightexpress.excellentenchants.ExcellentEnchants
 version: ${version}
 api-version: 1.19
 authors: [ NightExpress, Nailm ]
-description: ${description}
+description: Vanilla-like enchants for your server.
 load-before: # These plugins might read the EnchantmentRegistry, so we load before them
   - name: HuskSync
     bootstrap: false

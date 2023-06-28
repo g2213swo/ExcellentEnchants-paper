@@ -1,7 +1,6 @@
 plugins {
     id("su.nightexpress.project-conventions")
     alias(libs.plugins.paperweight.userdev)
-    alias(libs.plugins.indra)
 }
 
 dependencies {
@@ -13,8 +12,4 @@ tasks {
     assemble {
         dependsOn(reobfJar)
     }
-}
-
-indra {
-    javaVersions().target(17)
 }
