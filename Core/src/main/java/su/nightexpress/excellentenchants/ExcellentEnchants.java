@@ -21,6 +21,7 @@ import su.nightexpress.excellentenchants.hook.impl.ProtocolHook;
 import su.nightexpress.excellentenchants.nms.EnchantNMS;
 import su.nightexpress.excellentenchants.nms.v1_18_R2.V1_18_R2;
 import su.nightexpress.excellentenchants.nms.v1_19_R3.V1_19_R3;
+import su.nightexpress.excellentenchants.nms.v1_20_R1.V1_20_R1;
 import su.nightexpress.excellentenchants.tier.TierManager;
 
 public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
@@ -70,8 +71,9 @@ public class ExcellentEnchants extends NexPlugin<ExcellentEnchants> {
 
     private void setNMS() {
         this.enchantNMS = switch (Version.CURRENT) {
-            case V1_18_R2 -> new V1_18_R2(); // akiranya
+            case V1_18_R2 -> new V1_18_R2(); // Akiranya
             case V1_19_R3 -> new V1_19_R3();
+            case V1_20_R1 -> new V1_20_R1();
             default -> throw new IllegalStateException("Unsupported Minecraft version: " + Version.CURRENT);
         };
     }

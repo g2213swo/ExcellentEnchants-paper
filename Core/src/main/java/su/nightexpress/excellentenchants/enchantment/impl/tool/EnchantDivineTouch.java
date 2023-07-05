@@ -81,7 +81,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
     public @NotNull ItemStack getSpawner(@NotNull CreatureSpawner spawnerBlock) {
         ItemStack itemSpawner = new ItemStack(Material.SPAWNER);
         BlockStateMeta stateItem = (BlockStateMeta) itemSpawner.getItemMeta();
-        if (stateItem == null) return itemSpawner;
+        if (stateItem == null || spawnerBlock.getSpawnedType() == null) return itemSpawner;
 
         CreatureSpawner spawnerItem = (CreatureSpawner) stateItem.getBlockState();
         spawnerItem.setSpawnedType(spawnerBlock.getSpawnedType());

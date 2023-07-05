@@ -4,33 +4,24 @@ version: ${version}
 api-version: 1.19
 authors: [ NightExpress, Nailm ]
 description: Vanilla-like enchants for your server.
-load-before: # These plugins might read the EnchantmentRegistry, so we load before them
-  - name: HuskSync
-    bootstrap: false
-  - name: MMOItems
-    bootstrap: false
-  - name: ItemsAdder
-    bootstrap: false
-  - name: WanderingTraders
-    bootstrap: false
-  - name: BetterGUI
-    bootstrap: false
-load-after:
-  - name: NexEngine
-    bootstrap: false
 dependencies:
-  - name: NexEngine
-    required: true
-    bootstrap: false
-  - name: ProtocolLib
-    required: false
-    bootstrap: false
-  - name: NoCheatPlus
-    required: false
-    bootstrap: false
-  - name: PlaceholderAPI
-    required: false
-    bootstrap: false
+  server:
+    NexEngine:
+      load: BEFORE
+      required: true
+      join-classpath: true
+    ProtocolLib:
+      load: OMIT
+      required: false
+      join-classpath: true
+    NoCheatPlus:
+      load: OMIT
+      required: false
+      join-classpath: true
+    PlaceholderAPI:
+      load: OMIT
+      required: false
+      join-classpath: true
 permissions:
   excellentenchants.admin:
     description: Grants access to all plugin functions.

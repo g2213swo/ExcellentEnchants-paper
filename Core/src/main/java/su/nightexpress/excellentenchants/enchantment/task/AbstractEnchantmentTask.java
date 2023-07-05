@@ -17,10 +17,10 @@ public abstract class AbstractEnchantmentTask extends AbstractTask<ExcellentEnch
     }
 
     protected @NotNull Collection<? extends LivingEntity> getEntities() {
-        Set<LivingEntity> list = new HashSet<>(this.plugin.getServer().getOnlinePlayers());
+        Set<LivingEntity> list = new HashSet<>(plugin.getServer().getOnlinePlayers());
 
         if (Config.ENCHANTMENTS_ENTITY_PASSIVE_FOR_MOBS.get()) {
-            this.plugin.getServer().getWorlds().stream().filter(world -> !world.getPlayers().isEmpty()).forEach(world -> {
+            plugin.getServer().getWorlds().stream().filter(world -> !world.getPlayers().isEmpty()).forEach(world -> {
                 list.addAll(world.getEntitiesByClass(LivingEntity.class));
             });
         }

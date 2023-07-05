@@ -1,7 +1,13 @@
+# IDEA stuff
+
 .idea
 
+# Gradle
+
 .gradle
-build
-target
+**/build
+**/target
+
+# Final jar
 
 ExcellentEnchants*.jar
