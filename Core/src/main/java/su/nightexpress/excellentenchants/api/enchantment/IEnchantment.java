@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JYML;
+import su.nexmedia.engine.api.placeholder.PlaceholderMap; // Mewcraft - depends on interface
 import su.nightexpress.excellentenchants.enchantment.config.EnchantChargesFuel;
 import su.nightexpress.excellentenchants.enchantment.type.ObtainType;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface IEnchantment {
+    @NotNull PlaceholderMap getPlaceholders(int level); // Mewcraft - depends on interface
 
     @NotNull JYML getConfig();
 

@@ -149,6 +149,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         }
     }
 
+    @Override // Mewcraft
     public @NotNull PlaceholderMap getPlaceholders(int level) {
         if (level > this.getMaxLevel()) level = this.getMaxLevel();
         if (level < this.getStartLevel()) level = this.getStartLevel();
