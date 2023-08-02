@@ -22,12 +22,12 @@ import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
+import su.nightexpress.excellentenchants.api.enchantment.IEnchantment; // Mewcraft - depends on interface
 import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
-import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 
 import java.util.*;
 
-public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implements AutoPaged<ExcellentEnchant> {
+public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implements AutoPaged<IEnchantment> { // Mewcraft - depends on interface
 
     private static final String PATH = "/menu/enchants_list.yml";
 
@@ -56,9 +56,9 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
         this.enchantSlots = this.cfg.getIntArray("Enchantments.Slots");
 
         this.registerHandler(MenuItemType.class)
-            .addClick(MenuItemType.CLOSE, (viewer, event) -> plugin.runTask(task -> viewer.getPlayer().closeInventory()))
-            .addClick(MenuItemType.PAGE_NEXT, ClickHandler.forNextPage(this))
-            .addClick(MenuItemType.PAGE_PREVIOUS, ClickHandler.forPreviousPage(this));
+                .addClick(MenuItemType.CLOSE, (viewer, event) -> plugin.runTask(task -> viewer.getPlayer().closeInventory()))
+                .addClick(MenuItemType.PAGE_NEXT, ClickHandler.forNextPage(this))
+                .addClick(MenuItemType.PAGE_PREVIOUS, ClickHandler.forPreviousPage(this));
 
         this.load();
     }
@@ -81,18 +81,18 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
     }
 
     @Override
-    public @NotNull List<ExcellentEnchant> getObjects(@NotNull Player player) {
+    public @NotNull List<IEnchantment> getObjects(@NotNull Player player) { // Mewcraft - depends on interface
         return new ArrayList<>(EnchantRegistry.getRegistered().stream()
-            .sorted(Comparator.comparing(ExcellentEnchant::getName)).toList());
+                .sorted(Comparator.comparing(IEnchantment::getId)).toList()); // Mewcraft
     }
 
     @Override
-    public @NotNull ItemStack getObjectStack(@NotNull Player player, @NotNull ExcellentEnchant enchant) {
+    public @NotNull ItemStack getObjectStack(@NotNull Player player, @NotNull IEnchantment enchant) { // Mewcraft - depends on interface
         return this.getEnchantIcon(enchant, 1);
     }
 
     @Override
-    public @NotNull ItemClick getObjectClick(@NotNull ExcellentEnchant enchant) {
+    public @NotNull ItemClick getObjectClick(@NotNull IEnchantment enchant) { // Mewcraft - depends on interface
         return (viewer, event) -> {
             if (!event.isLeftClick()) return;
 
@@ -110,13 +110,13 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
         };
     }
 
-    private ItemStack getEnchantIcon(@NotNull ExcellentEnchant enchant, int level) {
+    private ItemStack getEnchantIcon(@NotNull IEnchantment enchant, int level) { // Mewcraft - depends on interface
         return this.iconCache
-            .computeIfAbsent(enchant.getId(), k -> new HashMap<>())
-            .computeIfAbsent(level, k -> this.buildEnchantIcon(enchant, level));
+                .computeIfAbsent(enchant.getId(), k -> new HashMap<>())
+                .computeIfAbsent(level, k -> this.buildEnchantIcon(enchant, level));
     }
 
-    private @NotNull ItemStack buildEnchantIcon(@NotNull ExcellentEnchant enchant, int level) {
+    private @NotNull ItemStack buildEnchantIcon(@NotNull IEnchantment enchant, int level) { // Mewcraft - depends on interface
         ItemStack icon = new ItemStack(this.enchantIcon);
         ItemMeta meta = icon.getItemMeta();
         if (meta == null) return icon;
@@ -125,11 +125,11 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
 
         List<String> conflicts = enchant.getConflicts().isEmpty() ? Collections.emptyList() : new ArrayList<>(this.enchantLoreConflicts);
         List<String> conflictNames = enchant.getConflicts()
-            .stream()
-            .map(key -> Enchantment.getByKey(NamespacedKey.minecraft(key)))
-            .filter(Objects::nonNull)
-            .map(LangManager::getEnchantment)
-            .toList();
+                .stream()
+                .map(key -> Enchantment.getByKey(NamespacedKey.minecraft(key)))
+                .filter(Objects::nonNull)
+                .map(LangManager::getEnchantment)
+                .toList();
         conflicts = StringUtil.replacePlaceholderList(Placeholders.ENCHANTMENT_NAME, conflicts, conflictNames, true);
 
         List<String> charges = enchant.isChargesEnabled() ? new ArrayList<>(this.enchantLoreCharges) : Collections.emptyList();
@@ -137,7 +137,7 @@ public class EnchantmentsListMenu extends ConfigMenu<ExcellentEnchants> implemen
         lore = ComponentUtil.replacePlaceholderList(PLACEHOLDER_CONFLICTS, lore, ComponentUtil.asComponent(conflicts), false);
         lore = ComponentUtil.replacePlaceholderList(PLACEHOLDER_CHARGES, lore, ComponentUtil.asComponent(charges), false);
         lore = ComponentUtil.replacePlaceholderList(PLACEHOLDER_OBTAINING, lore, ComponentUtil.asComponent(this.enchantLoreObtaining), false);
-        lore = ComponentUtil.replacePlaceholderList(Placeholders.ENCHANTMENT_DESCRIPTION, lore, ComponentUtil.asComponent(enchant.getDescription()), true);
+        lore = ComponentUtil.replacePlaceholderList(Placeholders.ENCHANTMENT_DESCRIPTION, lore, ComponentUtil.asComponent(enchant.getDescription(level)), true);
 
         meta.lore(lore);
 

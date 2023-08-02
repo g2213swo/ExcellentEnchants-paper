@@ -1,6 +1,6 @@
 package su.nightexpress.excellentenchants.config;
 
-import cc.mewcraft.mewcore.item.api.PluginItem;
+//import cc.mewcraft.mewcore.item.api.PluginItem;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -65,15 +65,16 @@ public class Config {
     // Akiranya starts - custom item support
     public static final JOption<EnchantChargesFuel> ENCHANTMENTS_CHARGES_FUEL_ITEM = new JOption<EnchantChargesFuel>("Enchantments.Charges.Fuel_Item",
         (cfg, path, def) -> {
-            PluginItem<?> pluginItem = cfg.getPluginItem(path + ".External");
-            return pluginItem != null ? new EnchantChargesFuel(pluginItem) : new EnchantChargesFuel(cfg.getItem(path + ".General"));
+//            PluginItem<?> pluginItem = cfg.getPluginItem(path + ".External");
+//            return pluginItem != null ? new EnchantChargesFuel(pluginItem) : new EnchantChargesFuel(cfg.getItem(path + ".General"));
+                return new EnchantChargesFuel(cfg.getItem(path + ".General"));
         },
         () -> new EnchantChargesFuel(new ItemStack(Material.LAPIS_LAZULI)),
         "Default item used to recharge item's enchantments on anvils.",
         "If you want different item for certain enchantments, you can do it in that enchantment configs.",
         "Item Options: " + Placeholders.URL_ENGINE_SCALER)
         .setWriter((cfg, path, obj) -> {
-            obj.getPluginItem().ifPresent(item -> cfg.setPluginItem(path + ".External", item));
+//            obj.getPluginItem().ifPresent(item -> cfg.setPluginItem(path + ".External", item));
             obj.getGeneralItem().ifPresent(item -> cfg.setItem(path + ".General", item));
         });
     // Akiranya ends

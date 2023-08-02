@@ -118,23 +118,23 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             int level = i;
 
             PlaceholderMap map = new PlaceholderMap()
-                .add(Placeholders.ENCHANTMENT_DESCRIPTION, () -> String.join("\n", this.getDescription()))
-                .add(Placeholders.ENCHANTMENT_NAME, this::getDisplayName)
-                .add(Placeholders.ENCHANTMENT_NAME_FORMATTED, () -> this.getNameFormatted(level))
-                .add(Placeholders.ENCHANTMENT_LEVEL, () -> NumberUtil.toRoman(level))
-                .add(Placeholders.ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(this.getStartLevel()))
-                .add(Placeholders.ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(this.getMaxLevel()))
-                .add(Placeholders.ENCHANTMENT_TIER, () -> this.getTier().getName())
-                .add(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, () -> String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
-                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, () -> NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
-                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, () -> NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
-                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, () -> NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
-                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, () -> NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
-                .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, () -> NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
-                .add(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, () -> NumberUtil.format(this.getChargesMax(level)))
-                .add(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, () -> NumberUtil.format(this.getChargesConsumeAmount(level)))
-                .add(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, () -> NumberUtil.format(this.getChargesRechargeAmount(level)))
-                .add(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, () -> ComponentUtil.asMiniMessage(ItemUtil.getName(this.getChargesFuel().getItem()))); // Akiranya - plugin item support
+                    .add(Placeholders.ENCHANTMENT_DESCRIPTION, () -> String.join("\n", this.getDescription()))
+                    .add(Placeholders.ENCHANTMENT_NAME, this::getDisplayName)
+                    .add(Placeholders.ENCHANTMENT_NAME_FORMATTED, () -> this.getNameFormatted(level))
+                    .add(Placeholders.ENCHANTMENT_LEVEL, () -> NumberUtil.toRoman(level))
+                    .add(Placeholders.ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(this.getStartLevel()))
+                    .add(Placeholders.ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(this.getMaxLevel()))
+                    .add(Placeholders.ENCHANTMENT_TIER, () -> this.getTier().getName())
+                    .add(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, () -> String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
+                    .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, () -> NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
+                    .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, () -> NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
+                    .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, () -> NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
+                    .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_FISHING, () -> NumberUtil.format(this.getObtainChance(ObtainType.FISHING)))
+                    .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_MOB_SPAWNING, () -> NumberUtil.format(this.getObtainChance(ObtainType.MOB_SPAWNING)))
+                    .add(Placeholders.ENCHANTMENT_CHARGES_MAX_AMOUNT, () -> NumberUtil.format(this.getChargesMax(level)))
+                    .add(Placeholders.ENCHANTMENT_CHARGES_CONSUME_AMOUNT, () -> NumberUtil.format(this.getChargesConsumeAmount(level)))
+                    .add(Placeholders.ENCHANTMENT_CHARGES_RECHARGE_AMOUNT, () -> NumberUtil.format(this.getChargesRechargeAmount(level)))
+                    .add(Placeholders.ENCHANTMENT_CHARGES_FUEL_ITEM, () -> ComponentUtil.asMiniMessage(ItemUtil.getName(this.getChargesFuel().getItem()))); // Akiranya - plugin item support
 
             if (this instanceof Chanced chanced) {
                 map.add(Placeholders.ENCHANTMENT_CHANCE, () -> NumberUtil.format(chanced.getTriggerChance(level)));
@@ -149,6 +149,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         }
     }
 
+    @Override // Mewcraft
     public @NotNull PlaceholderMap getPlaceholders(int level) {
         if (level > this.getMaxLevel()) level = this.getMaxLevel();
         if (level < this.getStartLevel()) level = this.getStartLevel();
@@ -251,10 +252,10 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     public @NotNull List<String> formatDescription(int level) {
         return new ArrayList<>(
-            this.getDescription(level)
-                .stream()
-                .map(line -> Config.ENCHANTMENTS_DESCRIPTION_FORMAT.get().replace(Placeholders.GENERIC_DESCRIPTION, line))
-                .toList()
+                this.getDescription(level)
+                        .stream()
+                        .map(line -> Config.ENCHANTMENTS_DESCRIPTION_FORMAT.get().replace(Placeholders.GENERIC_DESCRIPTION, line))
+                        .toList()
         );
     }
 
@@ -278,8 +279,8 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
 
     public int getLevelByEnchantCost(int expLevel) {
         int get = this.getDefaults().getLevelByEnchantCost().getValues().entrySet().stream()
-            .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey))
-            .map(Map.Entry::getKey).orElse(0);
+                .filter(en -> expLevel >= en.getValue().intValue()).max(Comparator.comparingInt(Map.Entry::getKey))
+                .map(Map.Entry::getKey).orElse(0);
 
         return get != 0 ? this.fineLevel(get, ObtainType.ENCHANTING) : 0;
     }

@@ -1,6 +1,6 @@
 plugins {
-    id("su.nightexpress.project-conventions")
-    alias(libs.plugins.paperweight.userdev)
+    `java-library`
+    id("io.papermc.paperweight.userdev") version "1.5.5"
 }
 
 dependencies {
