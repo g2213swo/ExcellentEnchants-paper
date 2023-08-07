@@ -34,7 +34,11 @@ public class EnchantCutter extends ExcellentEnchant implements Chanced, CombatEn
 
     public EnchantCutter(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to throw away enemy''s armor and damage it for " + PLACEHOLDER_DURABILITY_DAMAGE + "%.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_DURABILITY_DAMAGE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to throw away enemy's armor and damage it for %2$s%."
+        // %1$s = enchantment chance, %2$s = durability damage percentage
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.75);
     }

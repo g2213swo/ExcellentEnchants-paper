@@ -25,7 +25,11 @@ public class EnchantDoubleStrike extends ExcellentEnchant implements Chanced, Co
 
     public EnchantDoubleStrike(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOW);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to inflict double damage.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to inflict double damage."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(1.0);
     }

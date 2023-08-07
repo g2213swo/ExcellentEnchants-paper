@@ -26,7 +26,12 @@ public class EnchantLuckyMiner extends ExcellentEnchant implements Chanced, Bloc
 
     public EnchantLuckyMiner(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to gain " + PLACEHOLDER_EXP_MODIFIER + "% more exp from ores.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId()
+                + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_EXP_MODIFIER + ">");
+        // "enchantment.g2213swo.luckyminer.desc": "%1$s% chance to gain %2$s% more exp from ores."
+        // %1$s = Enchantment Chance
+        // %2$s = EXP Modifier
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
     }

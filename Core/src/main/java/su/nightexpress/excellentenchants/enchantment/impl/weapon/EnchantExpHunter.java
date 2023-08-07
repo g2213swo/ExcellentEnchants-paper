@@ -22,7 +22,11 @@ public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
 
     public EnchantExpHunter(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Increases exp drop from mobs by " + PLACEHOLDER_EXP_MODIFIER + "%.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + PLACEHOLDER_EXP_MODIFIER + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Increases exp drop from mobs by %1$s%."
+        // %1$s = exp modifier percentage
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.3);
     }

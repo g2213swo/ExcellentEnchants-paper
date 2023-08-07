@@ -28,7 +28,11 @@ public class EnchantIceAspect extends ExcellentEnchant implements Chanced, Potio
 
     public EnchantIceAspect(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Freezes and applies " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on hit.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_POTION_TYPE + ":" + Placeholders.ENCHANTMENT_POTION_LEVEL + ":" + Placeholders.ENCHANTMENT_POTION_DURATION + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Freezes and applies %1$s %2$s (%3$ss.) on hit."
+        // %1$s = potion type, %2$s = potion level, %3$s = potion duration
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.1);
     }

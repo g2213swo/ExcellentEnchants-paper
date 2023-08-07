@@ -30,28 +30,31 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
 
     public EnchantBomber(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch TNT that explodes in " + PLACEHOLDER_FUSE_TICKS + "s.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
         this.getDefaults().setConflicts(
-            EnchantEnderBow.ID, EnchantGhast.ID,
-            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
-            EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
-            EnchantHover.ID,
-            Enchantment.ARROW_FIRE.getKey().getKey(),
-            Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
-            Enchantment.ARROW_DAMAGE.getKey().getKey()
+                EnchantEnderBow.ID, EnchantGhast.ID,
+                EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+                EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
+                EnchantHover.ID,
+                Enchantment.ARROW_FIRE.getKey().getKey(),
+                Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
+                Enchantment.ARROW_DAMAGE.getKey().getKey()
         );
+//        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch TNT that explodes in " + PLACEHOLDER_FUSE_TICKS + "s.");
+        // "enchantment.g2213swo.bomber.desc": "%1$s % chance to launch TNT that explodes in %2$s s."
+        // %1$s = potion type, %2$s = potion level
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_FUSE_TICKS + ">");
     }
 
     @Override
     public void loadSettings() {
         super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
-            "5.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+                "5.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.fuseTicks = EnchantScaler.read(this, "Settings.Fuse_Ticks",
-            "100 - " + Placeholders.ENCHANTMENT_LEVEL + " * 10",
-            "Sets fuse ticks (before it will explode) for the launched TNT.");
+                "100 - " + Placeholders.ENCHANTMENT_LEVEL + " * 10",
+                "Sets fuse ticks (before it will explode) for the launched TNT.");
 
         this.addPlaceholder(PLACEHOLDER_FUSE_TICKS, level -> NumberUtil.format((double) this.getFuseTicks(level) / 20D));
     }

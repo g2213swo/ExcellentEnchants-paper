@@ -25,10 +25,13 @@ public class EnchantColdSteel extends ExcellentEnchant implements Chanced, Potio
 
     public EnchantColdSteel(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to apply " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on attacker.");
         this.getDefaults().setTier(0.3);
         this.getDefaults().setLevelMax(3);
-
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ":" + Placeholders.ENCHANTMENT_POTION_TYPE + ":"
+                + Placeholders.ENCHANTMENT_POTION_LEVEL + ":" + Placeholders.ENCHANTMENT_POTION_DURATION + ">");
+        // "enchantment.g2213swo.cold_steel.desc": "%1$s % chance to apply %2$s %3$s (%4$s sec.) on attacker."
+        // %1$s = chance, %2$s = potion type, %3$s = potion level, %4$s = potion duration
     }
 
     @Override

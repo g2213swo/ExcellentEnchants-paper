@@ -66,6 +66,7 @@ public class EnchantRegistry {
         this.register(EnchantTreasures.ID, () -> new EnchantTreasures(plugin));
         this.register(EnchantTunnel.ID, () -> new EnchantTunnel(plugin));
         this.register(EnchantVeinminer.ID, () -> new EnchantVeinminer(plugin));
+        this.register(EnchantXray.ID, () -> new EnchantXray(plugin));
 
         // Weapon enchants
         this.register(EnchantBaneOfNetherspawn.ID, () -> new EnchantBaneOfNetherspawn(plugin));

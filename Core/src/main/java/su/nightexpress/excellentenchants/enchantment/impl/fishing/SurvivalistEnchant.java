@@ -26,7 +26,8 @@ public class SurvivalistEnchant extends ExcellentEnchant implements FishingEncha
 
     public SurvivalistEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
-        this.getDefaults().setDescription("Automatically cooks fish if what is caught is raw.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.survivalist.desc": "Automatically cooks fish if what is caught is raw."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.4);
 

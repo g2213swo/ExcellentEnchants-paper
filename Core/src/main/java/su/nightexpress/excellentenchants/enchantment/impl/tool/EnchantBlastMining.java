@@ -43,7 +43,10 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
 
     public EnchantBlastMining(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to mine blocks by explosion.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.blast_mining.desc": "%1$s % chance to mine blocks by explosion."
+        // %1$s = chance to mine by explosion
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(1.0);
         this.getDefaults().setConflicts(EnchantVeinminer.ID, EnchantTunnel.ID);

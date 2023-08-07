@@ -38,7 +38,11 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
 
     public EnchantThrifty(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain mob spawn egg on kill.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to obtain mob spawn egg on kill."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.75);
 

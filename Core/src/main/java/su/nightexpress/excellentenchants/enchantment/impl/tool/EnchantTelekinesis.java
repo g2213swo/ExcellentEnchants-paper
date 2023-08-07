@@ -28,7 +28,8 @@ public class EnchantTelekinesis extends ExcellentEnchant implements Chanced, Blo
 
     public EnchantTelekinesis(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
-        this.getDefaults().setDescription("Moves all blocks loot directly to your inventory.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Moves all block loot directly to your inventory."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.75);
     }

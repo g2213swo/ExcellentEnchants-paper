@@ -21,7 +21,8 @@ public class EnchantNimble extends ExcellentEnchant implements Chanced, DeathEnc
 
     public EnchantNimble(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
-        this.getDefaults().setDescription("Moves all mob's loot directly to your inventory.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Moves all mob's loot directly to your inventory."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.4);
     }

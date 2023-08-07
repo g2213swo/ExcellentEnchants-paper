@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public interface EnchantNMS {
+public interface EnchantNMS { // net.minecraft.server
 
     void sendAttackPacket(@NotNull Player player, int id);
 

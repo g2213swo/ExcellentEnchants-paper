@@ -21,7 +21,11 @@ public class EnchantHaste extends ExcellentEnchant implements Potioned, PassiveE
 
     public EnchantHaste(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_POTION_TYPE + ":" + Placeholders.ENCHANTMENT_POTION_LEVEL + ">");
+        // "enchantment.g2213swo.haste.desc": "Grants permanent %1$s %2$s effect."
+        // %1$s = Potion Type
+        // %2$s = Potion Level
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
     }

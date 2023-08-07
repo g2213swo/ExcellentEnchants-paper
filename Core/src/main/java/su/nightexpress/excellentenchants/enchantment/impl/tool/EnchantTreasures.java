@@ -39,7 +39,11 @@ public class EnchantTreasures extends ExcellentEnchant implements Chanced, Block
 
     public EnchantTreasures(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to attempt to find a treasure in mined block.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to attempt to find a treasure in mined block."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
 

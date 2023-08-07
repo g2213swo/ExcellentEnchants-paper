@@ -21,7 +21,9 @@ public class DoubleCatchEnchant extends ExcellentEnchant implements FishingEncha
 
     public DoubleCatchEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
-        this.getDefaults().setDescription("Increases amount of caught item by x2 with " + Placeholders.ENCHANTMENT_CHANCE + "% chance.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.double_catch.desc": "Increases amount of caught item by x2 with %1$s% chance."
+        // %1$s = chance
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.5);
     }

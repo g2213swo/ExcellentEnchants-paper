@@ -27,7 +27,11 @@ public class EnchantVillageDefender extends ExcellentEnchant implements CombatEn
 
     public EnchantVillageDefender(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE_AMOUNT + " more damage to all pillagers.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + PLACEHOLDER_DAMAGE_AMOUNT + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Inflicts %1$s more damage to all pillagers."
+        // %1$s = damage amount
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
     }

@@ -44,7 +44,11 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
 
     public EnchantExplosiveArrows(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an explosive arrow.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to launch an explosive arrow."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
 

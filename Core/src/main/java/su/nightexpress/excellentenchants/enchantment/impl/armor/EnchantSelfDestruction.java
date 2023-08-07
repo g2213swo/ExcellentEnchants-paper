@@ -32,9 +32,13 @@ public class EnchantSelfDestruction extends ExcellentEnchant implements Chanced,
 
     public EnchantSelfDestruction(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("%enchantment_trigger_chance%% chance to create an explosion on death.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
+        // this.getDefaults().setDescription("%enchantment_trigger_chance%% chance to create an explosion on death.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.self_destruction.desc": "%1$s % chance to create an explosion on death."
+        // %1$s - %enchantment_trigger_chance%
     }
 
     @Override

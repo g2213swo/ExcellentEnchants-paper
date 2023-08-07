@@ -35,9 +35,13 @@ public class EnchantElementalProtection extends ExcellentEnchant {
 
     public EnchantElementalProtection(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + PLACEHOLDER_PROTECTION_AMOUNT + ".");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.2);
+//        this.getDefaults().setDescription("Reduces Poison, Magic, Wither, Lightning, Freeze damage by " + PLACEHOLDER_PROTECTION_AMOUNT + ".");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + PLACEHOLDER_PROTECTION_AMOUNT + ">");
+        // "enchantment.g2213swo.elemental_protection.desc": "Reduces Poison, Magic, Wither, Lightning, Freeze damage by %1$s."
+        // %1$s = protection amount
     }
 
     @Override

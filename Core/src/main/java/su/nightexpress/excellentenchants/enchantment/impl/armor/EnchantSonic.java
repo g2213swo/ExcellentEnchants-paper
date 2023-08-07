@@ -21,9 +21,13 @@ public class EnchantSonic extends ExcellentEnchant implements Potioned, PassiveE
 
     public EnchantSonic(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
+//        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_POTION_TYPE + ":" + Placeholders.ENCHANTMENT_POTION_LEVEL + ">");
+        // "enchantment.g2213swo.sonic.desc": "Grants permanent %1$s %2$s effect."
+        // %1$s = potion type, %2$s = potion level
     }
 
     @Override

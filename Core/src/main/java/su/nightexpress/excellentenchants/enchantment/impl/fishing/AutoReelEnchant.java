@@ -15,7 +15,8 @@ public class AutoReelEnchant extends ExcellentEnchant implements FishingEnchant 
 
     public AutoReelEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Automatically reels in a hook on bite.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.auto_reel.desc": "Automatically reels in a hook on bite."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(1.0);
     }

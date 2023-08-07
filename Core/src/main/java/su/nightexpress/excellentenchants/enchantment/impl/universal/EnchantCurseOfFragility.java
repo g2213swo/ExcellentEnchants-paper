@@ -22,7 +22,8 @@ public class EnchantCurseOfFragility extends ExcellentEnchant {
 
     public EnchantCurseOfFragility(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Prevents an item from being grindstoned or anviled.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Prevents an item from being grindstoned or anviled."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0D);
     }

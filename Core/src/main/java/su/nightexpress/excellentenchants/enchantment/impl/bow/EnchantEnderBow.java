@@ -25,7 +25,8 @@ public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Cha
 
     public EnchantEnderBow(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
-        this.getDefaults().setDescription("Shoots ender pearls instead of arrows.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Shoots ender pearls instead of arrows."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(1.0);
 

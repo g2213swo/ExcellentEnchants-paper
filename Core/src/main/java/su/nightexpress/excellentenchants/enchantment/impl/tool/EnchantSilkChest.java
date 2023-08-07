@@ -48,7 +48,8 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
-        this.getDefaults().setDescription("Drop chests and saves all its content.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Drop chests and saves all its content."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.5);
 

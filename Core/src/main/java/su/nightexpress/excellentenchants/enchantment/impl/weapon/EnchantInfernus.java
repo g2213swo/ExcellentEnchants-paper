@@ -27,7 +27,11 @@ public class EnchantInfernus extends ExcellentEnchant {
 
     public EnchantInfernus(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Launched trident will ignite the enemy for " + PLACEHOLDER_FIRE_DURATION + "s. on hit.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + PLACEHOLDER_FIRE_DURATION + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Launched trident will ignite the enemy for %1$s seconds on hit."
+        // %1$s = fire duration
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.1);
     }

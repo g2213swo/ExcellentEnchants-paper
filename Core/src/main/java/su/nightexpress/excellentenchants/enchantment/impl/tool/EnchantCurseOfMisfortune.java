@@ -28,7 +28,10 @@ public class EnchantCurseOfMisfortune extends ExcellentEnchant implements Chance
 
     public EnchantCurseOfMisfortune(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to have no drops from blocks or mobs.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.curse_of_misfortune.desc": "%1$s% chance to have no drops from blocks or mobs."
+        // %1$s = chance to have no drops from blocks or mobs
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0D);
         this.getDefaults().setConflicts(

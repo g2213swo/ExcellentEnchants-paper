@@ -45,7 +45,10 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
 
     public EnchantDivineTouch(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to mine spawner.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.divine_touch.desc": "%1$s% chance to mine spawner."
+        // %1$s = chance to mine spawner
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(1.0);
         this.getDefaults().setConflicts(EnchantSmelter.ID);

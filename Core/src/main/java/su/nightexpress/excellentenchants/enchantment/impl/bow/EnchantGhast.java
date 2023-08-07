@@ -32,7 +32,8 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
 
     public EnchantGhast(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
-        this.getDefaults().setDescription("Shoots fireballs instead of arrows.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Shoots fireballs instead of arrows."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.3);
 

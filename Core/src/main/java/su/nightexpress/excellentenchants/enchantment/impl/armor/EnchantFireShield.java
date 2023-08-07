@@ -25,9 +25,13 @@ public class EnchantFireShield extends ExcellentEnchant implements Chanced, Comb
 
     public EnchantFireShield(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to ignite the attacker for " + PLACEHOLDER_FIRE_DURATION + "s.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.4);
+//        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to ignite the attacker for " + PLACEHOLDER_FIRE_DURATION + "s.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_FIRE_DURATION + ">");
+        // "enchantment.g2213swo.fire_shield.desc": "%1$s%% chance to ignite the attacker for %2$s seconds."
+        // %1$s = chance, %2$s = fire duration
     }
 
     @Override

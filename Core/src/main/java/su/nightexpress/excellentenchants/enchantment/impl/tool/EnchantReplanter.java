@@ -43,10 +43,12 @@ public class EnchantReplanter extends ExcellentEnchant implements Chanced, Inter
 
     public EnchantReplanter(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
-        this.getDefaults().setDescription("Automatically replant crops on right click and when harvest.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:Automatically replant crops on right click and when harvest.>");
+        // "enchantment.g2213swo.replanter.desc": "Automatically replant crops on right click and when harvest."
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.3);
     }
+
 
     @Override
     public void loadSettings() {

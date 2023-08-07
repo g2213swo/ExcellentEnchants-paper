@@ -27,7 +27,12 @@ public class EnchantCurseOfBreaking extends ExcellentEnchant implements Chanced 
 
     public EnchantCurseOfBreaking(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to consume extra " + PLACEHOLDER_DURABILITY_AMOUNT + " durability points.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" +
+                Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_DURABILITY_AMOUNT + ">");
+        // "enchantment.g2213swo.curse_of_breaking.desc": "%1$s% chance to consume extra %2$s durability points."
+        // %1$s = chance to consume extra durability
+        // %2$s = amount of extra durability points consumed
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0D);
     }

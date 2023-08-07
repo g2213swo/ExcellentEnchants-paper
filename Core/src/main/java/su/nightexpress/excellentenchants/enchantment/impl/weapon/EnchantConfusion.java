@@ -28,7 +28,11 @@ public class EnchantConfusion extends ExcellentEnchant implements Chanced, Potio
 
     public EnchantConfusion(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to apply " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) on hit.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ":" + Placeholders.ENCHANTMENT_POTION_TYPE + ":" + Placeholders.ENCHANTMENT_POTION_LEVEL + ":" + Placeholders.ENCHANTMENT_POTION_DURATION + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to apply %2$s %3$s (%4$ss.) on hit."
+        // %1$s = enchantment chance, %2$s = potion type, %3$s = potion level, %4$s = potion duration
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.1);
     }

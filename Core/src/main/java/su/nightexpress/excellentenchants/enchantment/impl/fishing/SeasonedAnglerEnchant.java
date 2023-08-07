@@ -20,7 +20,9 @@ public class SeasonedAnglerEnchant extends ExcellentEnchant implements FishingEn
 
     public SeasonedAnglerEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Increases amount of XP gained from fishing by " + Placeholders.GENERIC_AMOUNT + "%.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.GENERIC_AMOUNT + ">");
+        // "enchantment.g2213swo.seasoned_angler.desc": "Increases amount of XP gained from fishing by %1$s%."
+        // %1$s = amount of XP increase
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(0.1);
     }

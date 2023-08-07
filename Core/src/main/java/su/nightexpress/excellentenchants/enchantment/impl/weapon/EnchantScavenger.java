@@ -32,7 +32,11 @@ public class EnchantScavenger extends ExcellentEnchant implements Chanced, Death
 
     public EnchantScavenger(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain additional loot from mobs.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to obtain additional loot from mobs."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
     }

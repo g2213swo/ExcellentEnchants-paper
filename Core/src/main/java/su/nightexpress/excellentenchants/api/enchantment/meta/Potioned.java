@@ -9,6 +9,7 @@ public interface Potioned {
 
     @NotNull Potioned getPotionImplementation();
 
+
     default boolean isPermanent() {
         return this.getPotionImplementation().isPermanent();
     }

@@ -39,7 +39,8 @@ public class EnchantTunnel extends ExcellentEnchant implements BlockBreakEnchant
 
     public EnchantTunnel(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
-        this.getDefaults().setDescription("Mines multiple blocks at once in a certain shape.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Mines multiple blocks at once in a certain shape."
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(1.0);
         this.getDefaults().setConflicts(EnchantVeinminer.ID, EnchantBlastMining.ID);

@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.api.config.JOption;
 import su.nexmedia.engine.api.config.JYML;
-import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.Placeholders;
@@ -40,7 +39,7 @@ public class EnchantDefaults {
     private EnchantChargesFuel chargesFuel;
 
     public EnchantDefaults(@NotNull ExcellentEnchant enchant) {
-        this.setDisplayName(StringUtil.capitalizeUnderscored(enchant.getId()));
+        this.setDisplayName(enchant.getName());
         this.setTier(0.1);
         this.setDescription(new ArrayList<>());
         this.setTreasure(false);

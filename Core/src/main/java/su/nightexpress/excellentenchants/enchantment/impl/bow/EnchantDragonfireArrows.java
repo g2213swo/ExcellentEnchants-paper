@@ -44,7 +44,11 @@ public class EnchantDragonfireArrows extends ExcellentEnchant implements Chanced
 
     public EnchantDragonfireArrows(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an dragonfire arrow (R=" + PLACEHOLDER_FIRE_RADIUS + ", " + PLACEHOLDER_FIRE_DURATION + "s).");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_FIRE_RADIUS + ":" + PLACEHOLDER_FIRE_DURATION + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to launch a dragonfire arrow (R=%2$s, %3$ss)."
+        // %1$s = enchantment chance, %2$s = fire radius, %3$s = fire duration
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
 

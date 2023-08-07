@@ -26,7 +26,10 @@ public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEn
 
     public CurseOfDrownedEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGHEST);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to fish up a Drowned Zombie.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.curse_of_drowned.desc": "%1$s% chance to fish up a Drowned Zombie."
+        // %1$s = chance
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0D);
     }

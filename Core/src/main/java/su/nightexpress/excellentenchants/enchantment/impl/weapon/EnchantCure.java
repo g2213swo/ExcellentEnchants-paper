@@ -28,7 +28,11 @@ public class EnchantCure extends ExcellentEnchant implements Chanced, CombatEnch
 
     public EnchantCure(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to cure Zombified Piglins and Zombie Villagers on hit.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to cure Zombified Piglins and Zombie Villagers on hit."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.5);
     }

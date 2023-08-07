@@ -50,6 +50,10 @@ import java.util.stream.Stream;
 public abstract class ExcellentEnchant extends Enchantment implements IEnchantment, IListener {
 
     private static final String NAMESPACE = "excellentenchants";
+
+    /**
+     * Only used in GUIs.
+     */
     private static final LoadingCache<ExcellentEnchant, Map<Integer, String>> STRING_NAME_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
         public @NotNull Map<Integer, String> load(final @NotNull ExcellentEnchant key) {
@@ -57,22 +61,23 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             int maxLvl = key.getMaxLevel();
 
             if (startLvl == 1 && startLvl == maxLvl) // only has single level
-                return Map.of(1, key.getDisplayName());
+                return Map.of(1, "<lang:enchantment.g2213swo." + key.getId() + "> ");
 
             return new Int2ObjectArrayMap<>() {{
                 for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
-                    this.put(lvl, key.getDisplayName() + " " + NumberUtil.toRoman(lvl));
+                    this.put(lvl, "<lang:enchantment.g2213swo." + key.getId() + "> " + NumberUtil.toRoman(lvl));
                 }
             }};
         }
     });
+
     private static final LoadingCache<ExcellentEnchant, Map<Integer, Component>> COMPONENT_NAME_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
         public @NotNull Map<Integer, Component> load(final @NotNull ExcellentEnchant key) {
             int startLvl = key.getStartLevel();
             int maxLvl = key.getMaxLevel();
 
-            Component displayName = Component.text(key.getDisplayName());
+            Component displayName = Component.translatable("enchantment.g2213swo." + key.getId());
             Style displayStyle = Style.style(b -> {
                 b.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
                 b.colorIfAbsent(key.getTier().getColor());
@@ -207,6 +212,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         return this.getDefaults().getDisplayName();
     }
 
+
     /**
      * Only used in GUIs.
      */
@@ -241,7 +247,6 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
      * Gets the enchantment description for the given enchantment level.
      *
      * @param level the enchantment level
-     *
      * @return a copy of the enchantment description for the given level
      */
     public @NotNull List<String> getDescription(int level) {
@@ -251,8 +256,10 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
     }
 
     public @NotNull List<String> formatDescription(int level) {
+        List<String> description = this.getDescription(level);
+
         return new ArrayList<>(
-                this.getDescription(level)
+                description
                         .stream()
                         .map(line -> Config.ENCHANTMENTS_DESCRIPTION_FORMAT.get().replace(Placeholders.GENERIC_DESCRIPTION, line))
                         .toList()
@@ -473,4 +480,5 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
         // Not compatible with this Paper API
         return Key.key(NAMESPACE, this.id).asString();
     }
+
 }

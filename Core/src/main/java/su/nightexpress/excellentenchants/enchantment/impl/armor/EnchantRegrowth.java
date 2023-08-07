@@ -41,24 +41,28 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
 
     public EnchantRegrowth(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every " + PLACEHOLDER_HEAL_INTERVAL + "s.");
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.7);
+//        this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every " + PLACEHOLDER_HEAL_INTERVAL + "s.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" +
+                PLACEHOLDER_HEAL_AMOUNT + ":" + PLACEHOLDER_HEAL_INTERVAL + ">");
+        // "enchantment.g2213swo.regrowth.desc": "Restores %1$s hearts every %2$s seconds."
+        // %1$s = heal amount %2$s = heal interval
     }
 
     @Override
     public void loadSettings() {
         super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
-            "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
+                "20.0 + " + Placeholders.ENCHANTMENT_LEVEL + " * 5");
         this.healInterval = JOption.create("Settings.Heal.Interval", 100,
-            "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
+                "How often (in ticks) enchantment will have effect? 1 second = 20 ticks.").read(cfg);
         this.healMinHealth = EnchantScaler.read(this, "Settings.Heal.Min_Health", "0.5",
-            "Minimal entity health for the enchantment to have effect.");
+                "Minimal entity health for the enchantment to have effect.");
         this.healMaxHealth = EnchantScaler.read(this, "Settings.Heal.Max_Health", "20.0",
-            "Maximal entity health when the enchantment will not heal anymore.");
+                "Maximal entity health when the enchantment will not heal anymore.");
         this.healAmount = EnchantScaler.read(this, "Settings.Heal.Amount", "0.25",
-            "Amount of hearts to be restored.");
+                "Amount of hearts to be restored.");
 
         this.addPlaceholder(PLACEHOLDER_HEAL_AMOUNT, level -> NumberUtil.format(this.getHealAmount(level)));
         this.addPlaceholder(PLACEHOLDER_HEAL_MIN_HEALTH, level -> NumberUtil.format(this.getHealMaxHealth(level)));

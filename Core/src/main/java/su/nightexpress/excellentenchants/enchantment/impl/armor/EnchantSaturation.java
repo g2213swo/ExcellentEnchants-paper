@@ -33,9 +33,13 @@ public class EnchantSaturation extends ExcellentEnchant implements PassiveEnchan
 
     public EnchantSaturation(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Restores " + PLACEHOLDER_SATURATION_AMOUNT + " food points every " + PLACEHOLDER_SATURATION_INTERVAL + "s.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.5);
+//        this.getDefaults().setDescription("Restores " + PLACEHOLDER_SATURATION_AMOUNT + " food points every " + PLACEHOLDER_SATURATION_INTERVAL + "s.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + PLACEHOLDER_SATURATION_AMOUNT + ":" + PLACEHOLDER_SATURATION_INTERVAL + ">");
+        // "enchantment.g2213swo.saturation.desc": "Restores %1$s food points every %2$s seconds."
+        // %1$s = saturation amount, %2$s = saturation interval
     }
 
     @Override

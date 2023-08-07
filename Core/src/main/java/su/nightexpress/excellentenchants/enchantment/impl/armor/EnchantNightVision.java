@@ -21,9 +21,13 @@ public class EnchantNightVision extends ExcellentEnchant implements Potioned, Pa
 
     public EnchantNightVision(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
         this.getDefaults().setLevelMax(1);
         this.getDefaults().setTier(0.7);
+//        this.getDefaults().setDescription("Grants permanent " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " effect.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_POTION_TYPE + ":" + Placeholders.ENCHANTMENT_POTION_LEVEL + ">");
+        // "enchantment.g2213swo.night_vision.desc": "Grants permanent %1$s %2$s effect."
+        // %1$s = potion type, %2$s = potion level
     }
 
     @Override

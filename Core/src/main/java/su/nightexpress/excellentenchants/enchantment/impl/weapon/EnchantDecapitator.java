@@ -53,7 +53,11 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
 
     public EnchantDecapitator(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain player''s or mob''s head.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to obtain player's or mob's head."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(0.75);
 

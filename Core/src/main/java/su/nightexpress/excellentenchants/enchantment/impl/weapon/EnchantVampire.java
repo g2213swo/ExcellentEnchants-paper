@@ -32,7 +32,10 @@ public class EnchantVampire extends ExcellentEnchant implements Chanced, CombatE
 
     public EnchantVampire(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to heal for " + PLACEHOLDER_HEAL_AMOUNT + " heart(s) on hit.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_HEAL_AMOUNT + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to heal for %2$s heart(s) on hit."
+        // %1$s = enchantment chance, %2$s = heal amount
         this.getDefaults().setLevelMax(4);
         this.getDefaults().setTier(0.75);
     }

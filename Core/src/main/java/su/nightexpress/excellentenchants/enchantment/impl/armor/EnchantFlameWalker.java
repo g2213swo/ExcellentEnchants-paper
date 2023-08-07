@@ -45,10 +45,12 @@ public class EnchantFlameWalker extends ExcellentEnchant implements ICleanable {
 
     public EnchantFlameWalker(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Ability to walk on lava and magma blocks without getting damage.");
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.7);
         this.getDefaults().getConflicts().add(Enchantment.FROST_WALKER.getKey().getKey());
+//        this.getDefaults().setDescription("Ability to walk on lava and magma blocks without getting damage.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // "enchantment.g2213swo.flame_walker.desc": "Ability to walk on lava and magma blocks without getting damage."
 
         this.blockTickTask = new BlockTickTask(plugin);
         this.blockTickTask.start();

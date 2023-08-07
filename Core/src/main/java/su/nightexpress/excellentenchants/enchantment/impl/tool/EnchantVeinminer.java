@@ -40,7 +40,11 @@ public class EnchantVeinminer extends ExcellentEnchant implements BlockBreakEnch
 
     public EnchantVeinminer(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
-        this.getDefaults().setDescription("Mines up to " + PLACEHOLDER_BLOCK_LIMIT + " blocks of the ore vein at once.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + PLACEHOLDER_BLOCK_LIMIT + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Mines up to %1$s blocks of the ore vein at once."
+        // %1$s = block limit
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.3);
         this.getDefaults().setConflicts(EnchantBlastMining.ID, EnchantTunnel.ID);

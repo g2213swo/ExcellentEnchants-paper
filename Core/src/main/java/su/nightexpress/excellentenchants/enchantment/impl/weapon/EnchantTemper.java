@@ -28,7 +28,11 @@ public class EnchantTemper extends ExcellentEnchant implements CombatEnchant {
 
     public EnchantTemper(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Inflicts " + PLACEHOLDER_DAMAGE_AMOUNT + "% (max. " + PLACEHOLDER_DAMAGE_CAPACITY + "%) more damage for each " + PLACEHOLDER_HEALTH_POINT + " hearts missing.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + PLACEHOLDER_DAMAGE_AMOUNT + ":" + PLACEHOLDER_DAMAGE_CAPACITY + ":" + PLACEHOLDER_HEALTH_POINT + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "Inflicts %1$s%% (max. %2$s%%) more damage for each %3$s hearts missing."
+        // %1$s = damage amount percentage, %2$s = damage capacity percentage, %3$s = health points
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.3);
     }

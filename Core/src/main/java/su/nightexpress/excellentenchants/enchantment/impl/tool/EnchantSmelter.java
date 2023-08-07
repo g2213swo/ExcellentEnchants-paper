@@ -38,7 +38,11 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
 
     public EnchantSmelter(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to smelt a block/ore.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ">");
+        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to smelt a block/ore."
+        // %1$s = enchantment chance
+
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.3);
         this.getDefaults().setConflicts(

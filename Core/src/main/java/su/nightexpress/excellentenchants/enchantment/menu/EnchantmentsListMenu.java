@@ -22,7 +22,7 @@ import su.nexmedia.engine.utils.PDCUtil;
 import su.nexmedia.engine.utils.StringUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchants;
 import su.nightexpress.excellentenchants.Placeholders;
-import su.nightexpress.excellentenchants.api.enchantment.IEnchantment; // Mewcraft - depends on interface
+import su.nightexpress.excellentenchants.api.enchantment.IEnchantment;
 import su.nightexpress.excellentenchants.enchantment.EnchantRegistry;
 
 import java.util.*;

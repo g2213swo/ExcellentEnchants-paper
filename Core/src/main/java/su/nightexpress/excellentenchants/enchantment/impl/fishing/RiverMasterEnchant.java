@@ -23,7 +23,8 @@ public class RiverMasterEnchant extends ExcellentEnchant {
 
     public RiverMasterEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription("Increases casting distance.");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
+        // // "enchantment.g2213swo.river_master.desc": "Increases casting distance."
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.1);
     }

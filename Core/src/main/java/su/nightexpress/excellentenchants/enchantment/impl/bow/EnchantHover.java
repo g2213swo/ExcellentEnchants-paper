@@ -35,7 +35,12 @@ public class EnchantHover extends ExcellentEnchant implements Chanced, Arrowed, 
 
     public EnchantHover(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
-        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch an arrow with " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.)");
+        this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
+                + Placeholders.ENCHANTMENT_CHANCE + ":" + Placeholders.ENCHANTMENT_POTION_TYPE + ":"
+                + Placeholders.ENCHANTMENT_POTION_LEVEL + ":" + Placeholders.ENCHANTMENT_POTION_DURATION + ">");
+        // "enchantment.g2213swo.hover.desc": "%1$s% chance to launch an arrow with %2$s %3$s (%4$ss.)"
+        // %1$s = enchantment chance, %2$s = potion type, %3$s = potion level, %4$s = potion duration
+
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.1);
         this.getDefaults().setConflicts(
