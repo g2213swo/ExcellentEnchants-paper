@@ -1,6 +1,10 @@
 package su.nightexpress.excellentenchants.nms.v1_20_R1;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -11,6 +15,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftFishHook;
@@ -18,6 +23,7 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -90,5 +96,24 @@ public class V1_20_R1 implements EnchantNMS {
             blocks.add(bukkitLoc.getBlock());
         }
         return blocks;
+    }
+
+    @Override
+    public org.bukkit.inventory.@NotNull ItemStack createItemStack(Key item, int count, BinaryTagHolder nbt) {
+        String itemName = item.value(); // Get the key value from the Key object
+        Material bukkitMaterial = Material.matchMaterial(itemName);
+        if (bukkitMaterial == null) {
+            // Handle error: Material does not exist in Bukkit
+            return new ItemStack(Material.AIR);
+        }
+
+        net.minecraft.world.item.ItemStack nmsStack = new net.minecraft.world.item.ItemStack(CraftMagicNumbers.getItem(bukkitMaterial), count);
+        try {
+            nmsStack.setTag(TagParser.parseTag(nbt.string()));
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return CraftItemStack.asBukkitCopy(nmsStack);
     }
 }

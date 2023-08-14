@@ -27,7 +27,6 @@ public class EnchantHardened extends ExcellentEnchant implements Chanced, Potion
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setLevelMax(3);
         this.getDefaults().setTier(0.4);
-//        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to obtain " + Placeholders.ENCHANTMENT_POTION_TYPE + " " + Placeholders.ENCHANTMENT_POTION_LEVEL + " (" + Placeholders.ENCHANTMENT_POTION_DURATION + "s.) when damaged.");
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
                 + Placeholders.ENCHANTMENT_CHANCE + ":" + Placeholders.ENCHANTMENT_POTION_TYPE + ":" + Placeholders.ENCHANTMENT_POTION_LEVEL + ":" + Placeholders.ENCHANTMENT_POTION_DURATION + ">");
         // "enchantment.g2213swo.hardened.desc": "%1$s%% chance to obtain %2$s %3$s (%4$s seconds) when damaged."

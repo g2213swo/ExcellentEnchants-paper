@@ -23,7 +23,6 @@ import su.nexmedia.engine.api.config.JYML;
 import su.nexmedia.engine.api.manager.IListener;
 import su.nexmedia.engine.api.placeholder.PlaceholderConstants;
 import su.nexmedia.engine.api.placeholder.PlaceholderMap;
-import su.nexmedia.engine.lang.LangManager;
 import su.nexmedia.engine.utils.ComponentUtil;
 import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.NumberUtil;
@@ -60,12 +59,23 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             int startLvl = key.getStartLevel();
             int maxLvl = key.getMaxLevel();
 
-            if (startLvl == 1 && startLvl == maxLvl) // only has single level
-                return Map.of(1, "<lang:enchantment.g2213swo." + key.getId() + "> ");
+            if (startLvl == 1 && startLvl == maxLvl) { // only has single level
+                return Map.of(1,
+                        ComponentUtil
+                                .asMiniMessage(Component
+                                        .translatable("enchantment.g2213swo." + key.getId())
+                                        .color(key.getTier().getColor())));
+            }
 
             return new Int2ObjectArrayMap<>() {{
                 for (int lvl = startLvl; lvl <= maxLvl; lvl++) {
-                    this.put(lvl, "<lang:enchantment.g2213swo." + key.getId() + "> " + NumberUtil.toRoman(lvl));
+//                    this.put(lvl, "<lang:enchantment.g2213swo." + key.getId() + "> " + NumberUtil.toRoman(lvl));
+                    this.put(lvl, ComponentUtil
+                            .asMiniMessage(Component
+                                    .translatable("enchantment.g2213swo." + key.getId())
+                                    .appendSpace()
+                                    .append(Component.text(NumberUtil.toRoman(lvl)))
+                                    .color(key.getTier().getColor())));
                 }
             }};
         }
@@ -130,7 +140,12 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
                     .add(Placeholders.ENCHANTMENT_LEVEL_MIN, () -> String.valueOf(this.getStartLevel()))
                     .add(Placeholders.ENCHANTMENT_LEVEL_MAX, () -> String.valueOf(this.getMaxLevel()))
                     .add(Placeholders.ENCHANTMENT_TIER, () -> this.getTier().getName())
-                    .add(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, () -> String.join(", ", Stream.of(this.getFitItemTypes()).map(type -> plugin.getLangManager().getEnum(type)).toList()))
+                    .add(Placeholders.ENCHANTMENT_FIT_ITEM_TYPES, () -> String.join(", ",
+                                    Stream.of(this.getFitItemTypes())
+                                            .map(type -> plugin
+                                                    .getLangManager()
+                                                    .getEnum(type))
+                                            .toList()))
                     .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_ENCHANTING, () -> NumberUtil.format(this.getObtainChance(ObtainType.ENCHANTING)))
                     .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_VILLAGER, () -> NumberUtil.format(this.getObtainChance(ObtainType.VILLAGER)))
                     .add(Placeholders.ENCHANTMENT_OBTAIN_CHANCE_LOOT_GENERATION, () -> NumberUtil.format(this.getObtainChance(ObtainType.LOOT_GENERATION)))
@@ -147,7 +162,7 @@ public abstract class ExcellentEnchant extends Enchantment implements IEnchantme
             if (this instanceof Potioned potioned) {
                 map.add(Placeholders.ENCHANTMENT_POTION_LEVEL, () -> NumberUtil.toRoman(potioned.getEffectAmplifier(level)));
                 map.add(Placeholders.ENCHANTMENT_POTION_DURATION, () -> NumberUtil.format(potioned.getEffectDuration(level) / 20D));
-                map.add(Placeholders.ENCHANTMENT_POTION_TYPE, () -> LangManager.getPotionType(potioned.getEffectType()));
+                map.add(Placeholders.ENCHANTMENT_POTION_TYPE, () -> "'" + ComponentUtil.asMiniMessage(Component.translatable(potioned.getEffectType())) + "'");
             }
 
             this.placeholdersMap.put(level, map);

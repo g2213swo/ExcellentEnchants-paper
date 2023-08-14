@@ -49,7 +49,7 @@ public class EnchantElectrifiedArrows extends ExcellentEnchant implements Chance
 
         this.getDefaults().setConflicts(
             EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID,
-            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantInstability.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
             EnchantWitheredArrows.ID, EnchantDragonfireArrows.ID
         );
     }

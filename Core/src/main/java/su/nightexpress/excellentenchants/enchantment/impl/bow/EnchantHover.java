@@ -45,7 +45,7 @@ public class EnchantHover extends ExcellentEnchant implements Chanced, Arrowed, 
         this.getDefaults().setTier(0.1);
         this.getDefaults().setConflicts(
             EnchantEnderBow.ID, EnchantGhast.ID, EnchantBomber.ID,
-            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantInstability.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
             EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID
         );
     }

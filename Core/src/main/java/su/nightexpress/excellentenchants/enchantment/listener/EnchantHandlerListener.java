@@ -1,5 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.listener;
 
+import net.momirealms.customfishing.api.event.FishResultEvent;
+import net.momirealms.customfishing.api.event.MiniGameStartEvent;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -226,6 +228,43 @@ public class EnchantHandlerListener extends AbstractListener<ExcellentEnchants> 
             }
         });
     }
+    // ---------------------------------------------------------------
+    // Fishing Start Enchants
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEnchantCustomFishingStart(MiniGameStartEvent event){
+        Player player = event.getPlayer();
+
+        ItemStack item = EnchantUtils.getFishingRod(player);
+        if (item == null) return;
+
+        EnchantUtils.getExcellents(item, FishingEnchant.class).forEach((enchant, level) -> {
+            if (event.isCancelled()) return; // Check if event was cancelled by some enchantment.
+            if (enchant.isOutOfCharges(item)) return;
+            if (enchant.onFishingStart(event, item, level)) {
+                enchant.consumeCharges(item);
+            }
+        });
+    }
+
+    // Fishing End Enchants
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEnchantCustomFishingEnd(FishResultEvent event){
+        Player player = event.getPlayer();
+
+        ItemStack item = EnchantUtils.getFishingRod(player);
+        if (item == null) return;
+        ItemStack result = event.getItemStack();
+        if (result == null) return;
+
+        EnchantUtils.getExcellents(item, FishingEnchant.class).forEach((enchant, level) -> {
+            if (event.isCancelled()) return; // Check if event was cancelled by some enchantment.
+            if (enchant.isOutOfCharges(item)) return;
+            if (enchant.onFishingResult(event, item, result, level)) {
+                enchant.consumeCharges(item);
+            }
+        });
+    }
+
 
     // ---------------------------------------------------------------
     // Death Related Enchants

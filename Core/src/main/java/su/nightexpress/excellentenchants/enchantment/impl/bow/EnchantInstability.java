@@ -27,9 +27,9 @@ import su.nightexpress.excellentenchants.enchantment.impl.meta.ArrowImplementati
 import su.nightexpress.excellentenchants.enchantment.impl.meta.ChanceImplementation;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
+public class EnchantInstability extends ExcellentEnchant implements Chanced, Arrowed, BowEnchant {
 
-    public static final String ID = "explosive_arrows";
+    public static final String ID = "instability";
     public static final String PLACEHOLDER_EXPLOSION_POWER = "%enchantment_explosion_power%";
 
     private static final String META_EXPLOSION_SOURCE = ID + "_source";
@@ -42,15 +42,15 @@ public class EnchantExplosiveArrows extends ExcellentEnchant implements Chanced,
     private ArrowImplementation arrowImplementation;
     private ChanceImplementation chanceImplementation;
 
-    public EnchantExplosiveArrows(@NotNull ExcellentEnchants plugin) {
+    public EnchantInstability(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
                 + Placeholders.ENCHANTMENT_CHANCE + ">");
-        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to launch an explosive arrow."
+        // "enchantment.g2213swo.instability.desc": "%1$s%% chance to launch an explosive arrow."
         // %1$s = enchantment chance
 
         this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0.7);
+        this.getDefaults().setTier(0.8);
 
         this.getDefaults().setConflicts(
             EnchantEnderBow.ID, EnchantGhast.ID, EnchantHover.ID,

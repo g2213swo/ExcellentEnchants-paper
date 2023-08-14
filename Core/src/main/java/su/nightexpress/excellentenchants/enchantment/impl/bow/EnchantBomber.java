@@ -34,14 +34,13 @@ public class EnchantBomber extends ExcellentEnchant implements Chanced, BowEncha
         this.getDefaults().setTier(0.7);
         this.getDefaults().setConflicts(
                 EnchantEnderBow.ID, EnchantGhast.ID,
-                EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+                EnchantInstability.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
                 EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
                 EnchantHover.ID,
                 Enchantment.ARROW_FIRE.getKey().getKey(),
                 Enchantment.ARROW_KNOCKBACK.getKey().getKey(),
                 Enchantment.ARROW_DAMAGE.getKey().getKey()
         );
-//        this.getDefaults().setDescription(Placeholders.ENCHANTMENT_CHANCE + "% chance to launch TNT that explodes in " + PLACEHOLDER_FUSE_TICKS + "s.");
         // "enchantment.g2213swo.bomber.desc": "%1$s % chance to launch TNT that explodes in %2$s s."
         // %1$s = potion type, %2$s = potion level
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ":" + PLACEHOLDER_FUSE_TICKS + ">");

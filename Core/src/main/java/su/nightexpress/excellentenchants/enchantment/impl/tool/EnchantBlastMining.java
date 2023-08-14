@@ -56,9 +56,9 @@ public class EnchantBlastMining extends ExcellentEnchant implements Chanced, Blo
     public void loadSettings() {
         super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
-            "20.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+            "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
         this.explosionPower = EnchantScaler.read(this, "Settings.Explosion.Power",
-            "3.0 + (" + Placeholders.ENCHANTMENT_LEVEL + " - 1.0 * 0.25)",
+            "2.0 + (" + Placeholders.ENCHANTMENT_LEVEL + " - 1.2 * 0.25)",
             "Explosion power. The more power = the more blocks (area) to explode.");
         this.minBlockStrength = EnchantScaler.read(this, "Settings.Min_Block_Strength",
             "1.5 - " + Placeholders.ENCHANTMENT_LEVEL + " / 10",

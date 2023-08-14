@@ -39,7 +39,7 @@ public class EnchantGhast extends ExcellentEnchant implements BowEnchant, Chance
 
         this.getDefaults().setConflicts(
             EnchantEnderBow.ID, EnchantBomber.ID,
-            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantInstability.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
             EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
             EnchantHover.ID,
             Enchantment.ARROW_FIRE.getKey().getKey(),

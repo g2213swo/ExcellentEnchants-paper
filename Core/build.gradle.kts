@@ -27,6 +27,10 @@ repositories {
 
     maven { url = uri("https://repo.md-5.net/content/repositories/snapshots/") }
     maven { url = uri("https://repo.md-5.net/content/repositories/releases/") }
+
+    flatDir {
+        dirs("libs")
+    }
 }
 
 dependencies {
@@ -40,6 +44,7 @@ dependencies {
     implementation(project(":V1_20_R1", configuration = "reobf"))
 
     // 3rd party plugins
+    compileOnly(files("../libs/CustomFishing-1.3.2.5-all.jar"))
     compileOnly("me.clip:placeholderapi:2.11.3")
     compileOnly("fr.neatmonster:nocheatplus:3.16.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")

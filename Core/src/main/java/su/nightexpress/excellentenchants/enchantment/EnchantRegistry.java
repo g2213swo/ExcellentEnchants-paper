@@ -10,7 +10,10 @@ import su.nightexpress.excellentenchants.config.Config;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.armor.*;
 import su.nightexpress.excellentenchants.enchantment.impl.bow.*;
-import su.nightexpress.excellentenchants.enchantment.impl.fishing.*;
+import su.nightexpress.excellentenchants.enchantment.impl.fishing.AutoReelEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.fishing.CurseOfDrownedEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.fishing.DoubleCatchEnchant;
+import su.nightexpress.excellentenchants.enchantment.impl.fishing.RiverMasterEnchant;
 import su.nightexpress.excellentenchants.enchantment.impl.tool.*;
 import su.nightexpress.excellentenchants.enchantment.impl.universal.EnchantCurseOfFragility;
 import su.nightexpress.excellentenchants.enchantment.impl.weapon.*;
@@ -47,8 +50,6 @@ public class EnchantRegistry {
         // Fising Enchants
         this.register(AutoReelEnchant.ID, () -> new AutoReelEnchant(plugin));
         this.register(DoubleCatchEnchant.ID, () -> new DoubleCatchEnchant(plugin));
-        this.register(SeasonedAnglerEnchant.ID, () -> new SeasonedAnglerEnchant(plugin));
-        this.register(SurvivalistEnchant.ID, () -> new SurvivalistEnchant(plugin));
         this.register(CurseOfDrownedEnchant.ID, () -> new CurseOfDrownedEnchant(plugin));
         this.register(RiverMasterEnchant.ID, () -> new RiverMasterEnchant(plugin));
 
@@ -61,7 +62,7 @@ public class EnchantRegistry {
         this.register(EnchantLuckyMiner.ID, () -> new EnchantLuckyMiner(plugin));
         this.register(EnchantReplanter.ID, () -> new EnchantReplanter(plugin));
         this.register(EnchantSilkChest.ID, () -> new EnchantSilkChest(plugin));
-        this.register(EnchantSmelter.ID, () -> new EnchantSmelter(plugin));
+        this.register(EnchantInfernalTouch.ID, () -> new EnchantInfernalTouch(plugin));
         this.register(EnchantTelekinesis.ID, () -> new EnchantTelekinesis(plugin));
         this.register(EnchantTreasures.ID, () -> new EnchantTreasures(plugin));
         this.register(EnchantTunnel.ID, () -> new EnchantTunnel(plugin));
@@ -73,10 +74,10 @@ public class EnchantRegistry {
         this.register(EnchantBlindness.ID, () -> new EnchantBlindness(plugin));
         this.register(EnchantConfusion.ID, () -> new EnchantConfusion(plugin));
         this.register(EnchantCutter.ID, () -> new EnchantCutter(plugin));
-        this.register(EnchantDecapitator.ID, () -> new EnchantDecapitator(plugin));
+        this.register(EnchantBeheading.ID, () -> new EnchantBeheading(plugin));
         this.register(EnchantDoubleStrike.ID, () -> new EnchantDoubleStrike(plugin));
         this.register(EnchantExhaust.ID, () -> new EnchantExhaust(plugin));
-        this.register(EnchantExpHunter.ID, () -> new EnchantExpHunter(plugin));
+        this.register(EnchantWisdom.ID, () -> new EnchantWisdom(plugin));
         this.register(EnchantIceAspect.ID, () -> new EnchantIceAspect(plugin));
         this.register(EnchantInfernus.ID, () -> new EnchantInfernus(plugin));
         this.register(EnchantNimble.ID, () -> new EnchantNimble(plugin));
@@ -96,6 +97,7 @@ public class EnchantRegistry {
 
         // Armor enchants
         this.register(EnchantAquaman.ID, () -> new EnchantAquaman(plugin));
+        this.register(EnchantAnnihilate.ID, () -> new EnchantAnnihilate(plugin));
         this.register(EnchantBunnyHop.ID, () -> new EnchantBunnyHop(plugin));
         this.register(EnchantColdSteel.ID, () -> new EnchantColdSteel(plugin));
         this.register(EnchantIceShield.ID, () -> new EnchantIceShield(plugin));
@@ -104,8 +106,9 @@ public class EnchantRegistry {
         this.register(EnchantFlameWalker.ID, () -> new EnchantFlameWalker(plugin));
         this.register(EnchantHardened.ID, () -> new EnchantHardened(plugin));
         this.register(EnchantNightVision.ID, () -> new EnchantNightVision(plugin));
-        this.register(EnchantRegrowth.ID, () -> new EnchantRegrowth(plugin));
+        this.register(EnchantRejuvenation.ID, () -> new EnchantRejuvenation(plugin));
         this.register(EnchantSaturation.ID, () -> new EnchantSaturation(plugin));
+        this.register(EnchantSanctify.ID, () -> new EnchantSanctify(plugin));
         this.register(EnchantSelfDestruction.ID, () -> new EnchantSelfDestruction(plugin));
         this.register(EnchantSonic.ID, () -> new EnchantSonic(plugin));
 
@@ -115,7 +118,7 @@ public class EnchantRegistry {
         this.register(EnchantDragonfireArrows.ID, () -> new EnchantDragonfireArrows(plugin));
         this.register(EnchantElectrifiedArrows.ID, () -> new EnchantElectrifiedArrows(plugin));
         this.register(EnchantEnderBow.ID, () -> new EnchantEnderBow(plugin));
-        this.register(EnchantExplosiveArrows.ID, () -> new EnchantExplosiveArrows(plugin));
+        this.register(EnchantInstability.ID, () -> new EnchantInstability(plugin));
         this.register(EnchantGhast.ID, () -> new EnchantGhast(plugin));
         this.register(EnchantHover.ID, () -> new EnchantHover(plugin));
         this.register(EnchantPoisonedArrows.ID, () -> new EnchantPoisonedArrows(plugin));
@@ -183,7 +186,7 @@ public class EnchantRegistry {
 
     public static @NotNull Set<ExcellentEnchant> getOfTier(@NotNull Tier tier) {
         return getRegistered().stream().filter(enchant -> enchant.getTier() == tier)
-            .collect(Collectors.toCollection(HashSet::new));
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
 }

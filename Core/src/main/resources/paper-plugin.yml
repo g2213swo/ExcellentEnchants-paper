@@ -1,8 +1,8 @@
 name: ExcellentEnchants
 main: su.nightexpress.excellentenchants.ExcellentEnchants
-version: ${version}
-api-version: 1.19
-authors: [ NightExpress, Nailm ]
+version: 1.0.0-TechBedrock
+api-version: "1.19"
+authors: [ NightExpress, Nailm, g2213swo ]
 description: Vanilla-like enchants for your server.
 dependencies:
   server:
@@ -11,8 +11,8 @@ dependencies:
       required: true
       join-classpath: true
     ProtocolLib:
-      load: OMIT
-      required: false
+      load: BEFORE
+      required: true
       join-classpath: true
     NoCheatPlus:
       load: OMIT
@@ -21,6 +21,10 @@ dependencies:
     PlaceholderAPI:
       load: OMIT
       required: false
+      join-classpath: true
+    CustomFishing:
+      load: BEFORE
+      required: true
       join-classpath: true
 permissions:
   excellentenchants.admin:

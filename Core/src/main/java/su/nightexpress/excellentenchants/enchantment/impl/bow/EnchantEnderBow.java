@@ -32,7 +32,7 @@ public class EnchantEnderBow extends ExcellentEnchant implements BowEnchant, Cha
 
         this.getDefaults().setConflicts(
             EnchantBomber.ID, EnchantGhast.ID,
-            EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
+            EnchantInstability.ID, EnchantPoisonedArrows.ID, EnchantConfusingArrows.ID,
             EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID,
             EnchantHover.ID,
             Enchantment.ARROW_FIRE.getKey().getKey(),

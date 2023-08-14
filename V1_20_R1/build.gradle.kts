@@ -13,3 +13,6 @@ tasks {
         dependsOn(reobfJar)
     }
 }
+repositories {
+    mavenCentral()
+}

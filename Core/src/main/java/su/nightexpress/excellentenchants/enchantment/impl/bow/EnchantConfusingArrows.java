@@ -41,7 +41,7 @@ public class EnchantConfusingArrows extends ExcellentEnchant implements Chanced,
         this.getDefaults().setTier(0.1);
         this.getDefaults().setConflicts(
                 EnchantEnderBow.ID, EnchantGhast.ID, EnchantBomber.ID, EnchantHover.ID,
-                EnchantExplosiveArrows.ID, EnchantPoisonedArrows.ID,
+                EnchantInstability.ID, EnchantPoisonedArrows.ID,
                 EnchantWitheredArrows.ID, EnchantElectrifiedArrows.ID, EnchantDragonfireArrows.ID
         );
     }

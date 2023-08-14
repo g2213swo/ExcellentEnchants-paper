@@ -1,7 +1,8 @@
 package su.nightexpress.excellentenchants.enchantment.impl.fishing;
 
+import net.momirealms.customfishing.api.event.FishResultEvent;
+import net.momirealms.customfishing.api.event.MiniGameStartEvent;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.Item;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -22,17 +23,17 @@ public class DoubleCatchEnchant extends ExcellentEnchant implements FishingEncha
     public DoubleCatchEnchant(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.LOWEST);
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" + Placeholders.ENCHANTMENT_CHANCE + ">");
-        // "enchantment.g2213swo.double_catch.desc": "Increases amount of caught item by x2 with %1$s% chance."
+        // "enchantment.g2213swo.double_catch.desc": "Increases amount of caught item by x2 with %1$s%% chance."
         // %1$s = chance
         this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0.5);
+        this.getDefaults().setTier(0.7);
     }
 
     @Override
     public void loadSettings() {
         super.loadSettings();
         this.chanceImplementation = ChanceImplementation.create(this,
-            "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
+                "10.0 * " + Placeholders.ENCHANTMENT_LEVEL);
     }
 
     @Override
@@ -46,16 +47,22 @@ public class DoubleCatchEnchant extends ExcellentEnchant implements FishingEncha
     }
 
     @Override
-    public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {
-        if (event.getState() != PlayerFishEvent.State.CAUGHT_FISH) return false;
-        if (!(event.getCaught() instanceof Item drop)) return false;
+    public boolean onFishingResult(@NotNull FishResultEvent event, @NotNull ItemStack item, @NotNull ItemStack result, int level) {
         if (!this.isAvailableToUse(event.getPlayer())) return false;
         if (!this.checkTriggerChance(level)) return false;
 
-        ItemStack stack = drop.getItemStack();
-        stack.setAmount(Math.min(stack.getMaxStackSize(), stack.getAmount() * 2));
-        drop.setItemStack(stack);
+        event.setDouble(true);
 
         return true;
+    }
+
+    @Override
+    public boolean onFishingStart(@NotNull MiniGameStartEvent event, @NotNull ItemStack item, int level) {
+        return false;
+    }
+
+    @Override
+    public boolean onFishing(@NotNull PlayerFishEvent event, @NotNull ItemStack item, int level) {
+        return false;
     }
 }

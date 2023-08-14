@@ -23,11 +23,11 @@ exotic:
   Color: 'yellow'
   Priority: 3
   Obtain_Chance:
-    ENCHANTING: 25.0
-    VILLAGER: 25.0
-    LOOT_GENERATION: 25.0
-    FISHING: 25.0
-    MOB_SPAWNING: 25.0
+    ENCHANTING: 15.0
+    VILLAGER: 15.0
+    LOOT_GENERATION: 15.0
+    FISHING: 15.0
+    MOB_SPAWNING: 15.0
 legendary:
   Name: 'Legendary'
   Color: 'gold'

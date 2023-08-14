@@ -1,5 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.impl.fishing;
 
+import net.momirealms.customfishing.api.event.FishResultEvent;
+import net.momirealms.customfishing.api.event.MiniGameStartEvent;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -49,6 +51,16 @@ public class CurseOfDrownedEnchant extends ExcellentEnchant implements FishingEn
     @Override
     public @NotNull EnchantmentTarget getItemTarget() {
         return EnchantmentTarget.FISHING_ROD;
+    }
+
+    @Override
+    public boolean onFishingResult(@NotNull FishResultEvent event, @NotNull ItemStack item, @NotNull ItemStack result, int level) {
+        return false;
+    }
+
+    @Override
+    public boolean onFishingStart(@NotNull MiniGameStartEvent event, @NotNull ItemStack item, int level) {
+        return false;
     }
 
     @Override

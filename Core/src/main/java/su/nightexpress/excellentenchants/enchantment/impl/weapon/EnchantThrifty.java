@@ -44,7 +44,7 @@ public class EnchantThrifty extends ExcellentEnchant implements Chanced, DeathEn
         // %1$s = enchantment chance
 
         this.getDefaults().setLevelMax(3);
-        this.getDefaults().setTier(0.75);
+        this.getDefaults().setTier(0.9);
 
         this.keyEntityIgnored = new NamespacedKey(plugin, ID + "_ignored");
     }

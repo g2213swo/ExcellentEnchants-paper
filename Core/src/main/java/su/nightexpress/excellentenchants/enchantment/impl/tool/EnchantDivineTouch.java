@@ -51,7 +51,7 @@ public class EnchantDivineTouch extends ExcellentEnchant implements Chanced, Blo
 
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(1.0);
-        this.getDefaults().setConflicts(EnchantSmelter.ID);
+        this.getDefaults().setConflicts(EnchantInfernalTouch.ID);
     }
 
     @Override

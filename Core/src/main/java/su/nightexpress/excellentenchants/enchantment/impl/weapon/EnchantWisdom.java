@@ -13,22 +13,22 @@ import su.nightexpress.excellentenchants.enchantment.config.EnchantScaler;
 import su.nightexpress.excellentenchants.enchantment.impl.ExcellentEnchant;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
-public class EnchantExpHunter extends ExcellentEnchant implements DeathEnchant {
+public class EnchantWisdom extends ExcellentEnchant implements DeathEnchant {
 
-    public static final String ID = "exp_hunter";
+    public static final String ID = "wisdom";
     public static final String PLACEHOLDER_EXP_MODIFIER = "%enchantment_exp_modifier%";
 
     private EnchantScaler expModifier;
 
-    public EnchantExpHunter(@NotNull ExcellentEnchants plugin) {
+    public EnchantWisdom(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
                 + PLACEHOLDER_EXP_MODIFIER + ">");
-        // "enchantment.g2213swo.your_enchant_id.desc": "Increases exp drop from mobs by %1$s%."
+        // "enchantment.g2213swo.wisdom.desc": "Increases exp drop from mobs by %1$s%."
         // %1$s = exp modifier percentage
 
         this.getDefaults().setLevelMax(5);
-        this.getDefaults().setTier(0.3);
+        this.getDefaults().setTier(0.5);
     }
 
     @Override

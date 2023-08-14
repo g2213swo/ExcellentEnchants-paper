@@ -22,9 +22,9 @@ import su.nightexpress.excellentenchants.enchantment.task.AbstractEnchantmentTas
 import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 import su.nightexpress.excellentenchants.enchantment.util.EnchantUtils;
 
-public class EnchantRegrowth extends ExcellentEnchant implements Chanced, PassiveEnchant, ICleanable {
+public class EnchantRejuvenation extends ExcellentEnchant implements Chanced, PassiveEnchant, ICleanable {
 
-    public static final String ID = "regrowth";
+    public static final String ID = "rejuvenation";
 
     private static final String PLACEHOLDER_HEAL_AMOUNT = "%enchantment_heal_amount%";
     private static final String PLACEHOLDER_HEAL_MIN_HEALTH = "%enchantment_heal_min_health%";
@@ -39,14 +39,14 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
     private ChanceImplementation chanceImplementation;
     private Task task;
 
-    public EnchantRegrowth(@NotNull ExcellentEnchants plugin) {
+    public EnchantRejuvenation(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setLevelMax(5);
         this.getDefaults().setTier(0.7);
 //        this.getDefaults().setDescription("Restores " + PLACEHOLDER_HEAL_AMOUNT + " hearts every " + PLACEHOLDER_HEAL_INTERVAL + "s.");
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:" +
                 PLACEHOLDER_HEAL_AMOUNT + ":" + PLACEHOLDER_HEAL_INTERVAL + ">");
-        // "enchantment.g2213swo.regrowth.desc": "Restores %1$s hearts every %2$s seconds."
+        // "enchantment.g2213swo.rejuvenation.desc": "Restores %1$s hearts every %2$s seconds."
         // %1$s = heal amount %2$s = heal interval
     }
 
@@ -139,7 +139,7 @@ public class EnchantRegrowth extends ExcellentEnchant implements Chanced, Passiv
         @Override
         public void action() {
             for (LivingEntity entity : this.getEntities()) {
-                EnchantUtils.getEquipped(entity, EnchantRegrowth.class).forEach((item, enchants) -> {
+                EnchantUtils.getEquipped(entity, EnchantRejuvenation.class).forEach((item, enchants) -> {
                     enchants.forEach((enchant, level) -> {
                         if (enchant.isOutOfCharges(item)) return;
                         if (enchant.onTrigger(entity, item, level)) {

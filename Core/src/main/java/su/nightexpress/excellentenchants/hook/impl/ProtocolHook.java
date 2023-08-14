@@ -7,17 +7,25 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 import su.nexmedia.engine.utils.ComponentUtil;
+import su.nexmedia.engine.utils.ItemUtil;
 import su.nexmedia.engine.utils.PDCUtil;
 import su.nightexpress.excellentenchants.ExcellentEnchantsAPI;
 import su.nightexpress.excellentenchants.config.Config;
@@ -40,9 +48,8 @@ public class ProtocolHook {
 
     public static void setup() {
         if (isRegistered) return;
-
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-
+        GsonComponentSerializer gsonComponentSerializer = GsonComponentSerializer.gson();
         manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, ListenerPriority.LOWEST, PacketType.Play.Client.SET_CREATIVE_SLOT) {
             // modifying the items received from creative players
             @Override
@@ -98,6 +105,23 @@ public class ProtocolHook {
             }
         });
 
+        manager.addPacketListener(new PacketAdapter(ExcellentEnchantsAPI.PLUGIN, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+                // get the message component
+                String json = packet.getChatComponents().read(0).getJson();
+                if (json == null) return;
+                System.out.println(json);
+                // get the message component
+                Component message = gsonComponentSerializer.deserialize(json);
+                Component component = modifyComponent(message, event.getPlayer());
+
+                // write the modified message
+                packet.getChatComponents().write(0, WrappedChatComponent.fromJson(gsonComponentSerializer.serialize(component)));
+            }
+        });
+
         isRegistered = true;
     }
 
@@ -113,8 +137,8 @@ public class ProtocolHook {
         List<Component> lore = Optional.ofNullable(meta.lore()).orElseGet(ArrayList::new);
 
         enchants = enchants.entrySet().stream() // sort enchantments by tier
-            .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority(), Comparator.reverseOrder()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
+                .sorted(Comparator.comparing(e -> e.getKey().getTier().getPriority(), Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (old, nev) -> nev, LinkedHashMap::new));
 
         AtomicInteger descSize = new AtomicInteger(0); // used to revert the description lore
         enchants.forEach((enchant, level) -> {
@@ -153,4 +177,39 @@ public class ProtocolHook {
         item.setItemMeta(meta);
         return item;
     }
+
+    public static Component modifyComponent(Component component, Player player) {
+        if (component instanceof TranslatableComponent translatableComponent) {
+            List<Component> newArgs = translatableComponent.args().stream()
+                    .map(arg -> modifyComponent(arg, player))
+                    .toList();
+            translatableComponent = translatableComponent.args(newArgs);
+            component = translatableComponent;
+        }
+
+        List<Component> newChildren = component.children().stream()
+                .map(child -> modifyComponent(child, player))
+                .toList();
+        component = component.children(newChildren);
+
+        HoverEvent<?> hoverEvent = component.style().hoverEvent();
+        if (hoverEvent != null && hoverEvent.value() instanceof HoverEvent.ShowItem showItem) {
+
+            Key item = showItem.item();
+            int count = showItem.count();
+            BinaryTagHolder nbt = showItem.nbt();
+            if (nbt == null) return component;
+            ItemStack bukkitItemStack = ExcellentEnchantsAPI.PLUGIN.getEnchantNMS().createItemStack(item, count, nbt);
+            ItemStack updated = update(bukkitItemStack);
+            if (updated == null) return component;
+            String nbtTag = ItemUtil.getNBTTag(updated);
+            HoverEvent.ShowItem newShowItem = HoverEvent.ShowItem
+                    .showItem(item, count, BinaryTagHolder.binaryTagHolder(nbtTag));
+            HoverEvent<HoverEvent.ShowItem> newHover = HoverEvent.showItem(newShowItem);
+            component = component.style(component.style().hoverEvent(newHover));
+        }
+
+        return component;
+    }
+
 }

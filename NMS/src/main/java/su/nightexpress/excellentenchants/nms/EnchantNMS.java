@@ -1,5 +1,7 @@
 package su.nightexpress.excellentenchants.nms;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FishHook;
@@ -20,4 +22,6 @@ public interface EnchantNMS { // net.minecraft.server
     @Nullable ItemStack getSpawnEgg(@NotNull LivingEntity entity);
 
     @NotNull Set<Block> handleFlameWalker(@NotNull LivingEntity entity, @NotNull Location location, int level);
+
+    @NotNull ItemStack createItemStack(Key item, int count, BinaryTagHolder nbt);
 }

@@ -1,5 +1,7 @@
 package su.nightexpress.excellentenchants.enchantment.impl.tool;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -44,14 +46,16 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     private String chestName;
     private List<String> chestLore;
     private final NamespacedKey keyChest;
-    @Deprecated private final Map<Integer, NamespacedKey> keyItems;
+
+    @Deprecated
+    private final Map<Integer, NamespacedKey> keyItems;
 
     public EnchantSilkChest(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.HIGH);
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc>");
         // "enchantment.g2213swo.your_enchant_id.desc": "Drop chests and saves all its content."
         this.getDefaults().setLevelMax(1);
-        this.getDefaults().setTier(0.5);
+        this.getDefaults().setTier(0.7);
 
         this.keyChest = new NamespacedKey(plugin, ID + ".item");
         this.keyItems = new TreeMap<>();
@@ -63,12 +67,20 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
     @Override
     public void loadSettings() {
         super.loadSettings();
-        this.chestName = JOption.create("Settings.Chest_Item.Name", "Chest <gray>(" + Placeholders.GENERIC_AMOUNT + " items)", // adventure
-            "Chest item display name.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg); // adventure
+//        "<lang:enchantment.g2213swo." + this.getId() + ".chest_info:" + Placeholders.GENERIC_AMOUNT + ">"
+        Component component = Component
+                .translatable("enchantment.g2213swo." + this.getId() + ".chest_info",
+                        Component.text(Placeholders.GENERIC_AMOUNT)
+                                .color(TextColor.color(0xFFE4C4))
+                )
+                .color(TextColor.color(0xF0F8FF));
+        Component chestInfo = ComponentUtil.removeItalic(component);
+        this.chestName = JOption.create("Settings.Chest_Item.Name", ComponentUtil.asMiniMessage(chestInfo), // adventure
+                "Chest item display name.",
+                "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg); // adventure
         this.chestLore = JOption.create("Settings.Chest_Item.Lore", new ArrayList<>(),
-            "Chest item lore.",
-            "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg); // adventure
+                "Chest item lore.",
+                "Use '" + Placeholders.GENERIC_AMOUNT + "' for items amount.").read(cfg); // adventure
     }
 
     @Deprecated
@@ -110,33 +122,6 @@ public class EnchantSilkChest extends ExcellentEnchant implements BlockDropEncha
         ItemUtil.replaceNameAndLore(chestStack, str -> str.replace(Placeholders.GENERIC_AMOUNT, String.valueOf(amount)));
         PDCUtil.set(chestStack, this.keyChest, true);
         return chestStack;
-
-        // Store and count chest items.
-        /*int amount = 0;
-        int count = 0;
-        for (ItemStack itemInv : chest.getBlockInventory().getContents()) {
-            if (itemInv == null) itemInv = new ItemStack(Material.AIR);
-            else amount++;
-
-            String base64 = ItemUtil.toBase64(itemInv);
-            if (base64 == null) continue;
-            if (base64.length() >= Short.MAX_VALUE) {
-                chest.getWorld().dropItemNaturally(chest.getLocation(), itemInv);
-                continue;
-            }
-            PDCUtil.setData(chestItem, this.getItemKey(count++), base64);
-        }
-
-        // Apply item meta name and items data string.
-        ItemMeta meta = chestItem.getItemMeta();
-        if (meta != null) {
-            String nameOrig = ItemUtil.getItemName(chestItem);
-            String nameChest = this.chestName.replace("%name%", nameOrig).replace("%items%", String.valueOf(amount));
-            meta.setDisplayName(nameChest);
-            chestItem.setItemMeta(meta);
-        }
-
-        return chestItem;*/
     }
 
     @Override

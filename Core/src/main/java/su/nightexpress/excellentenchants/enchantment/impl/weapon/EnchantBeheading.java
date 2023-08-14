@@ -39,9 +39,9 @@ import java.util.Set;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 
-public class EnchantDecapitator extends ExcellentEnchant implements Chanced, DeathEnchant {
+public class EnchantBeheading extends ExcellentEnchant implements Chanced, DeathEnchant {
 
-    public static final String ID = "decapitator";
+    public static final String ID = "beheading";
 
     private Set<EntityType> ignoredEntityTypes;
     private String headName;
@@ -51,11 +51,11 @@ public class EnchantDecapitator extends ExcellentEnchant implements Chanced, Dea
 
     private final NamespacedKey skullKey;
 
-    public EnchantDecapitator(@NotNull ExcellentEnchants plugin) {
+    public EnchantBeheading(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
                 + Placeholders.ENCHANTMENT_CHANCE + ">");
-        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to obtain player's or mob's head."
+        // "enchantment.g2213swo.beheading.desc": "%1$s%% chance to obtain player's or mob's head."
         // %1$s = enchantment chance
 
         this.getDefaults().setLevelMax(4);

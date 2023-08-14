@@ -28,19 +28,19 @@ import su.nightexpress.excellentenchants.enchantment.util.EnchantPriority;
 
 import java.util.Map;
 
-public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDropEnchant {
+public class EnchantInfernalTouch extends ExcellentEnchant implements Chanced, BlockDropEnchant {
 
-    public static final String ID = "smelter";
+    public static final String ID = "infernal_touch";
 
     private Sound sound;
     private Map<Material, Material> smeltingTable;
     private ChanceImplementation chanceImplementation;
 
-    public EnchantSmelter(@NotNull ExcellentEnchants plugin) {
+    public EnchantInfernalTouch(@NotNull ExcellentEnchants plugin) {
         super(plugin, ID, EnchantPriority.MEDIUM);
         this.getDefaults().setDescription("<lang:enchantment.g2213swo." + this.getId() + ".desc:"
                 + Placeholders.ENCHANTMENT_CHANCE + ">");
-        // "enchantment.g2213swo.your_enchant_id.desc": "%1$s%% chance to smelt a block/ore."
+        // "enchantment.g2213swo.infernal_touch.desc": "%1$s%% chance to smelt a block/ore."
         // %1$s = enchantment chance
 
         this.getDefaults().setLevelMax(5);
@@ -66,7 +66,9 @@ public class EnchantSmelter extends ExcellentEnchant implements Chanced, BlockDr
             (cfg, path, key) -> Material.getMaterial(cfg.getString(path + "." + key, "").toUpperCase()),
             Map.of(
                 Material.RAW_IRON, Material.IRON_INGOT,
-                Material.RAW_GOLD, Material.GOLD_INGOT
+                Material.RAW_GOLD, Material.GOLD_INGOT,
+                Material.RAW_COPPER, Material.COPPER_INGOT,
+                Material.ANCIENT_DEBRIS, Material.NETHERITE_SCRAP
             ),
             "Table of Original -> Smelted items.",
             "Syntax: 'Material Source : Material Result'.",
